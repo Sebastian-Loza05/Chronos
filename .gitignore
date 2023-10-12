@@ -1,0 +1,33 @@
+# node module
+chronos-app/node_modules
+
+# Expo
+chronos-app/.expo/
+chronos-app/dist/
+chronos-app/web-build/
+
+# Native
+chronos-app/*.orig.*
+chronos-app/*.jks
+chronos-app/*.p8
+chronos-app/*.p12
+chronos-app/*.key
+chronos-app/*.mobileprovision
+
+# Metro
+chronos-app/.metro-health-check*
+
+# debug
+chronos-app/npm-debug.*
+chronos-app/yarn-debug.*
+chronos-app/yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+chronos-app/.env*.local
+
+# typescript
+chronos-app/*.tsbuildinfo

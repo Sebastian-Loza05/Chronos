@@ -1,34 +1,20 @@
 import { StyleSheet, Text, View } from "react-native";
+import { useEffect } from "react";
+import { router } from "expo-router";
 
-export default function Page() {
+export default function Login() {
+  useEffect(() => {
+    // Espera 2000 ms (2 segundos) y luego navega a la siguiente pantalla
+    const timeout = setTimeout(() => {
+      router.push("/auth/login")
+    }, 3000);
+  });
+  
   return (
-    <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Chronos App </Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
+    <View>
+      <View>
+        <Text> Chronos </Text>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
-});

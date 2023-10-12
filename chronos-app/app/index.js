@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useEffect } from "react";
 import { router } from "expo-router";
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Login() {
   useEffect(() => {
@@ -11,10 +12,25 @@ export default function Login() {
   });
   
   return (
-    <View>
+    <SafeAreaView style={styles.container}>
       <View>
-        <Text> Chronos </Text>
+        <Text style={styles.texto}> Chronos </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  texto: {
+    fontSize: 24,
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  }
+})

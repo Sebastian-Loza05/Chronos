@@ -1,11 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Login() {
   return (
-    <View>
+    <SafeAreaView>
       <View>
-        <Text> Login Page </Text>
+        <View>
+          <Text> Login Page </Text>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

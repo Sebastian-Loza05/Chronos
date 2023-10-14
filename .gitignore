@@ -31,3 +31,6 @@ chronos-app/.env*.local
 
 # typescript
 chronos-app/*.tsbuildinfo
+
+# backend
+backend/env

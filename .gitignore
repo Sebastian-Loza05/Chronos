@@ -34,3 +34,6 @@ chronos-app/*.tsbuildinfo
 
 # backend
 backend/env
+
+# .env
+backend/.env

@@ -3,6 +3,8 @@ from decouple import config
 from werkzeug.security import generate_password_hash, check_password_hash
 from base64 import b64encode
 
+
+
 DATA_USER = config('DATA_USER')
 DATA_PASSWORD = config('DATA_PASSWORD')
 HOST = config('HOST')
@@ -33,6 +35,7 @@ class Users(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     profile = db.relationship('Profile', uselist=False, back_populates='user')
+    tasks = db.relationship('Tasks', cascade='all,delete', backref='user')
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -151,3 +154,74 @@ class Profile(db.Model):
         return Profile.query.filter_by(
             user_id=user_id
         ).one_or_none()
+
+class Tasks(db.Model):
+    __tablename__ = 'tasks'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
+    lugar = db.Column(db.String(100), nullable=True)
+    estado = db.Column(db.String(100), nullable=False)
+    descripcion = db.Column(db.String(255), nullable=True)
+    dia = db.Column(db.Date, nullable=False)
+    hora_inicio = db.Column(db.Time, nullable=False)
+    hora_final = db.Column(db.Time, nullable=False)
+
+    def format(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'nombre': self.nombre,
+            'lugar': self.lugar,
+            'estado': self.estado,
+            'descripcion': self.descripcion,
+            'dia': self.dia,
+            'hora_inicio': self.hora_inicio,
+            'hora_final': self.hora_final
+        }
+
+    def insert(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def update(self):
+        try:
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+    @staticmethod
+    def get_task_by_id(id):
+        return Tasks.query.filter_by(
+            id=id
+        ).one_or_none()
+
+    @staticmethod
+    def get_task_by_date(date):
+        return Tasks.query.filter_by(
+            dia=date
+        ).all()
+

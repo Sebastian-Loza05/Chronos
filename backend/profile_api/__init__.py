@@ -15,7 +15,6 @@ from flask_jwt_extended import (
 from decouple import config
 from models import Users, setup_db, Profile
 from datetime import timedelta
-from base64 import b64decode
 
 SECRET_KEY = config('SECRET_KEY')
 ACCESS_EXPIRES = timedelta(hours=1)
@@ -175,6 +174,23 @@ def update_profile():
             abort(406)
         else:
             abort(500)
+
+@app.route("/profile", methods=["DELETE"])
+@jwt_required()
+def delete_profile():
+    try:
+        current_user = get_jwt_identity()
+        user = Users.get_by_id(current_user["id"])
+        profile = user.profile
+        profile.delete()
+        user.delete()
+
+        return ({
+            'succes': True,
+        })
+    except Exception as e:
+        print(e)
+        abort(500)
 
 @app.errorhandler(401)
 def unauthorized(error):

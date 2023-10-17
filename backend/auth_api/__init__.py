@@ -32,7 +32,7 @@ jwt = JWTManager(app)
 revoked_tokens = set()
 
 setup_db(app)
-CORS(app, origins=["http://localhost:3000"])
+CORS(app, resources={r'/*': {'origins': '*'}})
 
 jwt_redis_blocklist = redis.StrictRedis(
     host="localhost", port=6379, db=0, decode_responses=True
@@ -215,6 +215,3 @@ def server_error(error):
         'message': 'Internal server error'
     }), 500
 
-if __name__ == '__main__':
-    app.config.from_object(config['development'])
-    app.run(debug=True)

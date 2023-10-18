@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground} from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import Inicio from "./inicio";
 import { authenticateUser } from '../api'; // Importa la función desde el archivo api.js
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {iconOffset} from 'react-native';
 
 
 
@@ -111,98 +112,98 @@ export default function Login() {
   
 
   return (
-    <ImageBackground
-      source={require("../../assets/fondo.png")}
-      style={styles.backgroundImage}
-    >
-      <SafeAreaView style={styles.container}>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollViewContent}
-          bounces={false}
-        ></KeyboardAwareScrollView>
-      
-      <KeyboardAwareScrollView
-        contentContainerStyle={[styles.scrollViewContent, { paddingBottom: keyboardOffset }]}
-        bounces={false}
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/logo-chronos.png")}
-            style={styles.logo}
-          />
-        </View>
-        <View style={styles.titleContainer}>
-          <Text style={styles.titleText}>Login</Text>
-        </View>
-        <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="User Name"
-          placeholderTextColor="white"
-          textAlign="center"
-          value={username}
-          onChangeText={handleUsernameChange}
-       />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={true}
-            placeholderTextColor="white"
-            textAlign="center"
-            value={password}
-            onChangeText={handlePasswordChange}
-          />
-        </View>
-        <TouchableOpacity
-          style={styles.loginButton}
-          activeOpacity={0.7}
-          onPress={handleLogin} // Llama a la función de inicio de sesión al hacer clic en el botón
-        >
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
-        {/*
-        <Text
-        style={styles.signupLinkBold}>
-        ¿No tienes cuenta?
-        </Text> 
-        */}
-        <TouchableOpacity
-          style={styles.signupLink}
-          onPress={() => router.push("/auth/register")}>
-          <Text style={styles.signupLinkBold}>Regístrate</Text>
-        </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <ImageBackground source={require('../../assets/fondo.png')} style={styles.backgroundImage}>
+              <View style={styles.logoContainer}>
+                <Image source={require('../../assets/logo-chronos.png')} style={styles.logo} />
+              </View>
+              <View style={styles.titleContainer}>
+                <Text style={styles.titleText}>Login</Text>
+              </View>
+            </ImageBackground>
+            <View style={styles.bottomContainer}>
+              <View style={styles.nuevo}>
+              <View style={[styles.inputContainer, { marginTop: -40, flexDirection: 'row' }]}>
+              <Image source={require('../../assets/user.png')} style={styles.icon} />
+              <TextInput
+                style={styles.input}
+                placeholder="User Name"
+                placeholderTextColor="white"
+                textAlign="center"
+                value={username}
+                onChangeText={handleUsernameChange}
+              />
+              </View>
+              <View style={[styles.inputContainer, { marginTop: 10, flexDirection: 'row' }]}>
+                <Image source={require('../../assets/key.png')} style={styles.icon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  secureTextEntry={true}
+                  placeholderTextColor="white"
+                  textAlign="center"
+                  value={password}
+                  onChangeText={handlePasswordChange}
+                />
+              </View>
+              </View>
+              <TouchableOpacity style={styles.loginButton} activeOpacity={0.7} onPress={handleLogin}>
+                <Text style={styles.loginText}>Login</Text>
+              </TouchableOpacity>
+              <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>¿No tienes una cuenta? </Text>
+              <TouchableOpacity onPress={() => router.push('/auth/register')}>
+                <Text style={styles.signupLinkBold}>Regístrate</Text>
+              </TouchableOpacity>
+            </View>
 
-        <View style={styles.circularContainer}>
-          <Image
-            source={require("../../assets/usuario.png")}
-            style={styles.userImage}
-          />
-        </View>
-        <View style={styles.circular_Container}>
-          <Image
-            source={require("../../assets/llave.png")}
-            style={styles.keyImage}
-          />
-        </View>
-      </KeyboardAwareScrollView>
-      
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
-    </ImageBackground>
   );
-}
+}  
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff', // Color de fondo
+    margin:0,
+    padding:0,
+
   },
   backgroundImage: {
     flex: 1,
+    resizeMode: 'cover', // Ajusta la imagen al tamaño del contenedor
+    margin:0,
+    padding:0,
   },
+  //Container de arriba
+  topContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor:"yellow",
+  },
+  //Container de abajo
+  bottomContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "red",
+  },
+
+  
   logoContainer: {
     alignItems: "center",
-    marginTop: -60,
+    marginTop: 0,
     marginBottom: 1,
   },
   logo: {
@@ -219,6 +220,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     alignItems: "center",
+    position: 'relative',
   },
   input: {
     width: 290,
@@ -237,26 +239,27 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   circularContainer: {
-    position: "absolute",
+    position: 'absolute',
     left: 35,
-    top: 274,
+    top: iconOffset,
     width: 50,
     height: 50,
     backgroundColor: 'white',
     borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+
   circular_Container: {
-    position: "absolute",
+    position: 'absolute',
     left: 35,
-    top: 349,
+    top:  100, // Ajusta el valor según el espacio deseado entre los íconos
     width: 50,
     height: 50,
     backgroundColor: 'white',
     borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   userImage: {
     width: 38,
@@ -273,7 +276,7 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: 'white',
     borderRadius: 20,
-    marginTop: 55,
+    marginTop: -102,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
@@ -283,17 +286,29 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  signupLink: {
-    alignItems: "center",
-    marginTop: 20, 
+  nuevo: {
+    marginBottom:143,
   },
-  signupLinkText: {
-    color: 'white',
-    fontSize: 16,
+  icon: {
+    position: 'absolute', // Superpone el ícono dentro del contenedor de entrada
+    top: 36, // Ajusta la posición vertical del ícono según tus necesidades
+    left:14,
+    width: 25,  // Ajusta el ancho del ícono según tus necesidades
+    height: 25, // Ajusta la altura del ícono según tus necesidades
+    zIndex: 1, // Asegura que los íconos estén en una capa superior
+  },
+  signupContainer: {
+    flexDirection: 'row', // Muestra los elementos en línea
+    alignItems: 'center', // Alinea verticalmente los elementos en el centro
+    justifyContent: 'center', // Alinea horizontalmente los elementos en el centro
+    marginTop:30,
+  },
+  signupText: {
+    fontSize: 16, // Tamaño de fuente del texto "¿No tienes cuenta?"
   },
   signupLinkBold: {
-    color: 'black', 
-    fontSize: 16,
-    fontWeight: 'bold', // Hace que el texto sea negrita
+    fontWeight: 'bold', // Hace que el texto "Regístrate" sea negrita
+    fontSize: 16, // Tamaño de fuente del texto "Regístrate"
   },
+  
 });

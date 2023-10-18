@@ -1,13 +1,50 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import Register from "./register";
+import { router } from "expo-router";
+import Inicio from "./inicio";
+import { authenticateUser } from '../api'; // Importa la función desde el archivo api.js
+import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
 
 export default function Login() {
   const navigation = useNavigation();
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        // Verificar si hay un token almacenado en AsyncStorage
+        const token = await AsyncStorage.getItem('userToken');
+        
+        if (token) {
+          // Realiza una solicitud GET al servidor para verificar el token
+          const response = await fetch('http://192.168.174.71:3000/auth/token', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            // Si se recibe una respuesta exitosa, redirige al usuario a la pantalla de inicio
+            router.replace("/auth/inicio");
+          }
+        }
+      } catch (error) {
+        console.error('Error al verificar el token:', error);
+      }
+    };
+
+    checkToken();
+  }, []); // El código se ejecutará una vez al cargar el componente
+
 
   const handleKeyboardDidShow = (event) => {
     const keyboardHeight = event.endCoordinates.height;
@@ -32,34 +69,58 @@ export default function Login() {
     setPassword(text);
   };
 
-  const handleLogin = () => {
-    fetch('http://192.168.212.253:3000/auth', { 
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          console.log('Usuario autenticado');
-          navigation.navigate('Inicio');
-        } else {
-          console.error('Error de autenticación');
-        }
-      })
-      .catch((error) => {
-        console.error('Error de red:', error);
-      });
+  const handleLogin = async () => {
+    if (!username || !password) {
+      // Mostrar un modal personalizado en lugar de alert
+      Alert.alert(
+        'Campos Incompletos',
+        'Por favor, complete ambos campos para iniciar sesión.',
+        [
+          {
+            text: 'OK',
+            onPress: () => console.log('OK Pressed'),
+          },
+        ]
+      );
+      return;
+    }
+  
+    const data = await authenticateUser(username, password);
+    if (data.success) {
+      console.log('Usuario autenticado');
+      await AsyncStorage.setItem('userToken', data.token);
+      router.replace("/auth/inicio");
+    }
+    else {
+      // Redirige al usuario a la pantalla de inicio de sesión en caso de autenticación fallida
+      router.replace("/auth/login");
+  
+      if (data.code === 404) {
+        // Usuario Incorrecto (404), muestra un mensaje de error
+        Alert.alert('La cuenta ingresada no existe', '', [{ text: 'OK' }]);
+      } 
+      else if (data.code === 403) {
+        // Password Incorrecto (403), muestra un mensaje de error
+        Alert.alert('Usuario o contraseña Incorrecta', '', [{ text: 'OK' }]);
+      } else {
+        // Otros errores de autenticación, muestra un mensaje de error genérico
+        Alert.alert('Error de autenticación', 'Lo siento, no pudimos autenticar tu usuario en este momento. Por favor, verifica la información ingresada y vuelve a intentarlo.', [{ text: 'Volver a intentarlo' }]);
+      }
+    }
   };
-  const [isRegistering, setIsRegistering] = useState(false); // Variable para mostrar el registro
+  
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ImageBackground
+      source={require("../../assets/fondo.png")}
+      style={styles.backgroundImage}
+    >
+      <SafeAreaView style={styles.container}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          bounces={false}
+        ></KeyboardAwareScrollView>
+      
       <KeyboardAwareScrollView
         contentContainerStyle={[styles.scrollViewContent, { paddingBottom: keyboardOffset }]}
         bounces={false}
@@ -101,18 +162,17 @@ export default function Login() {
         >
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
-
-        {isRegistering ? ( // Si estamos registrando, muestra la pantalla de registro
-          <Register />
-        ) : (
-
-          <TouchableOpacity
-        style={styles.signupLink}
-        onPress={() => navigation.navigate("Register")} // Redirige a la pantalla de registro
-      >
-        <Text style={styles.signupLinkText}>¿No tienes una cuenta? <Text style={styles.signupLinkBold}>Regístrate</Text></Text>
-      </TouchableOpacity>
-        )}
+        {/*
+        <Text
+        style={styles.signupLinkBold}>
+        ¿No tienes cuenta?
+        </Text> 
+        */}
+        <TouchableOpacity
+          style={styles.signupLink}
+          onPress={() => router.push("/auth/register")}>
+          <Text style={styles.signupLinkBold}>Regístrate</Text>
+        </TouchableOpacity>
 
         <View style={styles.circularContainer}>
           <Image
@@ -127,14 +187,18 @@ export default function Login() {
           />
         </View>
       </KeyboardAwareScrollView>
+      
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ff6373',
+  },
+  backgroundImage: {
+    flex: 1,
   },
   logoContainer: {
     alignItems: "center",
@@ -150,7 +214,7 @@ const styles = StyleSheet.create({
     marginTop: -40,
   },
   titleText: {
-    color: 'white',
+    color: 'black',
     fontSize: 40,
   },
   inputContainer: {
@@ -221,14 +285,14 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     alignItems: "center",
-    marginTop: 20, // Ajusta según tus necesidades
+    marginTop: 20, 
   },
   signupLinkText: {
     color: 'white',
     fontSize: 16,
   },
   signupLinkBold: {
-    color: 'white', // Puedes cambiar el color que prefieras
+    color: 'black', 
     fontSize: 16,
     fontWeight: 'bold', // Hace que el texto sea negrita
   },

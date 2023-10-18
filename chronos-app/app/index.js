@@ -7,7 +7,7 @@ export default function Login() {
   useEffect(() => {
     // Espera 2000 ms (2 segundos) y luego navega a la siguiente pantalla
     const timeout = setTimeout(() => {
-      router.push("/auth/login")
+      router.push("/auth/register")
     }, 3000);
   });
   

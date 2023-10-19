@@ -3,8 +3,6 @@ from decouple import config
 from werkzeug.security import generate_password_hash, check_password_hash
 from base64 import b64encode
 
-
-
 DATA_USER = config('DATA_USER')
 DATA_PASSWORD = config('DATA_PASSWORD')
 HOST = config('HOST')
@@ -167,6 +165,9 @@ class Tasks(db.Model):
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_final = db.Column(db.Time, nullable=False)
 
+    def __repr__(self):
+        return f'Task: id = {self.id}, user_id = {self.user_id}, nombre = {self.nombre}, estado = {self.estado}, dia = {self.dia}, inicio = {self.hora_inicio}, fin = {self.hora_final}'
+
     def format(self):
         return {
             'id': self.id,
@@ -176,8 +177,8 @@ class Tasks(db.Model):
             'estado': self.estado,
             'descripcion': self.descripcion,
             'dia': self.dia,
-            'hora_inicio': self.hora_inicio,
-            'hora_final': self.hora_final
+            'hora_inicio': self.hora_inicio.isoformat(),
+            'hora_final': self.hora_final.isoformat()
         }
 
     def insert(self):
@@ -218,6 +219,12 @@ class Tasks(db.Model):
         return Tasks.query.filter_by(
             id=id
         ).one_or_none()
+
+    @staticmethod
+    def get_tasks_by_user(user_id):
+        return Tasks.query.filter_by(
+            user_id=user_id
+        ).all()
 
     @staticmethod
     def get_task_by_date(date):

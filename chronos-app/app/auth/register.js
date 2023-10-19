@@ -219,7 +219,7 @@ export default function Register() {
                         placeholder="Last Name"
                         style={style.inputWithIcon}
                         value={formData.lastname}
-                        onChangeText={(text) => setFormData(prevState => ({...prevState, lastname: text}))}/>/>
+                        onChangeText={(text) => setFormData(prevState => ({...prevState, lastname: text}))}/>
                 </View>
                 <TouchableOpacity onPress={openGenderPicker}>
                     <View style={style.textInputContainer}>
@@ -240,24 +240,24 @@ export default function Register() {
                 >
                     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                         <View style={{
-                            width: '60%',
+                            width: '70%',
                             height: 200,
                             backgroundColor: 'white',
                             padding: 20,
                             borderRadius: 30
                         }}>
-                            <Picker
-                                selectedValue={formData.gender}
-                                onValueChange={(itemValue, itemIndex) => {
-                                    setGender(itemValue);
-                                    closeGenderPicker();
-                                }}
-                            >
+                    <Picker
+                        selectedValue={formData.gender}
+                        onValueChange={(itemValue, itemIndex) => {
+                            setFormData(prevState => ({...prevState, gender: itemValue}));
+                        }}
+                    >
                                 <Picker.Item label="Select Gender" value=""/>
                                 <Picker.Item label="Male" value="male"/>
                                 <Picker.Item label="Female" value="female"/>
                             </Picker>
-                            <Button title="Close" onPress={closeGenderPicker}/>
+                            <Button title="Confirm" onPress={closeGenderPicker}/>
+
                         </View>
                     </View>
                 </Modal>
@@ -269,7 +269,7 @@ export default function Register() {
                         style={style.inputWithIcon}
                         value={formData.birthday}
                         onFocus={showDatePicker}
-                        editable={false}
+                        editable={true}
                     />
                 </View>
 
@@ -287,7 +287,7 @@ export default function Register() {
                         <TextInput
                             placeholder="Location"
                             style={style.inputWithIcon}
-                            value={formData.location}
+                            value={formData.country}
                             editable={false}
                         />
                     </View>
@@ -314,11 +314,11 @@ export default function Register() {
                                         setSelectedCountry(itemValue);
                                         setSelectedDistrict(foundCountry.districts[0]);
                                         const newLocation = `${itemValue}, ${foundCountry.districts[0]}`;
-                                        setFormData(prevState => ({...prevState, location: newLocation}));
+                                        setFormData(prevState => ({...prevState, country: newLocation}));
                                     } else {
                                         setSelectedCountry('');
                                         setSelectedDistrict('');
-                                        setFormData(prevState => ({...prevState, location: ''}));
+                                        setFormData(prevState => ({...prevState, country: ''}));
                                     }
                                 }}
                             >
@@ -332,7 +332,7 @@ export default function Register() {
                                 onValueChange={(itemValue) => {
                                     setSelectedDistrict(itemValue);
                                     const newLocation = `${selectedCountry}, ${itemValue}`;
-                                    setFormData(prevState => ({...prevState, location: newLocation}));
+                                    setFormData(prevState => ({...prevState, country: newLocation}));
                                 }}
                             >
                                 {selectedCountryData.districts && selectedCountryData.districts.map(district => (
@@ -359,7 +359,12 @@ export default function Register() {
                 </View>
                 <View style={style.textInputContainer}>
                     <Icon name="envelope" size={20} color="#982C40" style={style.iconStyle}/>
-                    <TextInput placeholder="Email" style={style.inputWithIcon} value={email}/>
+                    <TextInput 
+                        placeholder="Email" 
+                        style={style.inputWithIcon} 
+                        value={formData.email}
+                        onChangeText={(text) => setFormData(prevState => ({...prevState, email: text}))}
+                    />
                 </View>
                 <Pressable onPress={handleSubmit}>
                     <View style={style.btnSesion}>

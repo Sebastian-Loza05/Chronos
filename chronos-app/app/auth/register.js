@@ -219,7 +219,7 @@ export default function Register() {
                         placeholder="Last Name"
                         style={style.inputWithIcon}
                         value={formData.lastname}
-                        onChangeText={(text) => setFormData(prevState => ({...prevState, lastname: text}))}/>/>
+                        onChangeText={(text) => setFormData(prevState => ({...prevState, lastname: text}))}/>
                 </View>
                 <TouchableOpacity onPress={openGenderPicker}>
                     <View style={style.textInputContainer}>
@@ -359,7 +359,12 @@ export default function Register() {
                 </View>
                 <View style={style.textInputContainer}>
                     <Icon name="envelope" size={20} color="#982C40" style={style.iconStyle}/>
-                    <TextInput placeholder="Email" style={style.inputWithIcon} value={email}/>
+                    <TextInput
+                      placeholder="Email" 
+                      style={style.inputWithIcon} 
+                      value={formData.email}
+                      onChangeText={(text) => setFormData(prevState => ({...prevState, email: text}))}
+                    />
                 </View>
                 <Pressable onPress={handleSubmit}>
                     <View style={style.btnSesion}>

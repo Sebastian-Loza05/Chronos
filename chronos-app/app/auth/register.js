@@ -13,6 +13,8 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { ScrollView } from 'react-native';
 import { Modal, Button } from 'react-native';
+import { router } from "expo-router";
+import Login from "./login";
 
 
 
@@ -160,30 +162,30 @@ export default function Register() {
     return null;
   }
   return (
-    <ScrollView style={{ flex: 0.1 }}>
+    <ScrollView style={{ flex: 1 }}>
     <LinearGradient colors={['#D78771', '#fdb9a9', '#FDD2C1','#b75142']} style={style.container}>
       <View style={style.overlay} />
       <Image source={logo} style={style.logo} />
       <Text style={style.txtTitulo}>Register</Text>
       <View style={style.textInputContainer}>
-        <Icon name="user" size={20} color="#B71C1C" style={style.iconStyle} />
+        <Icon name="user" size={20} color="#982C40" style={style.iconStyle} />
         <TextInput placeholder="Username" style={style.inputWithIcon} />
       </View>
       <View style={style.textInputContainer}>
-        <Icon name="lock" size={20} color="#B71C1C" style={style.iconStyle} />
+        <Icon name="lock" size={20} color="#982C40" style={style.iconStyle} />
         <TextInput placeholder="Password" secureTextEntry={true} style={style.inputWithIcon} />
       </View>
       <View style={style.textInputContainer}>
-        <Icon name="edit" size={20} color="#B71C1C" style={style.iconStyle} />
+        <Icon name="edit" size={20} color="#982C40" style={style.iconStyle} />
         <TextInput placeholder="Name" style={style.inputWithIcon} />
       </View>
       <View style={style.textInputContainer}>
-        <Icon name="edit" size={20} color="#B71C1C" style={style.iconStyle} />
+        <Icon name="edit" size={20} color="#982C40" style={style.iconStyle} />
         <TextInput placeholder="Last Name" style={style.inputWithIcon} />
       </View>
       <TouchableOpacity onPress={openGenderPicker}>
         <View style={style.textInputContainer}>
-          <Icon name="genderless" size={20} color="#B71C1C" style={style.iconStyle} />
+          <Icon name="genderless" size={20} color="#982C40" style={style.iconStyle} />
           <TextInput 
             placeholder="Gender" 
             style={style.inputWithIcon} 
@@ -204,7 +206,7 @@ export default function Register() {
               selectedValue={gender}
               onValueChange={(itemValue, itemIndex) => {
                 setGender(itemValue);
-                closeGenderPicker(); // Cierra el Picker después de seleccionar
+                closeGenderPicker(); 
               }}
             >
               <Picker.Item label="Select Gender" value="" />
@@ -217,7 +219,7 @@ export default function Register() {
       </Modal>
 
       <View style={style.textInputContainer}>
-        <Icon name="birthday-cake" size={20} color="#B71C1C" style={style.iconStyle} />
+        <Icon name="birthday-cake" size={20} color="#982C40" style={style.iconStyle} />
         <TextInput 
             placeholder="Birthday" 
             style={style.inputWithIcon} 
@@ -236,7 +238,7 @@ export default function Register() {
       )}
       <TouchableOpacity onPress={openLocationPicker}>
         <View style={style.textInputContainer}>
-          <Icon name="location-arrow" size={20} color="#B71C1C" style={style.iconStyle} />
+          <Icon name="location-arrow" size={20} color="#982C40" style={style.iconStyle} />
           <TextInput 
               placeholder="Location" 
               style={style.inputWithIcon} 
@@ -282,7 +284,7 @@ export default function Register() {
         </View>
       </Modal>
       <View style={style.textInputContainer}>
-          <Icon name="phone" size={20} color="#B71C1C" style={style.iconStyle} />
+          <Icon name="phone" size={20} color="#982C40" style={style.iconStyle} />
           <TextInput 
             placeholder="Phone" 
             style={style.inputWithIcon} 
@@ -291,7 +293,7 @@ export default function Register() {
           />
       </View>
       <View style={style.textInputContainer}>
-        <Icon name="envelope" size={20} color="#B71C1C" style={style.iconStyle} />
+        <Icon name="envelope" size={20} color="#982C40" style={style.iconStyle} />
         <TextInput placeholder="Email" style={style.inputWithIcon} />
       </View>
       <Pressable onPress={handleSubmit}>
@@ -299,9 +301,9 @@ export default function Register() {
           <Text style={style.txtSesion}>Submit</Text>
         </View>
       </Pressable>
-    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-      <Text style={style.redirectText}>¿Ya tienes una cuenta? Ingresa</Text>
-    </TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push('/auth/login')}>
+        <Text style={style.redirectText}>¿Ya tienes una cuenta? Ingresa</Text>
+      </TouchableOpacity>
     </LinearGradient>
     </ScrollView>
   );

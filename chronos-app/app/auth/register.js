@@ -9,7 +9,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import {LinearGradient} from 'expo-linear-gradient';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-picker/picker';
-import {useNavigation} from '@react-navigation/native';
 import {ScrollView} from 'react-native';
 import {Modal, Button} from 'react-native';
 import {router} from "expo-router";
@@ -32,18 +31,12 @@ export default function Register() {
         email: '',
     });
 
-    const navigation = useNavigation();
     const [message, setMessage] = useState(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     // const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [gender, setGender] = useState('');
-    const [selectedCountry, setSelectedCountry] = useState('');
-    const [selectedDistrict, setSelectedDistrict] = useState('');
-    //const [selectedCountry, setSelectedCountry] = useState('Peru');
-    //const [selectedDistrict, setSelectedDistrict] = useState('Lima');
     const [isGenderPickerVisible, setGenderPickerVisible] = useState(false);
-    const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
     const [errors, setErrors] = useState({});
 
     // Funciones
@@ -74,22 +67,6 @@ export default function Register() {
     const closeGenderPicker = () => {
         setGenderPickerVisible(false);
     };
-    const openLocationPicker = () => {
-        setLocationPickerVisible(true);
-    };
-
-    const closeLocationPicker = () => {
-        setLocationPickerVisible(false);
-    };
-
-    const countries = [
-        {
-            name: 'Peru',
-            districts: ['Lima', 'Arequipa', 'Cusco', 'Trujillo', 'Cajamarca', 'Lambayeque', 'Ancash', 'Callao', 'Junin',
-                'Ayachuco', 'Cusco', 'Puno', 'Arequipa', 'Huancavelica', 'Amazonas', 'Apurimac', 'Huanuco', 'San Martin', 'Piura', 'Loreto', 'Ica', 'Pasco', 'Tacna', 'Moquegua', 'Ucayali', 'Tumbes', 'Madre de Dios']
-        }
-    ];
-    const selectedCountryData = countries.find(country => country.name === selectedCountry) || {};
 
     const validateFields = () => {
         let tempErrors = {};
@@ -112,9 +89,6 @@ export default function Register() {
         }
         if (!formData.birthday) {
             tempErrors.birthday = "La fecha de nacimiento es obligatoria";
-        }
-        if (!formData.country) {
-            tempErrors.country = "La ubicación es obligatoria";
         }
         if (!formData.phone) {
             tempErrors.phone = "El numero es obligatorio";
@@ -143,6 +117,7 @@ export default function Register() {
 
         try {
             const data = await registerUser(formData);
+            console.log("data: ", data)
 
             if (data.error) {
                 throw new Error(data.message || 'Algo salió mal al registrarse.');
@@ -150,7 +125,7 @@ export default function Register() {
 
             const token = data.token;
             if (token) {
-                await AsyncStorage.setItem('userToken', token);
+                await AsyncStorage.setItem('userToken','Bearer ' + token);
             }
 
             setMessage('Registro exitoso!');
@@ -181,7 +156,7 @@ export default function Register() {
         return null;
     }
     return (
-        <ScrollView style={{flex: 1}}>
+        <ScrollView contentContainerStyle={style.all}>
             <LinearGradient colors={['#D78771', '#fdb9a9', '#FDD2C1', '#b75142']} style={style.container}>
                 <View style={style.overlay}/>
                 <Image source={logo} style={style.logo}/>
@@ -281,71 +256,6 @@ export default function Register() {
                         onChange={onDateChange}
                     />
                 )}
-                <TouchableOpacity onPress={openLocationPicker}>
-                    <View style={style.textInputContainer}>
-                        <Icon name="location-arrow" size={20} color="#982C40" style={style.iconStyle}/>
-                        <TextInput
-                            placeholder="Location"
-                            style={style.inputWithIcon}
-                            value={formData.country}
-                            editable={false}
-                        />
-                    </View>
-                </TouchableOpacity>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={isLocationPickerVisible}
-                    onRequestClose={closeLocationPicker}
-                >
-                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                        <View style={{
-                            width: '80%',
-                            height: 500,
-                            backgroundColor: 'white',
-                            padding: 20,
-                            borderRadius: 30
-                        }}>
-                            <Picker
-                                selectedValue={selectedCountry}
-                                onValueChange={(itemValue) => {
-                                    const foundCountry = countries.find(country => country.name === itemValue);
-                                    if (foundCountry) {
-                                        setSelectedCountry(itemValue);
-                                        setSelectedDistrict(foundCountry.districts[0]);
-                                        const newLocation = `${itemValue}, ${foundCountry.districts[0]}`;
-                                        setFormData(prevState => ({...prevState, country: newLocation}));
-                                    } else {
-                                        setSelectedCountry('');
-                                        setSelectedDistrict('');
-                                        setFormData(prevState => ({...prevState, country: ''}));
-                                    }
-                                }}
-                            >
-                                <Picker.Item label="Select Location" value=""/>
-                                {countries.map(country => (
-                                    <Picker.Item key={country.name} label={country.name} value={country.name}/>
-                                ))}
-                            </Picker>
-                            <Picker
-                                selectedValue={selectedDistrict}
-                                onValueChange={(itemValue) => {
-                                    setSelectedDistrict(itemValue);
-                                    const newLocation = `${selectedCountry}, ${itemValue}`;
-                                    setFormData(prevState => ({...prevState, country: newLocation}));
-                                }}
-                            >
-                                {selectedCountryData.districts && selectedCountryData.districts.map(district => (
-                                    <Picker.Item key={district} label={district} value={district}/>
-                                ))}
-                            </Picker>
-
-                            <Button title="Close" onPress={closeLocationPicker}/>
-
-                        </View>
-                    </View>
-                </Modal>
-
                 <View style={style.textInputContainer}>
                     <Icon name="phone" size={20} color="#982C40" style={style.iconStyle}/>
                     <TextInput
@@ -380,8 +290,14 @@ export default function Register() {
 }
 
 const style = StyleSheet.create({
+    all: {
+      flex: 1,
+      height: "100%",
+    },
+
     container: {
         flex: 1,
+        flexGrow: 1,
         justifyContent: "center",
         paddingHorizontal: 45,
     },

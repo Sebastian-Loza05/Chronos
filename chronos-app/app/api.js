@@ -1,7 +1,12 @@
 // api.js
+const ip = '192.168.58.170'
+export const api_user = "http://" + ip + ":3000/"
+export const api_profile = "http://" + ip + ":3001/"
+export const api_tasks = "http://" + ip + ":3002/"
+
 export const authenticateUser = async (username, password) => {
     try {
-      const response = await fetch('http://192.168.174.71:3000/auth', { 
+      const response = await fetch(api_user + 'auth', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -21,7 +26,7 @@ export const authenticateUser = async (username, password) => {
   };
 export const registerUser = async (formData) => {
   try {
-    const response = await fetch(`http://192.168.100.15:3000/register`, {
+    const response = await fetch(api_profile + `/sign_in`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

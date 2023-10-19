@@ -89,7 +89,7 @@ export default function Login() {
     const data = await authenticateUser(username, password);
     if (data.success) {
       console.log('Usuario autenticado');
-      await AsyncStorage.setItem('userToken', data.token);
+      await AsyncStorage.setItem('userToken', 'Bearer ' + data.token);
       router.replace("/auth/inicio");
     }
     else {
@@ -112,7 +112,6 @@ export default function Login() {
   
 
   return (
-    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -167,7 +166,6 @@ export default function Login() {
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </SafeAreaView>
   );
 }  
 

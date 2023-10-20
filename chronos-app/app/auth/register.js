@@ -125,11 +125,11 @@ export default function Register() {
 
             const token = data.token;
             if (token) {
-                await AsyncStorage.setItem('userToken','Bearer ' + token);
+                await AsyncStorage.setItem('userToken', token);
             }
 
             setMessage('Registro exitoso!');
-            router.replace("/auth/inicio");
+            router.replace("/calendar/dia");
 
         } catch (error) {
             setMessage(error.message);

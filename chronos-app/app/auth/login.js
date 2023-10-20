@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import Register from "./register";
 import { router } from "expo-router";
-import Inicio from "./inicio";
 import { authenticateUser } from '../api'; // Importa la función desde el archivo api.js
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,7 +36,7 @@ export default function Login() {
 
           if (response.ok) {
             // Si se recibe una respuesta exitosa, redirige al usuario a la pantalla de inicio
-            router.replace("/auth/inicio");
+            router.replace("/calendar/dia");
           }
         }
       } catch (error) {
@@ -93,8 +90,8 @@ export default function Login() {
     const data = await authenticateUser(username, password);
     if (data.success) {
       console.log('Usuario autenticado');
-      await AsyncStorage.setItem('userToken', 'Bearer ' + data.token);
-      router.replace("/auth/inicio");
+      await AsyncStorage.setItem('userToken', data.token);
+      router.replace("/calendar/dia");
     }
     else {
       // Redirige al usuario a la pantalla de inicio de sesión en caso de autenticación fallida

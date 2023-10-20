@@ -1,7 +1,10 @@
 import React from "react";
+import { Tabs } from 'expo-router/tabs'
 import { StyleSheet, Text, View, Button } from "react-native";
 import {router} from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HeaderDia from "../../components/headerDia";
+import CalendarView from "../../calendarView";
 
 export default function Inicio() {
 
@@ -22,6 +25,8 @@ export default function Inicio() {
     <View style={styles.container}>
       <Text style={styles.text}>Inicio</Text>
       <Button title="Cerrar Sesión" onPress={handleLogout} />
+      <HeaderDia />
+      <CalendarView />
     </View>
   );
 }

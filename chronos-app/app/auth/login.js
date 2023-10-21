@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback} from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import Register from "./register";
 import { router } from "expo-router";
-import Inicio from "./inicio";
 import { authenticateUser } from '../api'; // Importa la función desde el archivo api.js
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {iconOffset} from 'react-native';
+import {LinearGradient} from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {useFonts} from 'expo-font';
+import {useCallback} from 'react';
 
 
 
@@ -35,7 +36,7 @@ export default function Login() {
 
           if (response.ok) {
             // Si se recibe una respuesta exitosa, redirige al usuario a la pantalla de inicio
-            router.replace("/auth/inicio");
+            router.replace("/calendar/dia");
           }
         }
       } catch (error) {
@@ -90,7 +91,7 @@ export default function Login() {
     if (data.success) {
       console.log('Usuario autenticado');
       await AsyncStorage.setItem('userToken', data.token);
-      router.replace("/auth/inicio");
+      router.replace("/calendar/dia");
     }
     else {
       // Redirige al usuario a la pantalla de inicio de sesión en caso de autenticación fallida
@@ -109,49 +110,63 @@ export default function Login() {
       }
     }
   };
+
+  const [fontsLoaded, fontsError] = useFonts({
+    Ultra: require("../../assets/fonts/Ultra-Regular.ttf"),
+    Caprasimo: require("../../assets/fonts/Caprasimo-Regular.ttf"),
+});
+
+if (fontsError) {
+    console.error("Error loading fonts: ", fontsError);
+    return <Text>Error loading fonts</Text>;
+}
+
+const onLayoutRootView = useCallback(async () => {
+  if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+  }
+}, [fontsLoaded]);
+
+if (!fontsLoaded) {
+  return null;
+}
   
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <ScrollView contentContainerStyle={styles.all}>
+    <LinearGradient colors={['#D78771', '#fdb9a9', '#FDD2C1', '#b75142']} style={styles.backgroundImage}>
+
+
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.container}>
-            <ImageBackground source={require('../../assets/fondo.png')} style={styles.backgroundImage}>
+          <View style={styles.innercontainer}>
               <View style={styles.logoContainer}>
                 <Image source={require('../../assets/logo-chronos.png')} style={styles.logo} />
               </View>
               <View style={styles.titleContainer}>
                 <Text style={styles.titleText}>Login</Text>
               </View>
-            </ImageBackground>
-            <View style={styles.bottomContainer}>
               <View style={styles.nuevo}>
-              <View style={[styles.inputContainer, { marginTop: -40, flexDirection: 'row' }]}>
-              <Image source={require('../../assets/user.png')} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="User Name"
-                placeholderTextColor="white"
-                textAlign="center"
-                value={username}
-                onChangeText={handleUsernameChange}
-              />
-              </View>
-              <View style={[styles.inputContainer, { marginTop: 10, flexDirection: 'row' }]}>
-                <Image source={require('../../assets/key.png')} style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  secureTextEntry={true}
-                  placeholderTextColor="white"
-                  textAlign="center"
-                  value={password}
-                  onChangeText={handlePasswordChange}
-                />
-              </View>
+              <View style={styles.textInputContainer}>
+                    <Icon name="user" size={20} color="#982C40" style={styles.iconStyle}/>
+                    <TextInput
+                        placeholder="Username"
+                        style={styles.inputWithIcon}
+                        value={username}
+                        onChangeText={handleUsernameChange}
+                    />
+                </View>
+
+                <View style={styles.textInputContainer_}>
+                  <Icon name="lock" size={20} color="#982C40" style={styles.iconStyle}/>
+                    <TextInput
+                        placeholder="Password"
+                        style={styles.inputWithIcon}
+                        value={password}
+                        onChangeText={handlePasswordChange}
+                    />
+                </View>
+
               </View>
               <TouchableOpacity style={styles.loginButton} activeOpacity={0.7} onPress={handleLogin}>
                 <Text style={styles.loginText}>Login</Text>
@@ -164,26 +179,35 @@ export default function Login() {
             </View>
 
             </View>
-          </View>
         </TouchableWithoutFeedback>
+      
+      </LinearGradient>
+      
+      </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
   );
 }  
 
 const styles = StyleSheet.create({
-  container: {
+  all: {
     flex: 1,
-    backgroundColor: '#fff', // Color de fondo
-    margin:0,
-    padding:0,
-
+    height: "100%",
   },
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover', // Ajusta la imagen al tamaño del contenedor
+    alignItems: 'center',
+    justifyContent: 'center',
     margin:0,
     padding:0,
+  },
+  innerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    margin:0,
+    padding:0,
+    justifyContent:'center',
+    alignItems:'center',
   },
   //Container de arriba
   topContainer: {
@@ -205,6 +229,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 0,
     marginBottom: 1,
+    marginTop: -60,
   },
   logo: {
     width: 300,
@@ -212,15 +237,23 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     alignItems: "center",
-    marginTop: -40,
+    marginTop: -35,
   },
   titleText: {
-    color: 'black',
-    fontSize: 40,
-  },
+    fontSize: 30,
+    color: "#982C40",
+    textAlign: "center",
+    marginBottom: 100,
+    marginTop:4,
+    fontFamily: "Caprasimo",
+},
+iconStyle: {
+  marginRight: 10,
+},
   inputContainer: {
     alignItems: "center",
     position: 'relative',
+    marginBottom: 0,
   },
   input: {
     width: 290,
@@ -235,11 +268,42 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
   },
+  textInputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: -55,
+    borderRadius: 20,
+    height: 30,
+    paddingLeft: 10,
+    borderColor: "#FFFFFF",
+    borderWidth: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+},
+textInputContainer_: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 20,
+  borderRadius: 20,
+  height: 30,
+  paddingLeft: 10,
+  borderColor: "#FFFFFF",
+  borderWidth: 3,
+  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+},
+inputWithIcon: {
+  flex: 1,
+  color: "#982C40",
+  fontSize: 18,
+  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+},
   scrollViewContent: {
     flexGrow: 1,
   },
   circularContainer: {
     position: 'absolute',
+    top:  100, // Ajusta el valor según el espacio deseado entre los íconos
     left: 35,
     top: iconOffset,
     width: 50,
@@ -272,19 +336,23 @@ const styles = StyleSheet.create({
     borderRadius: 1,
   },
   loginButton: {
-    width: 200,
-    height: 50,
-    backgroundColor: 'white',
-    borderRadius: 20,
     marginTop: -102,
-    justifyContent: "center",
+    backgroundColor: "#ff1744",
+    height: 50,
+    borderRadius: 50,
     alignItems: "center",
-    alignSelf: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginBottom: 10,
   },
   loginText: {
-    color: '#ff6373',
-    fontSize: 20,
-    fontWeight: 'bold',
+      color: "#FFEBEE",
+      fontSize: 22,
+      fontWeight: "bold",
   },
   nuevo: {
     marginBottom:143,
@@ -304,9 +372,13 @@ const styles = StyleSheet.create({
     marginTop:30,
   },
   signupText: {
+    color: "#982C40",
     fontSize: 16, // Tamaño de fuente del texto "¿No tienes cuenta?"
   },
   signupLinkBold: {
+    color: "#982C40",
+    textAlign: 'center',
+    textDecorationLine: 'underline',
     fontWeight: 'bold', // Hace que el texto "Regístrate" sea negrita
     fontSize: 16, // Tamaño de fuente del texto "Regístrate"
   },

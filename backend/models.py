@@ -3,8 +3,6 @@ from decouple import config
 from werkzeug.security import generate_password_hash, check_password_hash
 from base64 import b64encode
 
-
-
 DATA_USER = config('DATA_USER')
 DATA_PASSWORD = config('DATA_PASSWORD')
 HOST = config('HOST')
@@ -161,11 +159,14 @@ class Tasks(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     nombre = db.Column(db.String(100), nullable=False)
     lugar = db.Column(db.String(100), nullable=True)
-    estado = db.Column(db.String(100), default=False)
+    estado = db.Column(db.Boolean, default=False)
     descripcion = db.Column(db.String(255), nullable=True)
     fecha = db.Column(db.Date, nullable=False)
     hora_inicio = db.Column(db.Time, nullable=False)
-    hora_final = db.Column(db.Time, nullable=False) # Quizas mejor que se horas
+    hora_final = db.Column(db.Time, nullable=False)
+
+    def __repr__(self):
+        return f'Task: id = {self.id}, user_id = {self.user_id}, nombre = {self.nombre}, estado = {self.estado}, dia = {self.dia}, inicio = {self.hora_inicio}, fin = {self.hora_final}'
 
     def format(self):
         return {
@@ -218,6 +219,12 @@ class Tasks(db.Model):
         return Tasks.query.filter_by(
             id=id
         ).one_or_none()
+
+    @staticmethod
+    def get_tasks_by_user(user_id):
+        return Tasks.query.filter_by(
+            user_id=user_id
+        ).all()
 
     @staticmethod
     def get_task_by_date(date):

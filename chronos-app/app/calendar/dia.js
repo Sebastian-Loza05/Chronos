@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet, View, Button } from "react-native";
 import {router} from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import HeaderDia from "../../components/headerDia";
-import CalendarView from "../../components/calendarView";
+import HeaderDia from "../../components/calendar/headerDia";
+import CalendarView from "../../components/calendar/calendarView";
 
 export default function CalendarDia() {
   
@@ -22,12 +22,11 @@ export default function CalendarDia() {
 
   return (
     <View style={styles.container}>
-      <Button title="Cerrar Sesión" onPress={handleLogout} />
       <View style={styles.header}>
-      <HeaderDia />
+        <HeaderDia />
       </View>
       <View style={styles.calendar}>
-      <CalendarView />
+        <CalendarView />
       </View>
     </View>
   );
@@ -46,14 +45,15 @@ const styles = StyleSheet.create({
   },
   header: {
     flexGrow: 1,
-    height: '30%',
+    height: '40%',
     width: '100%',
-    borderWidth:1
+    overflow: 'hidden'
   },
   calendar: {
     flexGrow: 1,
     height: '55%',
     width: '100%',
+    overflow: 'hidden'
   }
 
 });

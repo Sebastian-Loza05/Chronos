@@ -32,7 +32,7 @@ export default function Login() {
 
           if (response.ok) {
             // Si se recibe una respuesta exitosa, redirige al usuario a la pantalla de inicio
-            router.replace("/calendar/dia");
+            router.replace("/calendar/");
           }
         }
       } catch (error) {
@@ -87,7 +87,7 @@ export default function Login() {
     if (data.success) {
       console.log('Usuario autenticado');
       await AsyncStorage.setItem('userToken', data.token);
-      router.replace("/calendar/dia");
+      router.replace("/calendar");
     }
     else {
       // Redirige al usuario a la pantalla de inicio de sesión en caso de autenticación fallida

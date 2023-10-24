@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { router } from "expo-router";
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-export default function Login() {
+export default function Index() {
   useEffect(() => {
     // Espera 2000 ms (2 segundos) y luego navega a la siguiente pantalla
     const timeout = setTimeout(() => {

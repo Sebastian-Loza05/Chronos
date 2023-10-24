@@ -1,9 +1,9 @@
-import { View, StyleSheet } from "react-native"
+import { View, Text, StyleSheet } from "react-native"
 
 export default function HeaderDia() {
   return (
     <View>
-      Header
+      <Text>Header</Text>
     </View>
   )
 }

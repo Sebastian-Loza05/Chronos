@@ -129,7 +129,7 @@ export default function Register() {
             }
 
             setMessage('Registro exitoso!');
-            router.replace("/calendar/dia");
+            router.replace("/calendar");
 
         } catch (error) {
             setMessage(error.message);

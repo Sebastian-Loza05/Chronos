@@ -159,9 +159,9 @@ class Tasks(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     nombre = db.Column(db.String(100), nullable=False)
     lugar = db.Column(db.String(100), nullable=True)
-    estado = db.Column(db.String(100), nullable=False)
+    estado = db.Column(db.Boolean, default=False)
     descripcion = db.Column(db.String(255), nullable=True)
-    dia = db.Column(db.Date, nullable=False)
+    fecha = db.Column(db.Date, nullable=False)
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_final = db.Column(db.Time, nullable=False)
 
@@ -172,13 +172,13 @@ class Tasks(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'nombre': self.nombre,
-            'lugar': self.lugar,
-            'estado': self.estado,
-            'descripcion': self.descripcion,
-            'dia': self.dia,
-            'hora_inicio': self.hora_inicio.isoformat(),
-            'hora_final': self.hora_final.isoformat()
+            'name': self.nombre,
+            'place': self.lugar,
+            'state': self.estado,
+            'description': self.descripcion,
+            'date': self.fecha,
+            'start_time': self.hora_inicio.strftime('%H:%M:%S'),
+            'end_time': self.hora_final.strftime('%H:%M:%S')
         }
 
     def insert(self):

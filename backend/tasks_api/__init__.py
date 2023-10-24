@@ -28,6 +28,55 @@ jwt = JWTManager(app)
 setup_db(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
+# --------------------------
+@app.route("/task", methods=["POST"])
+@jwt_required()
+def create_task():
+    error_406 = False
+    error_422 = False
+    try:
+        data = request.get_json()
+        name = data.get('name', None)
+        place = data.get('place', None)
+        description = data.get('description', None)
+        date = data.get('date', None)
+        start_time = data.get('start_time', None)
+        end_time = data.get('end_time', None)
+
+        if name is None or date is None or start_time is None or end_time is None:
+            error_422 = True
+            abort(422)
+        current_user = get_jwt_identity()
+
+        task = Tasks(
+            user_id=current_user['id'],
+            nombre=name,
+            lugar=place,
+            descripcion=description,
+            fecha=date,
+            hora_inicio=start_time,
+            hora_final=end_time
+        )
+        result = task.insert()
+        if result == -1:
+            error_406 = True
+            abort(406)
+
+        return jsonify({
+            'success': True,
+            'created': task.format()
+        })
+    except Exception as e:
+        print(e)
+        if error_406:
+            abort(406)
+        elif error_422:
+            abort(422)
+        else:
+            abort(500)
+
+@app.route("/tasks", methods=["GET"])
+@jwt_required()
 def get_tasks_params(type_search, begin_date, end_date, user):
     # En caso sólo se quieran las tareas de un día
     if type_search == 1:
@@ -41,63 +90,6 @@ def get_tasks_params(type_search, begin_date, end_date, user):
         Tasks.user_id == user["id"]
     ).all()
     return tasks
-
-@app.route("/task", methods=["POST"])
-@jwt_required()
-def get_tasks():
-    error_422 = False
-    error_406 = False
-    try:
-        current_user = get_jwt_identity()
-        data = request.get_json()
-
-        # Obtenemos los datos de la creación de la tarea
-        tarea = data.get("tarea", None)
-        dia = data.get("dia", None)
-        descripcion = data.get("descripcion", None)
-        lugar = data.get("lugar", None)
-        hora_inicio = data.get("inicio", None)
-        hora_final = data.get("fin", None)
-
-        if tarea is None or dia is None or hora_final is None or hora_final is None:
-            error_422 = True
-            abort(422)
-
-        task = Tasks(
-            user_id=current_user["id"],
-            nombre=tarea,
-            estado="Sin completar",
-            dia=dia,
-            hora_inicio=hora_inicio,
-            hora_final=hora_final
-        )
-
-        if descripcion is not None:
-            task.descripcion = descripcion
-
-        if lugar is not None:
-            task.lugar = lugar
-
-        task_id = task.insert()
-        if task_id == -1:
-            error_406 = True
-            abort(406)
-
-        task = Tasks.get_task_by_id(task_id)
-
-        return ({
-            'success': True,
-            'task_created': task.format()
-        })
-
-    except Exception as e:
-        print(e)
-        if error_422:
-            abort(422)
-        elif error_406:
-            abort(406)
-        else:
-            abort(500)
 
 @app.route("/tasks/search", methods=["POST"])
 @jwt_required()

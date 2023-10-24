@@ -64,7 +64,7 @@ def auth():
 
         if user is None:
             error_404 = True
-            abort(404)
+            abort(403)
 
         if not user.check_password(password):
             error_403 = True
@@ -123,41 +123,6 @@ def logout():
     revoked_tokens.add(jti)
     # Returns "Access token revoked" or "Refresh token revoked"
     return jsonify({'message': 'Token revoked'}), 200
-
-@app.route("/auth/signup", methods=['POST'])
-def signup():
-    error_403 = False
-    error_406 = False
-    error_422 = False
-    try:
-        data = request.get_json()
-        username = data.get('username', None)
-        password = data.get('password', None)
-        if username is None or password is None:
-            error_422 = True
-            abort(422)
-
-        user = Users(username=username)
-        user.set_password(password)
-        user_id = user.insert()
-        if user_id == -1:
-            error_406 = True
-            abort(406)
-
-        return jsonify({
-            'success': True,
-            'created_user': user.format()
-        })
-    except Exception as e:
-        print(e)
-        if error_403:
-            abort(403)
-        elif error_406:
-            abort(406)
-        elif error_422:
-            abort(422)
-        else:
-            abort(500)
 
 @jwt.unauthorized_loader
 def unauthorized_response(callback):

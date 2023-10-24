@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native"
 import { horas } from "../app/horas";
+import {Text, View} from "react-native";
+
 
 export default function CalendarView() {
   const [currentHour, setCurrentHour]= useState(new Date().getHours());

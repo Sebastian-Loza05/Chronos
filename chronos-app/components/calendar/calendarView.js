@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native"
 import { horas } from "./../../app/horas"
+import Tasks from "./tasks/tasksView";
 
 
 export default function CalendarView() {
   const [currentHour, setCurrentHour]= useState(new Date().getHours());
   const [currentMinute, setCurrentMinute]= useState(new Date().getMinutes());
   const [left, setLeft] = useState(140);
+  const [formData, setFormData] = useState({
+    type_search: 0,
+    begin_date: ''
+  })
   const totalInterval = 70.0/60;
 
   const style_customized = StyleSheet.create({
@@ -36,7 +41,6 @@ export default function CalendarView() {
     }
   }, []);
 
-  console.log(left);
 
   const obtenerEstilo = (hora) => {
     if (currentHour == hora)
@@ -54,11 +58,11 @@ export default function CalendarView() {
     )
   });
 
-
   return (
     <ScrollView style={styles.calendar_scroll} horizontal={true}>
       {horas_text}
       <View style={style_customized.barra}></View>
+      <Tasks />
     </ScrollView>
   )
 }

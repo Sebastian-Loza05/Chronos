@@ -1,46 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useNavigation } from '@react-navigation/native';
 import { router } from "expo-router";
-import { authenticateUser } from '../api'; // Importa la función desde el archivo api.js
-import { Alert } from 'react-native';
+import { authenticateUser, loginByToken } from '../api'; // Importa la función desde el archivo api.js
+import { Alert, iconOffset } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {iconOffset} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useFonts} from 'expo-font';
-import {useCallback} from 'react';
-
-
-
 
 export default function Login() {
-  const navigation = useNavigation();
+
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   
   useEffect(() => {
     const checkToken = async () => {
-      try {
-        // Verificar si hay un token almacenado en AsyncStorage
-        const token = await AsyncStorage.getItem('userToken');
-        
-        if (token) {
-          // Realiza una solicitud GET al servidor para verificar el token
-          const response = await fetch('http://192.168.174.71:3000/auth/token', {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+      const token = await AsyncStorage.getItem('userToken');
+      const data = await loginByToken();
+      console.log(data);
 
-          if (response.ok) {
-            // Si se recibe una respuesta exitosa, redirige al usuario a la pantalla de inicio
-            router.replace("/calendar/");
-          }
-        }
-      } catch (error) {
-        console.error('Error al verificar el token:', error);
+      if (data.success){
+        router.replace("/calendar/")
       }
     };
 
@@ -114,32 +94,31 @@ export default function Login() {
   const [fontsLoaded, fontsError] = useFonts({
     Ultra: require("../../assets/fonts/Ultra-Regular.ttf"),
     Caprasimo: require("../../assets/fonts/Caprasimo-Regular.ttf"),
-});
+  });
 
-if (fontsError) {
+  if (fontsError) {
     console.error("Error loading fonts: ", fontsError);
     return <Text>Error loading fonts</Text>;
-}
-
-const onLayoutRootView = useCallback(async () => {
-  if (fontsLoaded) {
-      await SplashScreen.hideAsync();
   }
-}, [fontsLoaded]);
 
-if (!fontsLoaded) {
-  return null;
-}
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
   
-
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-    <ScrollView contentContainerStyle={styles.all}>
-    <LinearGradient colors={['#D78771', '#fdb9a9', '#FDD2C1', '#b75142']} style={styles.backgroundImage}>
+      <ScrollView contentContainerStyle={styles.all}>
+        <LinearGradient colors={['#D78771', '#fdb9a9', '#FDD2C1', '#b75142']} style={styles.backgroundImage}>
 
 
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.innercontainer}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.innercontainer}>
               <View style={styles.logoContainer}>
                 <Image source={require('../../assets/logo-chronos.png')} style={styles.logo} />
               </View>
@@ -147,24 +126,24 @@ if (!fontsLoaded) {
                 <Text style={styles.titleText}>Login</Text>
               </View>
               <View style={styles.nuevo}>
-              <View style={styles.textInputContainer}>
-                    <Icon name="user" size={20} color="#982C40" style={styles.iconStyle}/>
-                    <TextInput
-                        placeholder="Username"
-                        style={styles.inputWithIcon}
-                        value={username}
-                        onChangeText={handleUsernameChange}
-                    />
+                <View style={styles.textInputContainer}>
+                  <Icon name="user" size={20} color="#982C40" style={styles.iconStyle}/>
+                  <TextInput
+                    placeholder="Username"
+                    style={styles.inputWithIcon}
+                    value={username}
+                    onChangeText={handleUsernameChange}
+                  />
                 </View>
 
                 <View style={styles.textInputContainer_}>
                   <Icon name="lock" size={20} color="#982C40" style={styles.iconStyle}/>
-                    <TextInput
-                        placeholder="Password"
-                        style={styles.inputWithIcon}
-                        value={password}
-                        onChangeText={handlePasswordChange}
-                    />
+                  <TextInput
+                    placeholder="Password"
+                    style={styles.inputWithIcon}
+                    value={password}
+                    onChangeText={handlePasswordChange}
+                  />
                 </View>
 
               </View>
@@ -172,19 +151,19 @@ if (!fontsLoaded) {
                 <Text style={styles.loginText}>Login</Text>
               </TouchableOpacity>
               <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>¿No tienes una cuenta? </Text>
-              <TouchableOpacity onPress={() => router.push('/auth/register')}>
-                <Text style={styles.signupLinkBold}>Regístrate</Text>
-              </TouchableOpacity>
-            </View>
+                <Text style={styles.signupText}>¿No tienes una cuenta? </Text>
+                <TouchableOpacity onPress={() => router.push('/auth/register')}>
+                  <Text style={styles.signupLinkBold}>Regístrate</Text>
+                </TouchableOpacity>
+              </View>
 
             </View>
-        </TouchableWithoutFeedback>
-      
-      </LinearGradient>
-      
+          </TouchableWithoutFeedback>
+
+        </LinearGradient>
+
       </ScrollView>
-      </KeyboardAvoidingView>
+    </KeyboardAvoidingView>
   );
 }  
 

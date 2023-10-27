@@ -229,6 +229,6 @@ class Tasks(db.Model):
     @staticmethod
     def get_task_by_date(date):
         return Tasks.query.filter_by(
-            dia=date
+            fecha=date
         ).all()
 

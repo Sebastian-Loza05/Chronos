@@ -1,18 +1,11 @@
 import unittest
-from flask import (
-    request,
-    Flask
-)
-import json
 from profile_api import app as app1
 from auth_api import app as app2
 from tasks_api import app as app3
 
-from models import Users, setup_db
+from models import Users
 
-from flask_jwt_extended import (
-    create_access_token
-)
+from io import BytesIO
 
 class TestChronos(unittest.TestCase):
 
@@ -38,10 +31,20 @@ class TestChronos(unittest.TestCase):
     }
 
     NEW_TASK = {
-        "name": "Estudiar Aritmetica",
+        "name": "Estudiar ADA",
         "date": "2023-10-20",
         "start_time": "17:30:00",
         "end_time": "19:00:00"
+    }
+
+    SEARCH_TASK = {
+        "type_search": 2,
+        "begin_date": "2023-10-20",
+        "end_date": "2023-10-27"
+    }
+
+    UPDATE_TASK = {
+        "name": "Retirarme de ADA"
     }
 
     HEADERS = {}
@@ -86,7 +89,7 @@ class TestChronos(unittest.TestCase):
         self.assertTrue(data['profile'])
         self.assertTrue(data['token'])
 
-    def test_02_logout(self):
+    def test_03_logout(self):
         r = self.app1.post('/sign_in', json=self.NEW_USER)
         data = r.get_json()
         self.HEADERS['Authorization'] = 'Bearer ' + data['token']
@@ -96,7 +99,7 @@ class TestChronos(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertTrue(data['message'])
 
-    def test_03_get_token(self):
+    def test_04_get_token(self):
         r = self.app1.post('/sign_in', json=self.NEW_USER)
         data = r.get_json()
         self.HEADERS['Authorization'] = 'Bearer ' + data['token']
@@ -106,7 +109,22 @@ class TestChronos(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertTrue(data['success'])
 
-    def test_04_get_profile(self):
+    def test_05_patch_profile(self):
+        r = self.app1.post('/sign_in', json=self.NEW_USER)
+        data = r.get_json()
+        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+        with open('prueba.jpg', 'rb') as f:
+            image_data = f.read()
+        file_like = BytesIO(image_data)
+        content_type = 'multipart/form-data'
+        data = {'foto': (file_like, 'prueba.jpg')}
+
+        r = self.app1.patch('/profile', headers=self.HEADERS, content_type=content_type, data=data)
+        data = r.get_json()
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(data)
+
+    def test_06_get_profile(self):
         r = self.app1.post('/sign_in', json=self.NEW_USER)
         data = r.get_json()
         self.HEADERS['Authorization'] = 'Bearer ' + data['token']
@@ -116,7 +134,7 @@ class TestChronos(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertTrue(data['success'])
 
-    def test_05_delete_profile(self):
+    def test_07_delete_profile(self):
         r = self.app1.post('/sign_in', json=self.NEW_USER)
         data = r.get_json()
         self.HEADERS['Authorization'] = 'Bearer ' + data['token']
@@ -126,7 +144,7 @@ class TestChronos(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertTrue(data['success'])
 
-    def test_06_post_task(self):
+    def test_08_post_task(self):
         r = self.app1.post('/sign_in', json=self.NEW_USER)
         data = r.get_json()
         self.HEADERS['Authorization'] = 'Bearer ' + data['token']
@@ -137,5 +155,38 @@ class TestChronos(unittest.TestCase):
         self.assertTrue(data['success'])
         self.assertTrue(data['created'])
 
+    def test_09_get_task(self):
+        r = self.app1.post('/sign_in', json=self.NEW_USER)
+        data = r.get_json()
+        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+
+        r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.SEARCH_TASK['type_search'] = data['created']['id']
+
+        r = self.app3.post('/tasks/search', json=self.SEARCH_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['tasks'])
+
+    def test_10_patch_task(self):
+        r = self.app1.post('/sign_in', json=self.NEW_USER)
+        data = r.get_json()
+        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+
+        r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        task_id = data['created']['id']
+
+        r = self.app3.patch('/task/' + str(task_id), json=self.UPDATE_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['task_updated'])
 if __name__ == "__main__":
     unittest.main()

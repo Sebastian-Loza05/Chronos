@@ -61,6 +61,7 @@ class Users(db.Model):
 
     def delete(self):
         try:
+            self.profile.delete()
             db.session.delete(self)
             db.session.commit()
         except Exception as e:
@@ -231,4 +232,8 @@ class Tasks(db.Model):
         return Tasks.query.filter_by(
             dia=date
         ).all()
+
+# class Categories(db.Model):
+#     __tablename__ = 'categories'
+
 

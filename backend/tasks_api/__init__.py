@@ -28,6 +28,21 @@ jwt = JWTManager(app)
 setup_db(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
+
+def get_tasks_params(type_search, begin_date, end_date, user):
+    # En caso sólo se quieran las tareas de un día
+    if type_search == 1:
+        tasks = Tasks.get_task_by_date(begin_date)
+        return tasks
+    # En caso se quieran las tareas de un periodo de tiempo
+    if end_date is None:
+        return [-1]
+    tasks = Tasks.query.filter(
+        Tasks.fecha.between(begin_date, end_date),
+        Tasks.user_id == user["id"]
+    ).all()
+    return tasks
+
 # --------------------------
 @app.route("/task", methods=["POST"])
 @jwt_required()
@@ -62,6 +77,8 @@ def create_task():
             error_406 = True
             abort(406)
 
+        task = Tasks.get_task_by_id(result)
+
         return jsonify({
             'success': True,
             'created': task.format()
@@ -75,21 +92,6 @@ def create_task():
         else:
             abort(500)
 
-@app.route("/tasks", methods=["GET"])
-@jwt_required()
-def get_tasks_params(type_search, begin_date, end_date, user):
-    # En caso sólo se quieran las tareas de un día
-    if type_search == 1:
-        tasks = Tasks.get_task_by_date(begin_date)
-        return tasks
-    # En caso se quieran las tareas de un periodo de tiempo
-    if end_date is None:
-        return [-1]
-    tasks = Tasks.query.filter(
-        Tasks.dia.between(begin_date, end_date),
-        Tasks.user_id == user["id"]
-    ).all()
-    return tasks
 
 @app.route("/tasks/search", methods=["POST"])
 @jwt_required()

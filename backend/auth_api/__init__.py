@@ -91,7 +91,8 @@ def auth():
 
 
 @app.route("/auth/token", methods=['GET'])
-def loginByToken():
+@jwt_required()
+def login_by_token():
     error_401 = False
     try:
         token = None

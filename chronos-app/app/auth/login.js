@@ -17,7 +17,6 @@ export default function Login() {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('userToken');
       const data = await loginByToken();
-      console.log(data);
 
       if (data.success){
         router.replace("/calendar/")
@@ -138,12 +137,13 @@ export default function Login() {
 
                 <View style={styles.textInputContainer_}>
                   <Icon name="lock" size={20} color="#982C40" style={styles.iconStyle}/>
-                  <TextInput
-                    placeholder="Password"
-                    style={styles.inputWithIcon}
-                    value={password}
-                    onChangeText={handlePasswordChange}
-                  />
+                    <TextInput
+                        placeholder="Password"
+                        secureTextEntry={true}
+                        style={styles.inputWithIcon}
+                        value={password}
+                        onChangeText={handlePasswordChange}
+                    />
                 </View>
 
               </View>

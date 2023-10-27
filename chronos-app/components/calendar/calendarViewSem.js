@@ -1,34 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { horas } from "./../../app/horas";
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 
-export default function CalendarView() {
+const daysOfWeek = [
+  { day: 'MON', date: '05' },
+  { day: 'TUE', date: '06' },
+  { day: 'WED', date: '07' },
+  { day: 'THU', date: '08' },
+  { day: 'FRI', date: '09' },
+  { day: 'SAT', date: '10' },
+  { day: 'SUN', date: '11' },
+];
+
+const events = [
+  { day: 'MON', hour: 10, description: 'Evento texto' },
+  { day: 'MON', hour: 1, description: 'Evento texto' },
+  { day: 'WED', hour: 0, description: 'Evento texto1' },
+  { day: 'SAT', hour: 12, description: 'Evento texto2' },
+  { day: 'SUN', hour: 13, description: 'Evento texto3' },
+];
+
+const CalendarView = () => {
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
-  const [left, setLeft] = useState(140);
-  const totalInterval = 70.0 / 60;
-
-  // Datos ficticios de eventos
-  const events = [
-    { day: 'Lunes', hour: 1, duration: 30 },
-    { day: 'Martes', hour: 4, duration: 15 },
-    { day: 'Miercoles', hour: 6, duration: 45 },
-    // ... agregar mÃ¡s eventos como desees
-  ];
-   const daysOfWeek = [
-        { day: "MON", date: "05" },
-        { day: "TUE", date: "06" },
-        { day: "WED", date: "07" },
-        { day: "TRU", date: "08" },
-        { day: "FRI", date: "09" },
-        { day: "SUN", date: "10" },
-        { day: "SAT", date: "11" },
-    ];
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const now = new Date();
-      setLeft((now.getHours() * 60 + now.getMinutes()) * totalInterval + 35);
-    }, 1000);
+      setCurrentHour(new Date().getHours());
+    }, 1000 * 60);
 
     return () => {
       clearInterval(intervalId);
@@ -36,129 +33,163 @@ export default function CalendarView() {
   }, []);
 
   const obtenerEstilo = (hora) => {
-    if (currentHour == hora) return styles.horaSombreada;
-    return styles.horaNormal;
+    if (currentHour === hora) return { columnStyles: styles.horaConBordes, textStyles: styles.activeHourText };
+    return { columnStyles: {}, textStyles: {} };
   };
-
-  const dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
-
+  
   return (
-    <ScrollView style={styles.mainScrollView}>
-    <View style={styles.mainContainer}>
-     <View style={styles.nuevo}>
-            <View style={styles.daysOfWeekContainer}>
-                    {daysOfWeek.map((item, index) => (
-                        <View key={index} style={styles.nuevo2}>
-                            <Text style={styles.dayText}>{item.day}</Text>
-                            <Text style={styles.dateText}>{item.date}</Text>
-                        </View>
-                    ))}
-            </View>
-        </View>
-      <ScrollView style={styles.calendar_scroll} horizontal={true}>
-        {Object.keys(horas).map((hora, index) => (
-          <View key={index} style={styles.hora_view}>
-            <Text style={obtenerEstilo(hora)}>{hora}:00</Text>
-            <View style={styles.hora_divisor}></View>
+    <View style={styles.container}>
+      <ScrollView style={styles.verticalScroll}>
+        <View style={styles.rowsContainer}>
+          <View style={styles.daysColumn}>
+            {daysOfWeek.map((item) => (
+            <View style={styles.headerDayContainer} key={item.day}>
+              <View style ={styles.nuevo}>
+                <Text style={styles.headerDay}>{item.day}</Text>
+                <Text style={styles.HeaderDate}>{item.date}</Text>
+                </View>
+              </View>
+            ))}
           </View>
-        ))}
-        <View style={{ ...styles.barra, left: left }}></View>
+          <ScrollView horizontal={true} style={styles.content}>
+            {Array.from({ length: 24 }).map((_, index) => {
+              const { columnStyles, textStyles } = obtenerEstilo(index);
+              return (
+                <View key={index} style={[styles.column, columnStyles]}>
+                  <Text style={[styles.timeText, textStyles]}>{`${index}:00`}</Text>
+                  <View style={[styles.centeredLine, currentHour === index && styles.activeLine]}></View> 
+                  {events.filter(event => event.hour === index).map((event, idx) => (
+                    <View key={idx} style={[styles.event, { top: daysOfWeek.findIndex(d => d.day === event.day) * 60 + 60 }]}>
+                      <Text style={styles.eventText}>{event.description}</Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
       </ScrollView>
     </View>
-    </ScrollView>
   );
-}
-
+};
 const styles = StyleSheet.create({
-    nuevo2: {
-        marginBottom: 15,
-
-    },
-    mainContainer: {
-        flexDirection: "row",
-        backgroundColor:'white',
-    },
-    dateText: {
-        flex: 1,
-        fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
-
-    },
-    dayText: {
-        flex: 1,
-        fontSize: 15,
-        textAlign: 'center',
-        marginVertical: 7,
-
-    },
     nuevo: {
-        paddingRight: 0,
-        //marginTop: -10,
-        backgroundColor:'white',
-        width: 80,
-        justifyContent: 'flex-start',
-        paddingVertical: 30,
-    },    
-    daysOfWeekContainer: {
-        width: 60,
-        backgroundColor: "#A86773",
-        padding: 10,
-        marginRight: 10,
-        marginTop: 30,
-        marginLeft: 12,
-        borderRadius: 300,
-        marginBottom: 22,
+    //backgroundColor: 'green',
     },
+  activeHourText: {
+    color: '#A31939', // Puedes usar cualquier color que desees para la hora activa
+    fontWeight: 'bold', // Puedes hacer el texto más grueso si así lo prefieres
+  },
+  
+  centeredLine: {
+    position: 'absolute',
+    left: '50%', // Centrado horizontalmente
+    top: 0,
+    bottom: 0,
+    width: 1,
+    top: 40,
+    marginTop: 10,  // esto moverá la línea un poco hacia abajo
+    borderStyle: 'dashed', // esto hará que la línea sea entrelineada
+    borderColor: 'rgba(128, 128, 128, 0.5)', // color con transparencia
+    borderWidth: 1,
+    borderRadius: 0,
+  },
+  activeLine: {
+    backgroundColor: '#1E050B', // Color cuando la línea es activa (es la hora actual)\
+    marginTop: 10,  // esto moverá la línea un poco hacia abajo
+    borderStyle: 'dashed', // esto hará que la línea sea entrelineada    
+    borderWidth: 1,
+    borderRadius: 1,
+  },
   container: {
     flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF', 
   },
-  calendar_scroll: {
-    flexGrow: 1,
-    width: '100%',
-    paddingTop: '3%',
+  verticalScroll: {
+    flex: 1,
+  },
+  rowsContainer: {
     flexDirection: 'row',
   },
-  hora_view: {
-    flexDirection: 'column',
-    alignItems: 'center',
+  daysColumn: {
+    backgroundColor: '#A86773', // Color de fondo rosa claro de la barra de días
+    paddingHorizontal: 10,
+    marginTop: 60,
+    borderRadius: 50,// Radio inferior izquierdo
+    marginLeft: 15,  
+    marginRight: 13,
+  },
+  headerDay: {    
+    width: 38,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#1E050B', // Color de texto
+    height: 60,
+    lineHeight: 60,
+  },
+  timeText: {
     width: 60,
-    height: '100%',
-    justifyContent: 'flex-start',
-    paddingVertical: 10,
+    height: 60,
+    lineHeight: 60,
+    textAlign: 'center',
+    color: '#888',
   },
-  horaNormal: {
-    color: '#A5A5A5',
-    fontSize: 13,
-    textAlign: "center",
-    marginVertical: 5,
-    marginBottom: 10,
+  content: {
+    flex: 1,
+    flexDirection: 'row',
   },
-  horaSombreada: {
-    color: '#ECECEC',
-    fontSize: 13,
-    textAlign: "center",
-    borderRadius: 10,
-    marginVertical: 5,
-    marginBottom: 10,
-    backgroundColor: '#AB3D52',
+  column: {
+    width: 70,
   },
-  hora_divisor: {
-    borderLeftWidth: 1,
-    borderColor: '#A5A5A5',
-    height: "90%",
-    width: 0,
-    borderStyle: 'dashed'
-  },
-  barra: {
-    borderLeftWidth: 1.5,
-    borderColor: '#AB3D52',
-    borderStyle: 'dashed',
-    width: 0,
-    height: "90%",
+  event: {
     position: 'absolute',
-    bottom: 0,
-  }
+    left: 5,
+    right: 5,
+    height: 56,
+    backgroundColor: '#F7F7F7', 
+    borderRadius: 10, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 2,
+    elevation: 1, 
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    borderWidth: 1,    
+    borderColor: '#DDDDDD', // Borde sutil
+    justifyContent: 'space-between', // Distribuye el contenido (texto y línea) a lo largo del eje vertical
+  },
+  eventText: {
+    color: '#555',
+    fontWeight: 'bold',
+  },
+  line: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 1, // Altura de la línea
+    backgroundColor: '#1E050B', // Color de la línea
+    top: '50%', // Para que la línea quede centrada verticalmente dentro del evento
+  },
 });
+
+styles.headerDayContainer = {
+  height: 60,
+  justifyContent: 'center',
+  alignItems: 'center',
+  //backgroundColor: 'yellow',
+};
+
+styles.headerDay = {
+  textAlign: 'center',
+  fontSize: 16,
+  color: '#1E050B',
+};
+
+styles.HeaderDate = {
+  textAlign: 'center',
+  fontSize: 16,  // Hice el tamaño de la fecha un poco más pequeño
+  color: '#1E050B',
+};
+
+export default CalendarView;

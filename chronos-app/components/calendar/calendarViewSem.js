@@ -11,13 +11,15 @@ const daysOfWeek = [
   { day: 'SUN', date: '11' },
 ];
 
+
+
+
 const events = [
-  { day: 'MON', hour: 10, description: 'Evento texto' },
-  { day: 'MON', hour: 1, description: 'Evento texto' },
-  { day: 'WED', hour: 0, description: 'Evento texto1' },
-  { day: 'SAT', hour: 12, description: 'Evento texto2' },
-  { day: 'SUN', hour: 13, description: 'Evento texto3' },
+  { day: 'MON', hour: 15, description: 'Tarea 1', duration: 3 },
+  { day: 'MON', hour: 1, description: 'Evento texto', duration: 1 },
+  //... otros eventos
 ];
+
 
 const CalendarView = () => {
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
@@ -43,29 +45,37 @@ const CalendarView = () => {
         <View style={styles.rowsContainer}>
           <View style={styles.daysColumn}>
             {daysOfWeek.map((item) => (
-            <View style={styles.headerDayContainer} key={item.day}>
-              <View style ={styles.nuevo}>
+              <View style={styles.headerDayContainer} key={item.day}>
                 <Text style={styles.headerDay}>{item.day}</Text>
                 <Text style={styles.HeaderDate}>{item.date}</Text>
-                </View>
               </View>
             ))}
           </View>
           <ScrollView horizontal={true} style={styles.content}>
-            {Array.from({ length: 24 }).map((_, index) => {
-              const { columnStyles, textStyles } = obtenerEstilo(index);
-              return (
-                <View key={index} style={[styles.column, columnStyles]}>
-                  <Text style={[styles.timeText, textStyles]}>{`${index}:00`}</Text>
-                  <View style={[styles.centeredLine, currentHour === index && styles.activeLine]}></View> 
-                  {events.filter(event => event.hour === index).map((event, idx) => (
-                    <View key={idx} style={[styles.event, { top: daysOfWeek.findIndex(d => d.day === event.day) * 60 + 60 }]}>
-                      <Text style={styles.eventText}>{event.description}</Text>
-                    </View>
-                  ))}
-                </View>
-              );
-            })}
+          {Array.from({ length: 24 }).map((_, index) => {
+  const { columnStyles, textStyles } = obtenerEstilo(index);
+  return (
+    <View key={index} style={[styles.column, columnStyles]}>
+      <Text style={[styles.timeText, textStyles]}>{`${index}:00`}</Text>
+      <View style={[styles.centeredLine, currentHour === index && styles.activeLine]}></View> 
+      {events.filter(event => event.hour === index).map((event, idx) => (
+        <View 
+          key={idx} 
+          style={[
+            styles.event, 
+            { 
+              top: daysOfWeek.findIndex(d => d.day === event.day) * 60 + 60,
+              width: event.duration * 70 - 10 // Aquí ajustamos el ancho según la duración. -10 es para considerar los márgenes.
+            }
+          ]}
+        >
+          <Text style={styles.eventText}>{event.description}</Text>
+        </View>
+      ))}
+    </View>
+  );
+})}
+
           </ScrollView>
         </View>
       </ScrollView>

@@ -1,24 +1,35 @@
 import {View, StyleSheet, Text, TouchableOpacity, Modal} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import React, {useState} from 'react';
-import  AppLoading  from 'expo-app-loading';
+import React, {useState, useEffect} from 'react';
+import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
-import * as Permissions from 'expo-permissions';
 import LottieView from 'lottie-react-native';
-import { Audio } from 'expo-av';
-
-
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 
 export default function HeaderDia() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
+    const [date, setDate] = useState(new Date());
+    const [show, setShow] = useState(false);
+
+
     async function loadFonts() {
         await Font.loadAsync({
             'Gabarito': require('../../assets/fonts/Gabarito-VariableFont_wght.ttf'),
         });
     }
+
+    useEffect(() => {
+        // Cargar fuentes y otros recursos
+        async function loadData() {
+            await loadFonts();
+            // Puedes agregar más carga de recursos aquí si es necesario
+        }
+
+        loadData();
+    }, []);
 
     if (!fontsLoaded) {
         return (
@@ -41,9 +52,6 @@ export default function HeaderDia() {
         }, 20000);
     };
 
-
-
-
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
@@ -52,7 +60,6 @@ export default function HeaderDia() {
         console.log(`${option} Selected`);
         toggleModal();
     };
-
     const DateModal = () => (
         <Modal
             animationType="slide"
@@ -78,6 +85,7 @@ export default function HeaderDia() {
     } else if (currentHour >= 18 || currentHour < 6) {
         greeting = "Good Evening!";
     }
+
     function MicrophoneAnimation() {
         return (
             <LottieView
@@ -89,6 +97,11 @@ export default function HeaderDia() {
         );
     }
 
+    const onChange = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        setShow(false);
+        setDate(currentDate);
+    };
 
 
     return (
@@ -97,22 +110,47 @@ export default function HeaderDia() {
                 <TouchableOpacity onPress={toggleModal}>
                     <Text style={styles.text}>Today</Text>
                 </TouchableOpacity>
-                <DateModal />
+                <DateModal/>
                 <Text style={styles.greetingTitle}>{greeting}</Text>
                 <Text style={styles.greetingSubtitle}>Chronos</Text>
             </View>
             <View style={styles.taskHeader}>
-                <Text style={styles.title}>Task Today</Text>
+                <Text style={styles.title}>
+                    {date.toDateString()}
+                </Text>
                 <View style={styles.buttonsContainer}>
-                    {isRecording && <MicrophoneAnimation />}
+                    {isRecording && <MicrophoneAnimation/>}
                     <TouchableOpacity style={styles.button} onPress={onMicrophonePress}>
-                        <Icon name="microphone-alt" size={30} color="#982C40"/>
+                        <Icon name="microphone-alt" size={28} color="#982C40"/>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.button} onPress={onAddTaskPress}>
-                        <Icon name="plus-circle" size={30} color="#982C40"/>
+                        <Icon name="plus-circle" size={28} color="#982C40"/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={() => setShow(true)}>
+                        <Icon name="calendar-alt" size={28} color="#982C40"/>
                     </TouchableOpacity>
                 </View>
             </View>
+            <Modal
+                visible={show}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setShow(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalMessageContainer}>
+                        <Text style={styles.modalMessage}>Escoge una fecha:</Text>
+                        <DateTimePicker
+                            testID="dateTimePicker"
+                            value={date}
+                            mode="date"
+                            is24Hour={true}
+                            display="default"
+                            onChange={onChange}
+                        />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -129,12 +167,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         justifyContent: 'center',
         alignItems: 'right',
-        height: 150,
+        height: 140,
     },
     greetingTitle: {
         fontSize: 30,
         color: "#982C40",
-        paddingTop:13,
+        paddingTop: 13,
     },
     greetingSubtitle: {
         fontSize: 25,
@@ -147,14 +185,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 10,
         backgroundColor: '#ffffff',
-        height: 150,
+        height: 140,
     },
     buttonsContainer: {
         flexDirection: 'row',
     },
     button: {
         backgroundColor: '#ffffff',
-        borderRadius: 45,
+        borderRadius: 50,
         padding: 9,
         marginLeft: 10,
         borderColor: "#982C40",
@@ -162,10 +200,10 @@ const styles = StyleSheet.create({
 
     },
     title: {
-        fontSize: 45,
+        fontSize: 25,
         fontWeight: 'bold',
         color: "#982C40",
-        fontFamily:"Gabarito",
+        fontFamily: "Gabarito",
         paddingTop: 10,
 
     },
@@ -189,11 +227,30 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
     },
     animationExpanded: {
-        width: 400,
-        height: 400,
+        width: 380,
+        height: 380,
         position: 'absolute',
-        top: -35,
-        left: -85,
+        top: -75,
+        left: -60,
         zIndex: 1,
-    }
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'transparent'
+    },
+    modalMessageContainer: {
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalMessage: {
+        fontSize: 16,
+        marginBottom: 10,
+        right:-10,
+        fontFamily:'Gabarito',
+        color: "#982C40",
+    },
 });

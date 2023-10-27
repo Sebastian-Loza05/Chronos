@@ -27,7 +27,7 @@ export default function Login() {
         
         if (token) {
           // Realiza una solicitud GET al servidor para verificar el token
-          const response = await fetch('http://192.168.174.71:3000/auth/token', {
+          const response = await fetch('http://192.168.0.16:3000/auth/token', {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -161,6 +161,7 @@ if (!fontsLoaded) {
                   <Icon name="lock" size={20} color="#982C40" style={styles.iconStyle}/>
                     <TextInput
                         placeholder="Password"
+                        secureTextEntry={true}
                         style={styles.inputWithIcon}
                         value={password}
                         onChangeText={handlePasswordChange}

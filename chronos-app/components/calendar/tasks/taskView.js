@@ -1,6 +1,7 @@
 import React, { useState }  from "react";
 import { View, Text, StyleSheet, Modal } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import {hexToRgba} from "../../functions/functions"
 
 export default function Task({taskKey, task}) {
   async function loadFonts() {
@@ -14,7 +15,7 @@ export default function Task({taskKey, task}) {
 
   const [hoursStart, minutesStart, secondsStart] = task.start_time.split(":").map(Number);
   const [hoursEnd, minutesEnd, secondsEnd] = task.end_time.split(":").map(Number);
-
+  
   const left = (hoursStart*60 + minutesStart) * totalInterval + 35;
   const end = (hoursEnd*60 + minutesEnd) * totalInterval + 35;
   const width = end - left;
@@ -24,15 +25,12 @@ export default function Task({taskKey, task}) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
   }
   const color = colors[getRandomInt(0,3)]
+  const colorModal = hexToRgba(color, 0.95);
   
   const top = (taskKey%3 != 0) ? `${80-(80/(taskKey%3))}%`: '80%';
 
   const [isModalVisible, setModalVisible] = useState(false);
   
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  }
-
   const styles_customized = StyleSheet.create({
     task: {
       flex: 1,
@@ -49,7 +47,20 @@ export default function Task({taskKey, task}) {
       shadowOpacity: 0.5,
       shadowRadius: 10,
       elevation: 7
-    }
+    },
+    modalTask: {
+      padding: '5%',
+      height: '30%',
+      width: '80%',
+      backgroundColor: colorModal,
+      borderRadius: 10,
+      shadowColor: 'black',
+      shadowOffset: { width:0, height: 7 },
+      shadowOpacity: 0.5,
+      shadowRadius: 10,
+      elevation: 7,
+      fontFamily: 'Gabarito',
+    },
   })
   return (
     <View style={styles_customized.task}>
@@ -63,8 +74,11 @@ export default function Task({taskKey, task}) {
         onRequestClose={() => setModalVisible(false)}
       > 
         <View style={styles.modal}>
-          <View style={styles.modalTask}>
+          <View style={styles_customized.modalTask}>
             <Text style={styles.taskTitle}> {task.name} </Text>
+            <Text style={styles.info}> {task.date} </Text>
+            <Text style={styles.info}> 
+              {task.start_time.substring(0,5)} - {task.end_time.substring(0,5)} </Text>
           </View> 
         </View> 
       </Modal>
@@ -92,22 +106,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  modalTask: {
-    padding: '5%',
-    height: '50%',
-    width: '80%',
-    backgroundColor: '#A8A8A8',
-    borderRadius: 10,
-    shadowColor: 'black',
-    shadowOffset: { width:0, height: 7 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 7,
-    fontFamily: 'Gabarito',
-  },
   taskTitle: {
     fontSize: 20,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    margin: 0,
+    padding: 0
+  },
+  info: {
+    marginTop: '5%'
   }
 })
 

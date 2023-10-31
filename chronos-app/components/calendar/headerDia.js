@@ -5,6 +5,7 @@ import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
 import LottieView from 'lottie-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { getTasksDate } from "../../app/api";
 
 
 export default function HeaderDia() {
@@ -49,7 +50,7 @@ export default function HeaderDia() {
         setIsRecording(true);
         setTimeout(() => {
             setIsRecording(false);
-        }, 20000);
+        }, 10000);
     };
 
     const toggleModal = () => {
@@ -97,10 +98,19 @@ export default function HeaderDia() {
         );
     }
 
-    const onChange = (event, selectedDate) => {
+    const onChange = async (event, selectedDate) => {
+        console.log(selectedDate);
         const currentDate = selectedDate || date;
         setShow(false);
-        setDate(currentDate);
+        const formattedDate = selectedDate.toDateString();
+        console.log("dia: ", formattedDate);
+        const body = {
+          type_search: 1,
+          begin_date: formattedDate
+        }
+        const dataTasks = await getTasksDate(body);
+        if (data.success)
+          setTasks(dataTasks.tasks)
     };
 
 
@@ -139,7 +149,6 @@ export default function HeaderDia() {
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalMessageContainer}>
-                        <Text style={styles.modalMessage}>Escoge una fecha:</Text>
                         <DateTimePicker
                             testID="dateTimePicker"
                             value={date}
@@ -230,8 +239,8 @@ const styles = StyleSheet.create({
         width: 380,
         height: 380,
         position: 'absolute',
-        top: -75,
-        left: -60,
+        top: '-43%',
+        left: '-35%',
         zIndex: 1,
     },
     centeredView: {

@@ -77,6 +77,12 @@ export default function TabsLayout() {
           tabBarLabel: 'Profile',
         }}
       />
+      <Tabs.Screen
+        name="semana"
+        options={{
+          href: null
+        }}
+      />
     </Tabs>
   )
 }

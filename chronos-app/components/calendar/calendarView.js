@@ -8,10 +8,6 @@ export default function CalendarView() {
   const [currentHour, setCurrentHour]= useState(new Date().getHours());
   const [currentMinute, setCurrentMinute]= useState(new Date().getMinutes());
   const [left, setLeft] = useState(140);
-  const [formData, setFormData] = useState({
-    type_search: 0,
-    begin_date: ''
-  })
   const totalInterval = 70.0/60;
 
   const style_customized = StyleSheet.create({

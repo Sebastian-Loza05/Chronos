@@ -17,8 +17,9 @@ export default function Tasks() {
       const data = await getTasksDate(body);
       const data_tasks = data.tasks;
       data_tasks.sort(compararHoras);
-      if (data.success)
-        setTasks(data.tasks)
+      if (data.success){
+        setTasks(data_tasks);
+      }
     }
 
     getTasks();

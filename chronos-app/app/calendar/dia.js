@@ -1,24 +1,12 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { StyleSheet, View, Button } from "react-native";
-import {router} from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeaderDia from "../../components/calendar/headerDia";
 import CalendarView from "../../components/calendar/calendarView";
 
 export default function CalendarDia() {
+  const [tasks, setTasks] = useState([]);
   
-  const handleLogout = async () => {
-    try {
-      // Elimina el token de AsyncStorage para cerrar la sesión
-      await AsyncStorage.removeItem('userToken');
-      // Registra un mensaje en la consola cuando el usuario cierra sesión
-      console.log('Usuario cerró sesión exitosamente');
-      // Redirige al usuario a la pantalla de inicio de sesión
-      router.replace('auth/login');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
-  };
 
   return (
     <View style={styles.container}>

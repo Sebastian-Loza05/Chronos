@@ -181,12 +181,10 @@ def delete_profile():
     try:
         current_user = get_jwt_identity()
         user = Users.get_by_id(current_user["id"])
-        profile = user.profile
-        profile.delete()
         user.delete()
 
         return ({
-            'succes': True,
+            'success': True,
         })
     except Exception as e:
         print(e)

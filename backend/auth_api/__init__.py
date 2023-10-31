@@ -100,7 +100,7 @@ def login_by_token():
         if 'Authorization' in request.headers:
             token = request.headers["Authorization"]
             token = re.sub(rf'\b{palabra_eliminar}\b', '', token)
-            print("token:", token)
+            # print("token:", token)
 
         if token is None or token == "undefined":
             error_401 = True

@@ -153,15 +153,15 @@ def update_task(task_id):
         data = request.get_json()
 
         # Obtenemos los datos de la creación de la tarea
-        tarea = data.get("tarea", None)
-        dia = data.get("dia", None)
-        descripcion = data.get("descripcion", None)
-        estado = data.get("estado", None)
-        lugar = data.get("lugar", None)
-        hora_inicio = data.get("inicio", None)
-        hora_final = data.get("fin", None)
+        name = data.get("name", None)
+        date = data.get("date", None)
+        description = data.get("description", None)
+        state = data.get("state", None)
+        place = data.get("place", None)
+        start_time = data.get("start_time", None)
+        end_time = data.get("end_time", None)
 
-        if tarea is None and dia is None and hora_final is None and hora_final is None and descripcion is None and lugar is None and estado is None:
+        if name is None and date is None and start_time is None and end_time is None and description is None and place is None and state is None:
             error_422 = True
             abort(422)
 
@@ -174,28 +174,28 @@ def update_task(task_id):
             error_404 = True
             abort(404)
 
-        if estado is not None:
-            task.estado = "Completada"
+        if state is not None:
+            task.estado = state
 
-        if tarea is not None:
-            task.tarea = tarea
+        if name is not None:
+            task.tarea = name
 
-        if dia is not None:
-            task.dia = dia
+        if date is not None:
+            task.fecha = date
 
-        if descripcion is not None:
-            task.descripcion = descripcion
+        if description is not None:
+            task.descripcion = description
 
-        if lugar is not None:
-            task.lugar = lugar
+        if place is not None:
+            task.lugar = place
 
-        if hora_inicio is not None:
-            task.hora_inicio = hora_inicio
+        if start_time is not None:
+            task.hora_inicio = start_time
 
-        if hora_final is not None:
-            task.hora_final = hora_final
+        if end_time is not None:
+            task.hora_final = end_time
 
-        print(task)
+        # print(task)
 
         task_id = task.update()
 

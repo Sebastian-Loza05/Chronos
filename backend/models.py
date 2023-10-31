@@ -61,6 +61,7 @@ class Users(db.Model):
 
     def delete(self):
         try:
+            self.profile.delete()
             db.session.delete(self)
             db.session.commit()
         except Exception as e:
@@ -166,7 +167,7 @@ class Tasks(db.Model):
     hora_final = db.Column(db.Time, nullable=False)
 
     def __repr__(self):
-        return f'Task: id = {self.id}, user_id = {self.user_id}, nombre = {self.nombre}, estado = {self.estado}, dia = {self.dia}, inicio = {self.hora_inicio}, fin = {self.hora_final}'
+        return f'Task: id = {self.id}, user_id = {self.user_id}, nombre = {self.nombre}, estado = {self.estado}, fecha = {self.fecha}, inicio = {self.hora_inicio}, fin = {self.hora_final}'
 
     def format(self):
         return {
@@ -231,4 +232,8 @@ class Tasks(db.Model):
         return Tasks.query.filter_by(
             fecha=date
         ).all()
+
+# class Categories(db.Model):
+#     __tablename__ = 'categories'
+
 

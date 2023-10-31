@@ -33,9 +33,10 @@ const styles = StyleSheet.create({
   },
   header: {
     flexGrow: 1,
-    height: '40%',
+    height: '13%',
     width: '100%',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    backgroundColor: 'white',
   },
   calendar: {
     flexGrow: 1,

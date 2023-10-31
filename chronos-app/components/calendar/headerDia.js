@@ -167,7 +167,7 @@ export default function HeaderDia() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        //backgroundColor: 'red',
         width: '100%',
         paddingTop: 25,
     },
@@ -187,14 +187,16 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: 'bold',
         color: "#982C40",
+        marginTop: 10,
     },
     taskHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: 10,
-        backgroundColor: '#ffffff',
-        height: 140,
+        //backgroundColor:'yellow',
+        marginTop: -26,
+        
     },
     buttonsContainer: {
         flexDirection: 'row',
@@ -214,7 +216,7 @@ const styles = StyleSheet.create({
         color: "#982C40",
         fontFamily: "Gabarito",
         paddingTop: 10,
-
+        //backgroundColor: 'red',
     },
     text: {
         fontSize: 18,
@@ -234,6 +236,7 @@ const styles = StyleSheet.create({
         color: "#982C40",
         padding: 10,
         borderTopWidth: 1,
+        
     },
     animationExpanded: {
         width: 380,
@@ -242,6 +245,7 @@ const styles = StyleSheet.create({
         top: '-43%',
         left: '-35%',
         zIndex: 1,
+        
     },
     centeredView: {
         flex: 1,

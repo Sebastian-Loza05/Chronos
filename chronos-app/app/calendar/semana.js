@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     height: '10%',
     width: '100%',
-
   },
   calendar: {
     flexGrow: 1,

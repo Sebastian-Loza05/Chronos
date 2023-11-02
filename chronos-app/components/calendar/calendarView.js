@@ -15,7 +15,7 @@ export default function CalendarView() {
       flex: 1,
       borderLeftWidth: 1.5,
       borderColor: '#AB3D52',
-      borderStyle: 'solid', //antes de pushear o algo volver a cambiar a 'dashed'
+      borderStyle: 'solid',
       width: 0,
       height: "90%",
       position: 'absolute',

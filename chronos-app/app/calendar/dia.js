@@ -2,7 +2,9 @@ import React, {useEffect, useState} from "react";
 import { StyleSheet, View, Button } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeaderDia from "../../components/calendar/headerDia";
-import CalendarView from "../../components/calendar/calendarView";
+//import CalendarView from "../../components/calendar/calendarView";
+import CalendarViewDiaySem from "../../components/calendar/calendarViewDiaySem";
+
 
 export default function CalendarDia() {
   const [tasks, setTasks] = useState([]);
@@ -14,7 +16,7 @@ export default function CalendarDia() {
         <HeaderDia />
       </View>
       <View style={styles.calendar}>
-        <CalendarView />
+        <CalendarViewDiaySem />
       </View>
     </View>
   );

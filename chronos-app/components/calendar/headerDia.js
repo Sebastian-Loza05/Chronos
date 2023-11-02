@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
         color: "#982C40",
         fontFamily: "Gabarito",
         paddingTop: 10,
-        //backgroundColor: 'red',
     },
     text: {
         fontSize: 18,

@@ -5,7 +5,7 @@ import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
 import LottieView from 'lottie-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { getTasksDate } from "../../app/api";
+import {getTasksDate} from "../../app/api";
 
 
 export default function HeaderDia() {
@@ -105,12 +105,12 @@ export default function HeaderDia() {
         const formattedDate = selectedDate.toDateString();
         console.log("dia: ", formattedDate);
         const body = {
-          type_search: 1,
-          begin_date: formattedDate
+            type_search: 1,
+            begin_date: formattedDate
         }
         const dataTasks = await getTasksDate(body);
         if (data.success)
-          setTasks(dataTasks.tasks)
+            setTasks(dataTasks.tasks)
     };
 
 
@@ -136,30 +136,8 @@ export default function HeaderDia() {
                     <TouchableOpacity style={styles.button} onPress={onAddTaskPress}>
                         <Icon name="plus-circle" size={28} color="#982C40"/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => setShow(true)}>
-                        <Icon name="calendar-alt" size={28} color="#982C40"/>
-                    </TouchableOpacity>
                 </View>
             </View>
-            <Modal
-                visible={show}
-                transparent={true}
-                animationType="slide"
-                onRequestClose={() => setShow(false)}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalMessageContainer}>
-                        <DateTimePicker
-                            testID="dateTimePicker"
-                            value={date}
-                            mode="date"
-                            is24Hour={true}
-                            display="default"
-                            onChange={onChange}
-                        />
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 }
@@ -196,7 +174,7 @@ const styles = StyleSheet.create({
         padding: 10,
         //backgroundColor:'yellow',
         marginTop: -26,
-        
+
     },
     buttonsContainer: {
         flexDirection: 'row',
@@ -205,9 +183,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         borderRadius: 50,
         padding: 9,
-        marginLeft: 10,
+        marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 3,
+        top:-50,
+        left: -10,
 
     },
     title: {
@@ -235,7 +215,7 @@ const styles = StyleSheet.create({
         color: "#982C40",
         padding: 10,
         borderTopWidth: 1,
-        
+
     },
     animationExpanded: {
         width: 380,
@@ -244,7 +224,7 @@ const styles = StyleSheet.create({
         top: '-43%',
         left: '-35%',
         zIndex: 1,
-        
+
     },
     centeredView: {
         flex: 1,
@@ -261,8 +241,8 @@ const styles = StyleSheet.create({
     modalMessage: {
         fontSize: 16,
         marginBottom: 10,
-        right:-10,
-        fontFamily:'Gabarito',
+        right: -10,
+        fontFamily: 'Gabarito',
         color: "#982C40",
     },
 });

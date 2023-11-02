@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text, TouchableOpacity, Modal} from "react-native";
+import {View, StyleSheet, Text, TouchableOpacity, Modal, TextInput} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import React, {useState, useEffect} from 'react';
 import AppLoading from 'expo-app-loading';
@@ -14,6 +14,10 @@ export default function HeaderDia() {
     const [isRecording, setIsRecording] = useState(false);
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
+    const [taskText, setTaskText] = useState('');
+    const [taskDuration, setTaskDuration] = useState('');
+    const [modalVisible, setmodalVisible] = useState(false);
+
 
 
     async function loadFonts() {
@@ -41,9 +45,8 @@ export default function HeaderDia() {
             />
         );
     }
-
     const onAddTaskPress = () => {
-        console.log('Add Task Pressed');
+        setmodalVisible(true);
     };
 
     const onMicrophonePress = () => {
@@ -112,7 +115,18 @@ export default function HeaderDia() {
         if (data.success)
             setTasks(dataTasks.tasks)
     };
+    const handleCloseModal = () => {
+        setmodalVisible(false);
+        setTaskDuration(false);
+        setTaskText('');
+    };
 
+    const handleSaveTask = () => {
+        console.log('Task to save:', taskText, taskDuration);
+        setModalVisible(false);
+        setTaskText('');
+        setTaskDuration('');
+    };
 
     return (
         <View style={styles.container}>
@@ -136,7 +150,36 @@ export default function HeaderDia() {
                     <TouchableOpacity style={styles.button} onPress={onAddTaskPress}>
                         <Icon name="plus-circle" size={28} color="#982C40"/>
                     </TouchableOpacity>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={handleCloseModal}
+                    >
+                        <View style={styles.modalView}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Enter new task"
+                                value={taskText}
+                                onChangeText={setTaskText}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Enter duration"
+                                value={taskDuration}
+                                onChangeText={setTaskDuration}
+
+                            />
+                            <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
+                                <Text  style={styles.textbutton}>Guardar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
+                                <Text style={styles.textbutton}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Modal>
                 </View>
+
             </View>
         </View>
     );
@@ -221,10 +264,9 @@ const styles = StyleSheet.create({
         width: 380,
         height: 380,
         position: 'absolute',
-        top: '-43%',
-        left: '-35%',
+        top: '-22%',
+        left: '-27%',
         zIndex: 1,
-
     },
     centeredView: {
         flex: 1,
@@ -245,4 +287,59 @@ const styles = StyleSheet.create({
         fontFamily: 'Gabarito',
         color: "#982C40",
     },
+    modalView: {
+        margin: 20,
+        backgroundColor: "#ffedf1",
+        borderRadius: 20,
+        padding: 25,
+        alignItems: "center",
+        top:'30%',
+        shadowColor: "#000000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+
+    },
+    input: {
+        width: '80%',
+        padding: 15,
+        margin: 10,
+        borderWidth: 2,
+        borderColor: "#982C40",
+        borderRadius: 15,
+        backgroundColor:"#ffffff",
+        fontFamily:'Gabarito',
+    },
+    saveButton: {
+        backgroundColor: '#ffffff',
+        borderRadius: 50,
+        padding: 9,
+        marginLeft: 15,
+        borderColor: "#982C40",
+        borderWidth: 2,
+        top:-6,
+        left: -10,
+        marginBottom:10,
+        marginTop:15,
+        fontFamily:'Gabarito'
+    },
+    cancelButton: {
+        backgroundColor: '#ffffff',
+        borderRadius: 50,
+        padding: 8,
+        marginLeft: 15,
+        borderColor: "#982C40",
+        borderWidth: 2,
+        top:-6,
+        left: -10,
+    },
+    textbutton:{
+        fontSize:13,
+        fontFamily:'Gabarito',
+        color:"#982C40"
+    }
 });

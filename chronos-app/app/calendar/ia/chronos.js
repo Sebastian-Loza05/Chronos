@@ -5,14 +5,16 @@ import AppLoading from 'expo-app-loading';
 import {useState, useEffect} from 'react';
 import * as Font from 'expo-font';
 import Icon from "react-native-vector-icons/FontAwesome5";
-import Modal from 'react-native-modal';
 import {ScrollView} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 
 export default function Chronos() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
+    //const Tab = createBottomTabNavigator();
     const [suggestions, setSuggestions] = useState([
         {
             title: "Hacer ejercicio",
@@ -55,8 +57,8 @@ export default function Chronos() {
         setSuggestionsOpen(prevState => !prevState);
     };
 
+    // Aquí se puede obtener las sugerencias de la IA
     function getNewSuggestionFromAI() {
-        // Aquí simularemos obtener una sugerencia de la IA
         const newSuggestion = {
             title: "Leer un libro",
             time: "8:00 PM - 9:00 PM",
@@ -80,7 +82,6 @@ export default function Chronos() {
         );
     }
 
-
     function RobotAnimation() {
         return (
             <LottieView
@@ -103,10 +104,9 @@ export default function Chronos() {
         );
     }
     function handleSuggestionPress(suggestion) {
-        // navigation.navigate('CalendarScreen', { /* parámetros si es necesario */ });
+        //navigation.navigate('CalendarDia', { suggestion: suggestion });
         console.log('Suggestion pressed:', suggestion);
     }
-
 
     return (
         <View style={styles.container}>
@@ -162,6 +162,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "#982C40",
         paddingTop: 1,
+        top: -35,
         marginBottom: 20,
         alignItems: 'center',
         justifyContent: 'center',
@@ -171,6 +172,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         borderRadius: 15,
         padding: 20,
+        top: -40,
         width: '90%',
         height: '40%',
         alignItems: 'center',
@@ -182,6 +184,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 40,
         marginTop: 20,
+        top:-40,
         alignSelf: 'center',
     },
     buttonText: {
@@ -189,19 +192,22 @@ const styles = StyleSheet.create({
         color: "#982C40",
         fontFamily: 'Gabarito'
     },
-    translationText: {
-        marginTop: 40,
-        fontSize: 18,
-        color: '#A9A9A9',
-        textAlign: 'center',
-    },
     animationExpanded: {
         width: 250,
         height: 250
+
     },
     animation: {
-        width: 80,
-        height: 80
+        width: 270,
+        height: 270,
+        position: 'absolute',
+        zIndex: 10,
+        top: '50%',
+        left: '50%',
+        transform: [
+            { translateX: -190 },
+            { translateY: -142 },
+        ],
     },
     suggestionsPanel: {
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -276,10 +282,10 @@ const styles = StyleSheet.create({
 
     },
     suggestionsContainer: {
-        width: '90%', // por ejemplo
-        maxHeight: '80%', // por ejemplo
-        backgroundColor: 'white', // o cualquier otro color de fondo que desees
-        borderRadius: 10, // si quieres bordes redondeados
+        width: '90%',
+        maxHeight: '80%',
+        backgroundColor: 'white',
+        borderRadius: 10,
     },
     iconWithText: {
         flexDirection: 'row',

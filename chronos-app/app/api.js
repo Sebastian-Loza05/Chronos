@@ -100,7 +100,6 @@ export const getTasksDate = async (formData) => {
   }
 };
 
-<<<<<<< HEAD
 export const sendAudio = async (formData) => {
   try {
     const token = await AsyncStorage.getItem('userToken');
@@ -118,7 +117,6 @@ export const sendAudio = async (formData) => {
     console.log(error);
   }
 }
-=======
 
 export const createTask = async (formData) => {
   try {
@@ -162,7 +160,5 @@ export const updateTask = async (taskId, formData) => {
   }
 };
 
-
->>>>>>> 680aed92cc7b7cc638de5d23d88dd0a173103192
 
   

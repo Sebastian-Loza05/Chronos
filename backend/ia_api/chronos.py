@@ -48,16 +48,21 @@ class Chronos:
         response = self.get_completion(behavior, prompt)
         return response
     
-    # Pop up en la pantalla principal para guiar el uso de chronos
-    def chronos_suggestions(fecha, bloqueados):
-        suggestions = []
-        behavior = """
-
-        """
-
-        print("Chronos esta generando sugerencias...")
-
-        return suggestions
+    def get_suggestion(self, fecha, horario, speech):
+        behavior = """"
+          A continuación, vas a actuar como un sugeridor de horarios llamado “Chronos”. 
+          Tu tarea es sugerir un horario óptimo para realizar una actividad propuesta por el usuario. 
+          Como entrada tendrás los siguientes parámetros:
+          \n- Fecha actual\n- Horarios bloqueados\n- Actividad descrita por el usuario (speech que contiene la actividad y el tiempo)\n
+          Las fechas tiene el siguiente formato:\n<día>/<mes>/<año> <hora-inicio> - <hora-final>: <actividad>\n
+          SOLAMENTE debes responder la fecha con el formato dado. 
+          NO realices ningún comentario adicional al respecto por favor (<día>/<mes>/<año> <hora-inicio> - <hora-final>: <actividad>).
+        """ 
+        horario = '\n'.join(horario)
+        prompt = f"Fecha actual: {fecha}\nHorarios bloqueados:\n{horario}Actividad descrita por el usuario:\n{speech}"
+        print("Chronos esta pensando...")
+        response = self.get_completion(behavior, prompt)
+        return response
     
 class User:
 
@@ -65,14 +70,15 @@ class User:
         self.fecha = datetime.date.today().strftime("%d/%m/%Y")
         self.horario = horario
         self.chronos = Chronos("gpt-3.5-turbo")
-
-    def make_request(self, actividad, tiempo):
-        response = self.chronos.get_request(self.fecha, actividad, tiempo, self.horario)
+    
+    def make_request(self, speech):
+        response = self.chronos.get_suggestion(self.fecha, self.horario, speech)
         print(f"Chronos: {response}")
         print("¿Deseas insertar esta actividad en tu horario?")
         answer = input()
         if answer == "si":
             self.horario.append(response)
+        return response
             
     def get_horario(self):
         return self.horario

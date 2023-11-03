@@ -16,6 +16,7 @@ from datetime import timedelta
 from werkzeug.utils import secure_filename
 
 from transcribe import speech_to_text
+from chronos import User
 
 SECRET_KEY = config('SECRET_KEY')
 ACCESS_EXPIRES = timedelta(hours=1)
@@ -52,9 +53,20 @@ def voice_recomendations():
 
         text = speech_to_text('uploads/audio.wav')
 
+        horario = [
+            "03/11/2023 00:00 - 08:00: duermo",
+            "03/11/2023 08:00 - 08:30: desayuno",
+            "03/11/2023 08:30 - 09:30 Pasear al perro",
+            "03/11/2023 09:00 - 11:00: Clases de algoritmos",
+            "03/11/2023 16:00 - 18:00: Clases de Machine Learning"
+        ]
+
+        user = User(horario)
+        response = user.make_request(text)
+
         return jsonify({
             'success': True,
-            'text': text
+            'response': response
         })
 
     except Exception as e:

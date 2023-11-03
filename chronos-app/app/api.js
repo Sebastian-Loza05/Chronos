@@ -1,7 +1,7 @@
 // api.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ip = '192.168.0.16'
+const ip = '192.168.100.15'
 
 export const api_user = "http://" + ip + ":3000/"
 export const api_profile = "http://" + ip + ":3001/"
@@ -91,5 +91,49 @@ export const getTasksDate = async (formData) => {
     throw(error);
   }
 };
+
+export const createTask = async (formData) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    const response = await fetch(api_tasks + 'task', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+
+      body: JSON.stringify(formData)
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const updateTask = async (taskId, formData) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    const response = await fetch(api_tasks + `task/${taskId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al actualizar la tarea');
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 
   

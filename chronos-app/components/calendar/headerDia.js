@@ -6,7 +6,7 @@ import * as Font from 'expo-font';
 import LottieView from 'lottie-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {getTasksDate} from "../../app/api";
-
+import {createTask} from "../../app/api";
 
 export default function HeaderDia() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -14,10 +14,14 @@ export default function HeaderDia() {
     const [isRecording, setIsRecording] = useState(false);
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
-    const [taskText, setTaskText] = useState('');
-    const [taskDuration, setTaskDuration] = useState('');
     const [modalVisible, setmodalVisible] = useState(false);
-
+    const [name, setName] = useState('');
+    const [place, setPlace] = useState('');
+    const [description, setDescription] = useState('');
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
+    const [dia, setDia]=useState('');
+    const [State, setState]=useState('');
 
 
     async function loadFonts() {
@@ -117,72 +121,158 @@ export default function HeaderDia() {
     };
     const handleCloseModal = () => {
         setmodalVisible(false);
-        setTaskDuration(false);
-        setTaskText('');
     };
+    const handleSaveTask = async () => {
+        if (!name.trim()) {
+            alert('Por favor, ingrese el nombre de la tarea.');
+            return;
+        }
+        if (!dia.trim()) {
+            alert('Por favor, ingrese la fecha de la tarea.');
+            return;
+        }
+        if (!startTime.trim()) {
+            alert('Por favor, ingrese la hora de inicio de la tarea.');
+            return;
+        }
+        if (!endTime.trim()) {
+            alert('Por favor, ingrese la hora de finalización de la tarea.');
+            return;
+        }
 
-    const handleSaveTask = () => {
-        console.log('Task to save:', taskText, taskDuration);
-        setModalVisible(false);
-        setTaskText('');
-        setTaskDuration('');
+        const formData = {
+            name: name.trim(),
+            place: place.trim(),
+            description: description.trim(),
+            state:State.trim(),
+            date: dia.trim(),
+            start_time: startTime.trim(),
+            end_time: endTime.trim(),
+        };
+
+        try {
+            const data = await createTask(formData);
+            console.log('Success:', data);
+            setModalVisible(false);
+            setName('');
+            setPlace('');
+            setDescription('');
+            setDia('');
+            setStartTime('');
+            setEndTime('');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al guardar la tarea. Por favor, intente de nuevo.');
+        }
     };
+    /*const handleUpdateTask = async () => {
+        const formData = {
+            name,
+            date,
+            description,
+            State,
+            place,
+            start_time: startTime,
+            end_time: endTime,
+        };
+
+        try {
+            const taskId = 'ID_TO_TASK_UPDATE';
+            const data = await updateTask(taskId, formData);
+            console.log('Task updated:', data);
+            setModalVisible(false);
+            setName('');
+            setPlace('');
+            setDescription('');
+            setState('');
+            setDia('');
+            setStartTime('');
+            setEndTime('');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al actualizar la tarea. Por favor, intente de nuevo.');
+        }
+    };*/
+
 
     return (
-        <View style={styles.container}>
-            <View style={styles.greetingHeader}>
-                <TouchableOpacity onPress={toggleModal}>
-                    <Text style={styles.text}>Today</Text>
-                </TouchableOpacity>
-                <DateModal/>
-                <Text style={styles.greetingTitle}>{greeting}</Text>
-                <Text style={styles.greetingSubtitle}>Chronos</Text>
-            </View>
-            <View style={styles.taskHeader}>
-                <Text style={styles.title}>
-                    {date.toDateString()}
-                </Text>
-                <View style={styles.buttonsContainer}>
-                    {isRecording && <MicrophoneAnimation/>}
-                    <TouchableOpacity style={styles.button} onPress={onMicrophonePress}>
-                        <Icon name="microphone-alt" size={28} color="#982C40"/>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={onAddTaskPress}>
-                        <Icon name="plus-circle" size={28} color="#982C40"/>
-                    </TouchableOpacity>
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={modalVisible}
-                        onRequestClose={handleCloseModal}
-                    >
-                        <View style={styles.modalView}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Enter new task"
-                                value={taskText}
-                                onChangeText={setTaskText}
-                            />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Enter duration"
-                                value={taskDuration}
-                                onChangeText={setTaskDuration}
-
-                            />
-                            <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
-                                <Text  style={styles.textbutton}>Guardar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
-                                <Text style={styles.textbutton}>Cancelar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Modal>
-                </View>
-
-            </View>
+    <View style={styles.container}>
+        <View style={styles.greetingHeader}>
+            <TouchableOpacity onPress={toggleModal}>
+                <Text style={styles.text}>Today</Text>
+            </TouchableOpacity>
+            <DateModal/>
+            <Text style={styles.greetingTitle}>{greeting}</Text>
+            <Text style={styles.greetingSubtitle}>Chronos</Text>
         </View>
-    );
+        <View style={styles.taskHeader}>
+            <Text style={styles.title}>
+                Hola
+            </Text>
+            <View style={styles.buttonsContainer}>
+                {isRecording && <MicrophoneAnimation/>}
+                <TouchableOpacity style={styles.button} onPress={onMicrophonePress}>
+                    <Icon name="microphone-alt" size={28} color="#982C40"/>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={onAddTaskPress}>
+                    <Icon name="plus-circle" size={28} color="#982C40"/>
+                </TouchableOpacity>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={handleCloseModal}
+                >
+                    <View style={styles.modalView}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Task Name"
+                            value={name}
+                            onChangeText={setName}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Date"
+                            value={dia}
+                            onChangeText={setDia}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Start Time"
+                            value={startTime}
+                            onChangeText={setStartTime}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="End Time"
+                            value={endTime}
+                            onChangeText={setEndTime}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Place (Optional)"
+                            value={place}
+                            onChangeText={setPlace}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Description (Optional)"
+                            value={description}
+                            onChangeText={setDescription}
+                        />
+                        <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
+                            <Text style={styles.textbutton}>Guardar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
+                            <Text style={styles.textbutton}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Modal>
+            </View>
+
+        </View>
+    </View>
+);
 }
 
 const styles = StyleSheet.create({
@@ -229,7 +319,7 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 3,
-        top:-50,
+        top: -50,
         left: -10,
 
     },
@@ -293,7 +383,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 25,
         alignItems: "center",
-        top:'30%',
+        top: '20%',
         shadowColor: "#000000",
         shadowOffset: {
             width: 0,
@@ -311,8 +401,8 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: "#982C40",
         borderRadius: 15,
-        backgroundColor:"#ffffff",
-        fontFamily:'Gabarito',
+        backgroundColor: "#ffffff",
+        fontFamily: 'Gabarito',
     },
     saveButton: {
         backgroundColor: '#ffffff',
@@ -321,11 +411,11 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,
-        top:-6,
+        top: -6,
         left: -10,
-        marginBottom:10,
-        marginTop:15,
-        fontFamily:'Gabarito'
+        marginBottom: 10,
+        marginTop: 15,
+        fontFamily: 'Gabarito'
     },
     cancelButton: {
         backgroundColor: '#ffffff',
@@ -334,12 +424,12 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,
-        top:-6,
+        top: -6,
         left: -10,
     },
-    textbutton:{
-        fontSize:13,
-        fontFamily:'Gabarito',
-        color:"#982C40"
-    }
+    textbutton: {
+        fontSize: 13,
+        fontFamily: 'Gabarito',
+        color: "#982C40"
+    },
 });

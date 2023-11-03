@@ -77,6 +77,7 @@ export const loginByToken = async () => {
 export const getTasksDate = async (formData) => {
   try {
     const token = await AsyncStorage.getItem('userToken');
+    console.log('Sending data to API:', JSON.stringify(formData)); // Asegúrate de que los datos son correctos
     const response = await fetch(api_tasks + 'tasks/search', {
       method: 'POST',
       headers: {
@@ -84,12 +85,18 @@ export const getTasksDate = async (formData) => {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(formData)
-    })
+    });
 
-    return await response.json()
+    console.log('Response status:', response.status);
+    const responseJson = await response.json();
+    console.log('Response from API:', responseJson);
+
+    return responseJson;
   } catch (error) {
+    console.error('Error in getTasksDate:', error);
     throw(error);
   }
 };
+
 
   

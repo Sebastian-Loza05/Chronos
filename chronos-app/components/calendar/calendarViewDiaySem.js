@@ -1,13 +1,172 @@
+//CalendarViewDiaySem (todo es dinamico y solo falta poner + estetico el modal cuando se presiona una tarea *nda + uwu*)
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableWithoutFeedback, Dimensions} from "react-native"
+import Modal from 'react-native-modal';
 import { horas } from "./../../app/horas"
 import Tasks from "./tasks/tasksView";
 import moment from 'moment';
 import Swiper from 'react-native-swiper';
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {getTasksDate} from '../../../chronos-app/app/api';
+import { TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import {compararHoras} from "../functions/functions";
 
 const {width} = Dimensions.get('screen');
 
+const getUniqueColor = (taskId) => {
+    const colors = [
+    //pink, verdebonito, skyblue, amarillo, moradito, lightcoral, azuleado, fucsia/rosado
+      'pink', '#4CE862', 'skyblue', '#FFE633', '#EE62FF', 'lightcoral', '#3BA3FF', '#FF62A5', 
+    ];
+  
+    const colorIndex = taskId % colors.length; // Usando el id de la tarea se obteniene un índice de color especifico uwu
+    return colors[colorIndex];
+  };
+
+const TasksList = ({ tasks, containerHeight }) => {
+  console.log("Tasks inside TasksList:", tasks);
+  return (
+    <View style={{ position: 'relative', flex: 1 }}>
+      {tasks.map((task) => (
+        <TaskItem key={task.id} task={task} containerHeight={containerHeight} />
+      ))}
+    </View>
+  );
+};
+
+const TaskItem = ({ task, containerHeight }) => {
+    const taskColor = getUniqueColor(task.id);
+    const startTime = moment(task.start_time, 'HH:mm');
+    const endTime = moment(task.end_time, 'HH:mm');
+  
+    const durationInMinutes = endTime.diff(startTime, 'minutes');
+  
+    const topPosition = ((startTime.hours() * containerHeight) + ((startTime.minutes() / 60) * containerHeight))-1645;
+    const taskHeight = (durationInMinutes / 60) * containerHeight;
+  
+    const taskStyle = {
+      position: 'absolute',
+      top: topPosition,
+      height: taskHeight,
+      width: '78%',
+      marginLeft: 60,
+      borderRadius: 15,
+      padding: 10,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: taskColor, 
+    };
+
+    console.log("StartTime:", startTime);
+    console.log("EndTime:", endTime);
+    console.log("Top Position:", topPosition);
+    console.log("Task Height:", taskHeight);
+  
+  
+    const timeStyle = {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 5,  // Separación entre el nombre de la tarea y el tiempo
+    };
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const toggleModal = () => {
+        console.log("Touched task. Modal should open.");
+        setIsModalVisible(!isModalVisible);
+    };
+
+    const closeButtonStyle = {
+        position: 'absolute',
+        top: 20, 
+        right: 20,
+      };
+      
+      const closeIconStyle = {
+        fontSize: 20, // Tamaño del icono
+        color: 'red', // Color del icono
+      };
+
+      const modalStyle = {
+        backgroundColor: taskColor,
+        padding: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        height: 513,
+        width: 340,
+     };
+
+     const titleStyle ={
+        fontWeight: 'bold',
+        marginBottom: 115,
+        marginTop: -160,
+        fontSize: 28,
+        textAlign: 'center',
+     };
+     const dateStyle = {
+        //backgroundColor: 'skyblue',
+        marginBottom: 20,
+        marginTop: -80,
+
+     };
+     const starttimeStyle={
+        //backgroundColor: 'green',
+        marginBottom: 20,
+
+     };
+     const endtimeStyle={
+        //backgroundColor: 'yellow',
+        marginBottom: 20,
+     };
+
+     const descripStyle={
+        marginBottom: 20,
+        //backgroundColor: 'orange',
+        
+     };
+
+     const placeStyle={
+        
+     };
+
+     const formattedDate = moment.utc(task.date).format('ddd, DD MMM YYYY');
+
+      return (
+        <View>
+          <TouchableOpacity onPress={toggleModal}>
+            <View style={taskStyle}>
+              <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{task.name}</Text>
+              <View style={timeStyle}>
+                <Text>⏰</Text>
+                <Text style={{ marginLeft: 5 }}>{task.start_time} - {task.end_time}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <Modal isVisible={isModalVisible}>
+            <View style={modalStyle}>
+              {/* Botón de cierre del modal "X" */}
+              <TouchableOpacity style={closeButtonStyle} onPress={toggleModal}>
+                <Icon name="times" style={closeIconStyle} />
+              </TouchableOpacity>
+      
+              {/* Contenido del modal */}
+              <Text style={titleStyle}>{task.name}</Text>
+              <Text style={dateStyle}>Date: {formattedDate}</Text>
+              <Text style={starttimeStyle}>Hora Inicio: {task.start_time}</Text>
+              <Text style={endtimeStyle}>Hora Fin: {task.end_time}</Text>
+              <Text style={descripStyle}>Descripción: {task.description}</Text>
+              <Text style={placeStyle}>Ubicación: {task.place}</Text>
+
+            </View>
+          </Modal>
+        </View>
+      );   
+};
+
+  
 export default function CalendarViewDiaySem() {
     const swiper = React.useRef();
     const [value, setValue] = React.useState(new Date());
@@ -16,7 +175,43 @@ export default function CalendarViewDiaySem() {
     const [currentMinute, setCurrentMinute]= useState(new Date().getMinutes());
     const [left, setLeft] = useState(140);
     const totalInterval = 70.0/60;
-  
+    
+    // Cambia el estado inicial de tareas a un arreglo vacío
+    const [tasks, setTasks] = useState([]);
+
+    // useEffect para cargar las tareas cuando el componente se monta o la fecha cambia
+
+    useEffect(() => {
+        const loadTasks = async () => {
+          try {
+            const formData = {
+                type_search: 1,
+                begin_date: moment(value).format('YYYY-MM-DD')
+            };
+            const response = await getTasksDate(formData);
+            console.log('Tasks fetched:', response); 
+            
+            if (response && response.success) { 
+                const tasksWithFormattedTime = response.tasks.map(task => ({
+                  ...task,
+                  start_time: moment(task.start_time, 'HH:mm:ss').format('HH:mm'), // Convertierto a formato 'HH:mm'
+                  end_time: moment(task.end_time, 'HH:mm:ss').format('HH:mm') // Convertierto a formato 'HH:mm'
+              }));
+              tasksWithFormattedTime.sort(compararHoras); // Ordenando las tareas
+              setTasks(tasksWithFormattedTime); // Actualizando el estado con las tareas ordenadas
+            } else {
+              throw new Error('NO HAY TAREAS ESE DIA / API call was not successful');
+            }
+          } catch (error) {
+            console.log("Error fetching tasks:", error.message);
+            setTasks([]); // Vaciando la lista de tareas en caso de error
+          }
+        };
+      
+        loadTasks();
+      }, [value]); // Dependencia de useEffect
+      
+
     const style_customized = StyleSheet.create({
         barra: {
           flex: 1,
@@ -49,15 +244,23 @@ export default function CalendarViewDiaySem() {
         return styles.horaNormal;
     } 
 
+
+    const containerHeight = 70; // Altura de cada contenedor de hora
+
     const horas_text = [];
     Object.keys(horas).map((hora) => {
-      horas_text.push(
-        <View style={styles.hora_view}>
-          <Text key={horas[hora]} style={obtenerEstilo(hora)}> {hora}:00 </Text>
-          <View style={styles.hora_divisor}></View>
+    // Utilizando padStart para formatear las horas en el formato "00:00"
+    const formattedHour = hora.toString().padStart(2, '0');
+
+    horas_text.push(
+        <View key={horas[hora]} style={[styles.hora_view, { height: containerHeight }]}>
+        <Text style={obtenerEstilo(hora)}> {formattedHour}:00 </Text>
+        <View style={styles.hora_divisor}></View>
         </View>
-      )
+    );
     });
+
+
 
     const weeks = React.useMemo(() => {
         const start = moment(start).add(week, 'weeks'). startOf('week');
@@ -135,12 +338,13 @@ export default function CalendarViewDiaySem() {
                 </Swiper>
             </View>
 
-            <View style={{flex: 1, paddingVertical: 24, paddingHorizontal: 16}}>
+            <View style={{flex: 1, paddingVertical: 24}}>
                 <Text style={styles.contentText}>{value.toDateString()}</Text>
-                    <ScrollView contentContainerStyle={styles.all}>
+                <ScrollView> 
+                    <View style={styles.xd}>
                         {horas_text}
-                        <View style={style_customized.barra}></View>
-                        <Tasks />
+                    </View>
+                    <TasksList tasks={tasks} containerHeight={containerHeight} />
                     </ScrollView>
             </View>
         </View>
@@ -149,6 +353,28 @@ export default function CalendarViewDiaySem() {
 }
 
 const styles = StyleSheet.create({
+
+    hora_view: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16, // Espacio a la izquierda de cada hora
+      },
+      hora_divisor: {
+        flex: 1,
+        borderBottomWidth: 0.5, // Grosor más delgado para la línea
+        borderBottomColor: '#AB3D52',
+        marginRight: '-1000%',
+    },
+      horaSombreada: {
+        //hora actual
+        backgroundColor: '#AB3D52',
+      },
+      horaNormal: {
+        // Estilos para otras horas
+      },
+    all: {
+        //backgroundColor: 'yellow',
+    },
     calendar_scroll: {
     flex: 1,
     backgroundColor: '#fff',
@@ -177,7 +403,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#999',
     marginBottom: 12,
-    marginTop:-18,
+    marginTop: -3,
+    textAlign: 'center',
   },
   itemRow:{
     width,
@@ -218,7 +445,7 @@ const styles = StyleSheet.create({
   placeholderContent: {
     borderWidth: 4,
     borderColor: '#e5e7eb',
-    borderStyle: 'dashed',
+    borderStyle: 'solid', //antes de pushear o algo volver a cambiar a 'dashed'
     borderRadius: 9,
     flex: 1,
   },

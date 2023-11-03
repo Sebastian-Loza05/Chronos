@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text, TouchableOpacity, Modal, TextInput} from "react-native";
+import {View, StyleSheet, Text, TouchableOpacity, Modal, TextInput, Platform} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import React, {useState, useEffect} from 'react';
 import AppLoading from 'expo-app-loading';
@@ -7,9 +7,17 @@ import LottieView from 'lottie-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {getTasksDate} from "../../app/api";
 import {createTask} from "../../app/api";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 export default function HeaderDia() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+    const [selectedTime, setSelectedTime] = useState(new Date());
+    const [FinTime, setFinTime] = useState('');
+    const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
+    const [selectedEndTime, setSelectedEndTime] = useState(new Date());
     const [isModalVisible, setModalVisible] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [date, setDate] = useState(new Date());
@@ -104,6 +112,48 @@ export default function HeaderDia() {
             />
         );
     }
+    const onDateChange = (event, selectedDate) => {
+        setDatePickerVisibility(Platform.OS === 'ios');
+        if (selectedDate) {
+            setSelectedDate(selectedDate);
+            const formattedDate = selectedDate.toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
+            setDia(formattedDate);
+        }
+    };
+
+    const onTimeChange = (event, selectedTime) => {
+        setTimePickerVisibility(Platform.OS === 'ios');
+        if (selectedTime) {
+            setSelectedTime(selectedTime);
+            let hours = selectedTime.getHours().toString().padStart(2, '0');
+            let minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+            let formattedTime = `${hours}:${minutes}`;
+
+            setStartTime(formattedTime);
+        }
+    };
+    const onEndTimeChange = (event, selectedTime) => {
+        setEndTimePickerVisibility(Platform.OS === 'ios');
+        if (selectedTime) {
+            setSelectedEndTime(selectedTime);
+            let hours = selectedTime.getHours().toString().padStart(2, '0');
+            let minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+            let formattedTime = `${hours}:${minutes}`;
+
+            setFinTime(formattedTime);
+        }
+    };
+
+    const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
+    const showTimePicker = () => {
+        setTimePickerVisibility(true);
+    };
+    const showEndTimePicker = () => {
+        setEndTimePickerVisibility(true);
+    };
+
 
     const onChange = async (event, selectedDate) => {
         console.log(selectedDate);
@@ -204,11 +254,6 @@ export default function HeaderDia() {
             <DateModal/>
             <Text style={styles.greetingTitle}>{greeting}</Text>
             <Text style={styles.greetingSubtitle}>Chronos</Text>
-        </View>
-        <View style={styles.taskHeader}>
-            <Text style={styles.title}>
-                Hola
-            </Text>
             <View style={styles.buttonsContainer}>
                 {isRecording && <MicrophoneAnimation/>}
                 <TouchableOpacity style={styles.button} onPress={onMicrophonePress}>
@@ -235,19 +280,56 @@ export default function HeaderDia() {
                             placeholder="Date"
                             value={dia}
                             onChangeText={setDia}
+                            onFocus={showDatePicker}
+                            editable={!isDatePickerVisible}
                         />
+                        {isDatePickerVisible && (
+                            <DateTimePicker
+                                value={selectedDate}
+                                mode="date"
+                                display="default"
+                                onChange={onDateChange}
+                            />
+                        )}
                         <TextInput
                             style={styles.input}
                             placeholder="Start Time"
                             value={startTime}
                             onChangeText={setStartTime}
+                            onFocus={showTimePicker}
+                            editable={!isTimePickerVisible}
                         />
+
+                        {isTimePickerVisible && (
+                            <RNDateTimePicker
+                                value={selectedTime}
+                                mode="time"
+                                display="default"
+                                onChange={onTimeChange}
+                                onTouchCancel={() => setTimePickerVisibility(false)}
+                            />
+                        )}
+
                         <TextInput
                             style={styles.input}
                             placeholder="End Time"
-                            value={endTime}
-                            onChangeText={setEndTime}
+                            value={FinTime}
+                            onChangeText={setFinTime}
+                            onFocus={showEndTimePicker}
+                            editable={!isEndTimePickerVisible}
                         />
+
+                        {isEndTimePickerVisible && (
+                            <RNDateTimePicker
+                                value={selectedEndTime}
+                                mode="time"
+                                display="default"
+                                onChange={onEndTimeChange}
+                                onTouchCancel={() => setEndTimePickerVisibility(false)}
+                            />
+                        )}
+
+
                         <TextInput
                             style={styles.input}
                             placeholder="Place (Optional)"
@@ -269,7 +351,6 @@ export default function HeaderDia() {
                     </View>
                 </Modal>
             </View>
-
         </View>
     </View>
 );
@@ -278,9 +359,8 @@ export default function HeaderDia() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        //backgroundColor: 'red',
         width: '100%',
-        paddingTop: 25,
+        paddingTop: 55,
     },
     greetingHeader: {
         padding: 15,
@@ -300,17 +380,12 @@ const styles = StyleSheet.create({
         color: "#982C40",
         marginTop: 10,
     },
-    taskHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 10,
-        //backgroundColor:'yellow',
-        marginTop: -26,
-
-    },
     buttonsContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 2,
+        marginTop: -26,
     },
     button: {
         backgroundColor: '#ffffff',
@@ -319,8 +394,8 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 3,
-        top: -50,
-        left: -10,
+        top: -40,
+        left: 220,
 
     },
     title: {
@@ -354,8 +429,8 @@ const styles = StyleSheet.create({
         width: 380,
         height: 380,
         position: 'absolute',
-        top: '-22%',
-        left: '-27%',
+        top: '-18%',
+        left: '-1%',
         zIndex: 1,
     },
     centeredView: {
@@ -381,9 +456,9 @@ const styles = StyleSheet.create({
         margin: 20,
         backgroundColor: "#ffedf1",
         borderRadius: 20,
-        padding: 25,
+        padding: 20,
         alignItems: "center",
-        top: '20%',
+        top: '15%',
         shadowColor: "#000000",
         shadowOffset: {
             width: 0,
@@ -392,11 +467,13 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
+        width:'88%',
+        height:'62%'
 
     },
     input: {
-        width: '80%',
-        padding: 15,
+        width: '75%',
+        padding: 6,
         margin: 10,
         borderWidth: 2,
         borderColor: "#982C40",
@@ -407,12 +484,12 @@ const styles = StyleSheet.create({
     saveButton: {
         backgroundColor: '#ffffff',
         borderRadius: 50,
-        padding: 9,
+        padding: 5,
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,
         top: -6,
-        left: -10,
+        left: -92,
         marginBottom: 10,
         marginTop: 15,
         fontFamily: 'Gabarito'
@@ -420,12 +497,12 @@ const styles = StyleSheet.create({
     cancelButton: {
         backgroundColor: '#ffffff',
         borderRadius: 50,
-        padding: 8,
+        padding: 5,
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,
-        top: -6,
-        left: -10,
+        top: -42,
+        left: 75,
     },
     textbutton: {
         fontSize: 13,

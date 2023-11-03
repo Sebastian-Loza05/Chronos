@@ -8,7 +8,10 @@ import moment from 'moment';
 import Swiper from 'react-native-swiper';
 import {getTasksDate} from '../../../chronos-app/app/api';
 import { TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import FontistoIcon from 'react-native-vector-icons/Fontisto';
+import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {compararHoras} from "../functions/functions";
 
 const {width} = Dimensions.get('screen');
@@ -81,12 +84,12 @@ const TaskItem = ({ task, containerHeight }) => {
 
     const closeButtonStyle = {
         position: 'absolute',
-        top: 20, 
-        right: 20,
+        top: 8, 
+        right: 8,
       };
       
       const closeIconStyle = {
-        fontSize: 20, // Tamaño del icono
+        fontSize: 33, // Tamaño del icono
         color: 'red', // Color del icono
       };
 
@@ -101,15 +104,16 @@ const TaskItem = ({ task, containerHeight }) => {
 
      const titleStyle ={
         fontWeight: 'bold',
-        marginBottom: 115,
-        marginTop: -160,
+        marginBottom: 75,
+        marginTop: -100,
         fontSize: 28,
         textAlign: 'center',
      };
-     const dateStyle = {
+     
+     const datextoStyle = {
         //backgroundColor: 'skyblue',
-        marginBottom: 20,
-        marginTop: -80,
+        fontWeight: 'bold',
+        fontSize: 18,
 
      };
      const starttimeStyle={
@@ -132,38 +136,119 @@ const TaskItem = ({ task, containerHeight }) => {
         
      };
 
+     const datedStyle = {
+        flexDirection: 'row',  // Para alinear ícono y texto en la misma línea
+        alignItems: 'center',  // Alinear verticalmente en el centro
+        marginBottom: 10,
+        marginTop: -45,
+        //backgroundColor: 'red',
+    };
+
+    const startStyle = {
+        flexDirection: 'row',  // Para alinear ícono y texto en la misma línea
+        alignItems: 'center',  // Alinear verticalmente en el centro
+        marginBottom: 10,
+        marginTop: 0,
+        //backgroundColor: 'red',
+    };
+
+    const endStyle = {
+        flexDirection: 'row',  // Para alinear ícono y texto en la misma línea
+        alignItems: 'center',  // Alinear verticalmente en el centro
+        marginBottom: 10,
+        marginTop: 0,
+        //backgroundColor: 'red',
+    };
+
+    const descStyle = {
+      flexDirection: 'row',  
+      alignItems: 'flex-start',
+        marginBottom: 10,
+        marginTop: 0,
+        flexWrap: 'wrap',  
+        //backgroundColor: 'red',
+    };
+
+    const ubiStyle = {
+      flexDirection: 'row',  
+      alignItems: 'flex-start',
+        marginBottom: 10,
+        marginTop: 0,
+        flexWrap: 'wrap',  
+        //backgroundColor: 'red',
+    };
+
+    const contentTextStyle = {
+      fontSize: 17,
+      paddingVertical: 3, 
+  };
+  
+
+    
+    const iconStyle = {
+        marginRight: 5,  // Espaciado entre ícono y texto.
+    };
+
      const formattedDate = moment.utc(task.date).format('ddd, DD MMM YYYY');
-
-      return (
-        <View>
-          <TouchableOpacity onPress={toggleModal}>
-            <View style={taskStyle}>
-              <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{task.name}</Text>
-              <View style={timeStyle}>
-                <Text>⏰</Text>
-                <Text style={{ marginLeft: 5 }}>{task.start_time} - {task.end_time}</Text>
+     
+     return (
+      <View>
+        <TouchableOpacity onPress={toggleModal}>
+          <View style={taskStyle}>
+            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{task.name}</Text>
+            <View style={timeStyle}>
+              <Text>⏰</Text>
+              <Text style={{ marginLeft: 5 }}>{task.start_time} - {task.end_time}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+        <Modal isVisible={isModalVisible}>
+          <View style={modalStyle}>
+            {/* Botón de cierre del modal "X" */}
+            <TouchableOpacity style={closeButtonStyle} onPress={toggleModal}>
+              <FontistoIcon name="close" style={closeIconStyle} />
+            </TouchableOpacity>
+    
+            {/* Contenido del modal */}
+            <Text style={titleStyle}>{task.name}</Text>
+            <View style={datedStyle}>
+              <ComunityIcon name="calendar-clock" size={23} color="#000" style={iconStyle} />
+              <Text style={datextoStyle}>Fecha: </Text> 
+              <Text style={{fontSize: 17}}>{formattedDate}</Text>
+            </View>
+            <View style={startStyle}>
+              <ComunityIcon name="clock-time-three" size={23} color="#000" style={iconStyle} /> 
+              <Text style={datextoStyle}>Hora Inicio: </Text> 
+              <Text style={{fontSize: 17}}>{task.start_time}</Text>
+            </View>
+            <View style={endStyle}>
+              <Ionicons name="timer" size={23} color="#000" style={iconStyle} /> 
+              <Text style={datextoStyle}>Hora Fin: </Text> 
+              <Text style={{fontSize: 17}}>{task.end_time}</Text>
+            </View>
+    
+            {/* Condición para mostrar descripción solo si no es null */}
+            {task.description && (
+                <View style={descStyle}>
+                <ComunityIcon name="text" size={23} color="#000" style={iconStyle} /> 
+                <Text style={datextoStyle}>Descripción: </Text> 
+                <Text style={contentTextStyle}>{task.description}</Text>
+                </View>
+            )}
+    
+            {/* Condición para mostrar ubicación solo si no es null */}
+            {task.place && (
+              <View style={ubiStyle}>
+              <FontistoIcon name="map-marker-alt" size={21} color="#000" style={iconStyle} /> 
+              <Text style={datextoStyle}> Ubicación: </Text> 
+              <Text style={contentTextStyle}>{task.place}</Text>
               </View>
-            </View>
-          </TouchableOpacity>
-          <Modal isVisible={isModalVisible}>
-            <View style={modalStyle}>
-              {/* Botón de cierre del modal "X" */}
-              <TouchableOpacity style={closeButtonStyle} onPress={toggleModal}>
-                <Icon name="times" style={closeIconStyle} />
-              </TouchableOpacity>
-      
-              {/* Contenido del modal */}
-              <Text style={titleStyle}>{task.name}</Text>
-              <Text style={dateStyle}>Date: {formattedDate}</Text>
-              <Text style={starttimeStyle}>Hora Inicio: {task.start_time}</Text>
-              <Text style={endtimeStyle}>Hora Fin: {task.end_time}</Text>
-              <Text style={descripStyle}>Descripción: {task.description}</Text>
-              <Text style={placeStyle}>Ubicación: {task.place}</Text>
-
-            </View>
-          </Modal>
-        </View>
-      );   
+            )}
+          </View>
+        </Modal>
+      </View>
+    );
+    
 };
 
   

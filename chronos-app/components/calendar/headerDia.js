@@ -10,6 +10,8 @@ import {createTask} from "../../app/api";
 
 export default function HeaderDia() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [isModalVisible, setModalVisible] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [date, setDate] = useState(new Date());
@@ -104,6 +106,18 @@ export default function HeaderDia() {
             />
         );
     }
+    const onDateChange = (event, selectedDate) => {
+        setDatePickerVisibility(Platform.OS === 'ios');
+        if (selectedDate) {
+            setSelectedDate(selectedDate);
+            const formattedDate = selectedDate.toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
+            setDia(formattedDate);
+        }
+    };
+
+    const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
 
     const onChange = async (event, selectedDate) => {
         console.log(selectedDate);
@@ -204,11 +218,6 @@ export default function HeaderDia() {
             <DateModal/>
             <Text style={styles.greetingTitle}>{greeting}</Text>
             <Text style={styles.greetingSubtitle}>Chronos</Text>
-        </View>
-        <View style={styles.taskHeader}>
-            <Text style={styles.title}>
-                Hola
-            </Text>
             <View style={styles.buttonsContainer}>
                 {isRecording && <MicrophoneAnimation/>}
                 <TouchableOpacity style={styles.button} onPress={onMicrophonePress}>
@@ -235,7 +244,17 @@ export default function HeaderDia() {
                             placeholder="Date"
                             value={dia}
                             onChangeText={setDia}
+                            onFocus={showDatePicker}
+                            editable={!isDatePickerVisible}
                         />
+                        {isDatePickerVisible && (
+                            <DateTimePicker
+                                value={selectedDate}
+                                mode="date"
+                                display="default"
+                                onChange={onDateChange}
+                            />
+                        )}
                         <TextInput
                             style={styles.input}
                             placeholder="Start Time"
@@ -269,7 +288,6 @@ export default function HeaderDia() {
                     </View>
                 </Modal>
             </View>
-
         </View>
     </View>
 );
@@ -278,9 +296,8 @@ export default function HeaderDia() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        //backgroundColor: 'red',
         width: '100%',
-        paddingTop: 25,
+        paddingTop: 55,
     },
     greetingHeader: {
         padding: 15,
@@ -300,17 +317,12 @@ const styles = StyleSheet.create({
         color: "#982C40",
         marginTop: 10,
     },
-    taskHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 10,
-        //backgroundColor:'yellow',
-        marginTop: -26,
-
-    },
     buttonsContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 2,
+        marginTop: -26,
     },
     button: {
         backgroundColor: '#ffffff',
@@ -319,8 +331,8 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 3,
-        top: -50,
-        left: -10,
+        top: -40,
+        left: 220,
 
     },
     title: {
@@ -354,8 +366,8 @@ const styles = StyleSheet.create({
         width: 380,
         height: 380,
         position: 'absolute',
-        top: '-22%',
-        left: '-27%',
+        top: '-18%',
+        left: '-1%',
         zIndex: 1,
     },
     centeredView: {
@@ -383,7 +395,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 25,
         alignItems: "center",
-        top: '20%',
+        top: '15%',
         shadowColor: "#000000",
         shadowOffset: {
             width: 0,
@@ -392,11 +404,13 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
+        width:'90%',
+        height:'60%'
 
     },
     input: {
         width: '80%',
-        padding: 15,
+        padding: 10,
         margin: 10,
         borderWidth: 2,
         borderColor: "#982C40",
@@ -407,7 +421,7 @@ const styles = StyleSheet.create({
     saveButton: {
         backgroundColor: '#ffffff',
         borderRadius: 50,
-        padding: 9,
+        padding: 4,
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,
@@ -420,7 +434,7 @@ const styles = StyleSheet.create({
     cancelButton: {
         backgroundColor: '#ffffff',
         borderRadius: 50,
-        padding: 8,
+        padding: 4,
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,

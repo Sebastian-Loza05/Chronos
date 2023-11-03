@@ -99,7 +99,7 @@ export default function Chronos() {
             <Text style={styles.title}>Welcome to Chronos</Text>
 
             <View style={styles.card}>
-              <RobotAnimation />
+              <Image source={require('../../../assets/images/robot.png')} style={styles.robotImage} />
             </View>
 
             <Voice setSuggestionsOpen={setSuggestionsOpen}/>
@@ -144,8 +144,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "#982C40",
         paddingTop: 1,
-        top: -35,
-        marginBottom: 20,
+        top: 15,
+        marginBottom: 2,
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: 'Gabarito'
@@ -153,13 +153,24 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: 'transparent',
         borderRadius: 15,
-        padding: 20,
-        top: -40,
+        marginBottom: '20%',
+        top: 20,
         width: '90%',
-        height: '40%',
+        height: '50%',
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    robotImage: {
+        height: 300,
+        width: 300,
+        resizeMode: 'cover',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin:0,
+        padding:0,
+    },
+
     button: {
         backgroundColor: '#f8c1c1',
         paddingVertical: 10,
@@ -198,7 +209,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         padding: 20,
         borderRadius: 5,
-        marginTop: 10,
         shadowColor: '#000',
         shadowOpacity: 0.2,
         shadowOffset: { width: 0, height: 2 },

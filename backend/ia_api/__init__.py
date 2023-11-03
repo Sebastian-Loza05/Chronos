@@ -1,3 +1,5 @@
+import ffmpeg
+import os
 from flask import (
     Flask,
     request,
@@ -37,6 +39,7 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 def voice_recomendations():
     error_406 = False
     error_422 = False
+    output_file = "uploads/audio.wav"
     try:
         if 'audio' not in request.files:
             error_406 = True
@@ -47,10 +50,14 @@ def voice_recomendations():
         if not audio_file:
             error_422 = True
             abort(422)
-
-        audio_file.save('uploads/audio.wav')
-
+        print(audio_file.filename)
+        save_file = f'uploads/{audio_file.filename}'
+        audio_file.save(save_file)
+        ffmpeg.input(save_file).output(output_file).run()
+        os.remove(save_file)
         text = speech_to_text('uploads/audio.wav')
+        os.remove(output_file)
+        
 
         return jsonify({
             'success': True,
@@ -65,3 +72,51 @@ def voice_recomendations():
             abort(422)
         else:
             abort(500)
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        'success': False,
+        'code': 401,
+        'message': 'Unauthorized'
+    }), 401
+
+@app.errorhandler(403)
+def forbbiden(error):
+    return jsonify({
+        'success': False,
+        'code': 403,
+        'message': 'Forbbiden'
+    }), 403
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        'success': False,
+        'code': 404,
+        'message': 'resource not found'
+    }), 404
+
+@app.errorhandler(406)
+def not_accepted(error):
+    return jsonify({
+        'success': False,
+        'code': 406,
+        'message': 'Not accepted'
+    }), 406
+
+@app.errorhandler(422)
+def unprocesable(error):
+    return jsonify({
+        'success': False,
+        'code': 422,
+        'message': 'Unprocesable'
+    }), 422
+
+@app.errorhandler(500)
+def server_error(error):
+    return jsonify({
+        'success': False,
+        'code': 500,
+        'message': 'Internal server error'
+    }), 500

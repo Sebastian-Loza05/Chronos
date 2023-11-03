@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Modal, TouchableOpacity, Dimensions} from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Audio } from 'expo-av';
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { sendAudio } from '../../app/api';
-import * as FileSystem from 'expo-file-system';
 import { router } from 'expo-router';
+import { BlurView } from 'expo-blur';
 
+
+const ScreenWidth = Dimensions.get('window').width;
+const ScreenHeight = Dimensions.get('window').height;
 
 export default function Voice({setSuggestionsOpen}) {
   const [recording, setRecording] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
 
-  const onMicrophonePress = () => {
-    startRecording(true);
-    setSuggestionsOpen(false);
-    setTimeout(() => {
-      setRecording(false);
-    }, 3000);
-  };
+  const width = (ScreenWidth * 100 ) /100;
+  const height = (ScreenHeight * 30 ) /100;
 
   const startRecording = async () => {
+    setSuggestionsOpen(false);
+    setModalVisible(true);
     try {
-      console.log("Requesting Permissions");;
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -41,7 +41,8 @@ export default function Voice({setSuggestionsOpen}) {
 
   const stopRecording = async () => {
     console.log('Stopping recording..');
-    setRecording(undefined);
+    setRecording(false);
+    setModalVisible(false);
     await recording.stopAndUnloadAsync();
     await Audio.setAudioModeAsync(
       {
@@ -55,15 +56,9 @@ export default function Voice({setSuggestionsOpen}) {
   }
 
   const manageAudio = async (audioUri) => {
-    const audioFile = await FileSystem.readAsStringAsync(audioUri, {
-      encoding: FileSystem.EncodingType.Base64
-    })
-
     const formData = new FormData();
-    // formData.append('audio', audioUri);
     const filetype = audioUri.split(".").pop();
     const filename = audioUri.split("/").pop();
-    console.log("type: ", filetype, "name: ", filename);
     const audio = {
       uri: audioUri,
       type: `audio/${filetype}`,
@@ -91,8 +86,23 @@ export default function Voice({setSuggestionsOpen}) {
 
   return (
     <View>
-      {false && <MicrophoneAnimation/>}
-      <TouchableOpacity style={styles.button} onPress={recording ? stopRecording : startRecording}>
+      <Modal 
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <BlurView 
+          intensity={70}
+          style={styles.modal}
+        >
+          <MicrophoneAnimation/>
+          <TouchableOpacity style={styles.button_stop} onPress={stopRecording}>
+            <Icon name="stop" size={23} color="#982C40" />
+          </TouchableOpacity>
+        </BlurView>
+      </Modal>
+      <TouchableOpacity style={styles.button} onPress={startRecording}>
         <Icon name="microphone-alt" size={28} color="#982C40"/>
       </TouchableOpacity>
     </View>
@@ -100,6 +110,16 @@ export default function Voice({setSuggestionsOpen}) {
 }
 
 const styles = StyleSheet.create({
+  modal: {
+    flex: 1,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+
   button: {
     backgroundColor: '#f8c1c1',
     paddingVertical: 10,
@@ -110,16 +130,20 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 
+  button_stop: {
+    backgroundColor: '#f8c1c1',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 40,
+    marginTop: "38%",
+    alignSelf: 'center',
+  },
+
   animation: {
-    width: 270,
-    height: 270,
+    flex: 1,
+    alignSelf: 'center',
+    width: "100%",
+    height: '100%',
     position: 'absolute',
-    zIndex: 10,
-    top: '50%',
-    left: '50%',
-    transform: [
-      { translateX: -190 },
-      { translateY: -142 },
-    ],
   },
 })

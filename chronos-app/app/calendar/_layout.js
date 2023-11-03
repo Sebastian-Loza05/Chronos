@@ -6,7 +6,7 @@ import { Image } from "react-native";
 export default function TabsLayout() {
   return (
     <Tabs
-      initialRouteName="dia"
+      initialRouteName="ia/chronos"
       screenOptions={({route}) => ({
         tabBarIcon: ({focused, size}) => {
           let iconName;

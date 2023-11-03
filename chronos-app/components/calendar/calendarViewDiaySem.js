@@ -165,7 +165,7 @@ const TaskItem = ({ task, containerHeight }) => {
       alignItems: 'flex-start',
         marginBottom: 10,
         marginTop: 0,
-        flexWrap: 'wrap',  // <-- Añade esta línea
+        flexWrap: 'wrap',  
         //backgroundColor: 'red',
     };
 
@@ -174,19 +174,19 @@ const TaskItem = ({ task, containerHeight }) => {
       alignItems: 'flex-start',
         marginBottom: 10,
         marginTop: 0,
-        flexWrap: 'wrap',  // <-- Añade esta línea
+        flexWrap: 'wrap',  
         //backgroundColor: 'red',
     };
 
     const contentTextStyle = {
       fontSize: 17,
-      paddingVertical: 3, // Ajusta este valor según tu preferencia
+      paddingVertical: 3, 
   };
   
 
     
     const iconStyle = {
-        marginRight: 5,  // Espaciado entre ícono y texto. Ajustable según preferencia.
+        marginRight: 5,  // Espaciado entre ícono y texto.
     };
 
      const formattedDate = moment.utc(task.date).format('ddd, DD MMM YYYY');

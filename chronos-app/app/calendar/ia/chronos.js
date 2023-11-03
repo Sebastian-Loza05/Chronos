@@ -1,18 +1,14 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {StyleSheet, Text, View, Image, TouchableOpacity} from "react-native";
 import LottieView from 'lottie-react-native';
 import AppLoading from 'expo-app-loading';
-import {useState, useEffect} from 'react';
 import * as Font from 'expo-font';
 import Icon from "react-native-vector-icons/FontAwesome5";
-import {ScrollView} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Voice from "../../../components/audio/voice";
 
 
 export default function Chronos() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [isRecording, setIsRecording] = useState(false);
     const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
     //const Tab = createBottomTabNavigator();
     const [suggestions, setSuggestions] = useState([
@@ -50,7 +46,7 @@ export default function Chronos() {
         setSuggestionsOpen(false);
         setTimeout(() => {
             setIsRecording(false);
-        }, 10000);
+        }, 1000);
     };
     const toggleSuggestionsPanel = () => {
         //getNewSuggestionFromAI();
@@ -81,7 +77,7 @@ export default function Chronos() {
             </TouchableOpacity>
         );
     }
-
+    //
     function RobotAnimation() {
         return (
             <LottieView
@@ -93,16 +89,6 @@ export default function Chronos() {
         );
     }
 
-    function MicrophoneAnimation() {
-        return (
-            <LottieView
-                style={styles.animation}
-                source={require('../../../assets/animations/voz.json')}
-                autoPlay
-                loop
-            />
-        );
-    }
     function handleSuggestionPress(suggestion) {
         //navigation.navigate('CalendarDia', { suggestion: suggestion });
         console.log('Suggestion pressed:', suggestion);
@@ -113,15 +99,11 @@ export default function Chronos() {
             <Text style={styles.title}>Welcome to Chronos</Text>
 
             <View style={styles.card}>
-                <RobotAnimation/>
+              <RobotAnimation />
             </View>
 
-            {isRecording && <MicrophoneAnimation/>}
-
-            <TouchableOpacity style={styles.button} onPress={onMicrophonePress}>
-                <Icon name="microphone-alt" size={28} color="#982C40"/>
-            </TouchableOpacity>
-
+            <Voice setSuggestionsOpen={setSuggestionsOpen}/>
+  
             <TouchableOpacity style={styles.button} onPress={toggleSuggestionsPanel}>
                 <Text style={styles.buttonText}>Sugerencias</Text>
             </TouchableOpacity>
@@ -195,7 +177,6 @@ const styles = StyleSheet.create({
     animationExpanded: {
         width: 250,
         height: 250
-
     },
     animation: {
         width: 270,

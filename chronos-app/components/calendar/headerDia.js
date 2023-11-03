@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text, TouchableOpacity, Modal, TextInput} from "react-native";
+import {View, StyleSheet, Text, TouchableOpacity, Modal, TextInput, Platform} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import React, {useState, useEffect} from 'react';
 import AppLoading from 'expo-app-loading';
@@ -7,11 +7,17 @@ import LottieView from 'lottie-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {getTasksDate} from "../../app/api";
 import {createTask} from "../../app/api";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 export default function HeaderDia() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+    const [selectedTime, setSelectedTime] = useState(new Date());
+    const [FinTime, setFinTime] = useState('');
+    const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
+    const [selectedEndTime, setSelectedEndTime] = useState(new Date());
     const [isModalVisible, setModalVisible] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [date, setDate] = useState(new Date());
@@ -115,9 +121,39 @@ export default function HeaderDia() {
         }
     };
 
+    const onTimeChange = (event, selectedTime) => {
+        setTimePickerVisibility(Platform.OS === 'ios');
+        if (selectedTime) {
+            setSelectedTime(selectedTime);
+            let hours = selectedTime.getHours().toString().padStart(2, '0');
+            let minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+            let formattedTime = `${hours}:${minutes}`;
+
+            setStartTime(formattedTime);
+        }
+    };
+    const onEndTimeChange = (event, selectedTime) => {
+        setEndTimePickerVisibility(Platform.OS === 'ios');
+        if (selectedTime) {
+            setSelectedEndTime(selectedTime);
+            let hours = selectedTime.getHours().toString().padStart(2, '0');
+            let minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+            let formattedTime = `${hours}:${minutes}`;
+
+            setFinTime(formattedTime);
+        }
+    };
+
     const showDatePicker = () => {
         setDatePickerVisibility(true);
     };
+    const showTimePicker = () => {
+        setTimePickerVisibility(true);
+    };
+    const showEndTimePicker = () => {
+        setEndTimePickerVisibility(true);
+    };
+
 
     const onChange = async (event, selectedDate) => {
         console.log(selectedDate);
@@ -260,13 +296,40 @@ export default function HeaderDia() {
                             placeholder="Start Time"
                             value={startTime}
                             onChangeText={setStartTime}
+                            onFocus={showTimePicker}
+                            editable={!isTimePickerVisible}
                         />
+
+                        {isTimePickerVisible && (
+                            <RNDateTimePicker
+                                value={selectedTime}
+                                mode="time"
+                                display="default"
+                                onChange={onTimeChange}
+                                onTouchCancel={() => setTimePickerVisibility(false)}
+                            />
+                        )}
+
                         <TextInput
                             style={styles.input}
                             placeholder="End Time"
-                            value={endTime}
-                            onChangeText={setEndTime}
+                            value={FinTime}
+                            onChangeText={setFinTime}
+                            onFocus={showEndTimePicker}
+                            editable={!isEndTimePickerVisible}
                         />
+
+                        {isEndTimePickerVisible && (
+                            <RNDateTimePicker
+                                value={selectedEndTime}
+                                mode="time"
+                                display="default"
+                                onChange={onEndTimeChange}
+                                onTouchCancel={() => setEndTimePickerVisibility(false)}
+                            />
+                        )}
+
+
                         <TextInput
                             style={styles.input}
                             placeholder="Place (Optional)"
@@ -393,7 +456,7 @@ const styles = StyleSheet.create({
         margin: 20,
         backgroundColor: "#ffedf1",
         borderRadius: 20,
-        padding: 25,
+        padding: 20,
         alignItems: "center",
         top: '15%',
         shadowColor: "#000000",
@@ -404,13 +467,13 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-        width:'90%',
-        height:'60%'
+        width:'88%',
+        height:'62%'
 
     },
     input: {
-        width: '80%',
-        padding: 10,
+        width: '75%',
+        padding: 6,
         margin: 10,
         borderWidth: 2,
         borderColor: "#982C40",
@@ -421,12 +484,12 @@ const styles = StyleSheet.create({
     saveButton: {
         backgroundColor: '#ffffff',
         borderRadius: 50,
-        padding: 4,
+        padding: 5,
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,
         top: -6,
-        left: -10,
+        left: -92,
         marginBottom: 10,
         marginTop: 15,
         fontFamily: 'Gabarito'
@@ -434,12 +497,12 @@ const styles = StyleSheet.create({
     cancelButton: {
         backgroundColor: '#ffffff',
         borderRadius: 50,
-        padding: 4,
+        padding: 5,
         marginLeft: 15,
         borderColor: "#982C40",
         borderWidth: 2,
-        top: -6,
-        left: -10,
+        top: -42,
+        left: 75,
     },
     textbutton: {
         fontSize: 13,

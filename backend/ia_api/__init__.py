@@ -15,6 +15,8 @@ from models import Users, setup_db, Tasks
 from datetime import timedelta
 from werkzeug.utils import secure_filename
 
+from transcribe import speech_to_text
+
 SECRET_KEY = config('SECRET_KEY')
 ACCESS_EXPIRES = timedelta(hours=1)
 JWT_SECRET_KEY = config('JWT_SECRET_KEY')
@@ -47,8 +49,12 @@ def voice_recomendations():
             abort(422)
 
         audio_file.save('uploads/audio.wav')
+
+        text = speech_to_text('uploads/audio.wav')
+
         return jsonify({
-        'success': True
+            'success': True,
+            'text': text
         })
 
     except Exception as e:

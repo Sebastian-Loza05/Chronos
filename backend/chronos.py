@@ -1,7 +1,8 @@
 import openai
 import datetime
 
-openai.api_key = "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"
+#openai.api_key = "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"
+openai.api_key = "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"
 
 # Chat gpt-3.5-turbo model as Chronos
 # Chronos debe tener acceso a ciertos datos del usuario como su horario
@@ -23,7 +24,7 @@ class Chronos:
               "content": prompt,
             }
           ],
-          temperature=0.5,
+          temperature=1,
           max_tokens=256,
           top_p=1,
           frequency_penalty=0,

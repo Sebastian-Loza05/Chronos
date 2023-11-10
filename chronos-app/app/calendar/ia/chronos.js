@@ -99,10 +99,9 @@ export default function Chronos() {
             <Text style={styles.title}>Welcome to Chronos</Text>
 
             <View style={styles.card}>
-              <Image source={require('../../../assets/images/robot.png')} style={styles.robotImage} />
             </View>
 
-            <Voice setSuggestionsOpen={setSuggestionsOpen}/>
+            <Voice setSuggestionsOpen={setSuggestionsOpen} setSuggestions={setSuggestions}/>
   
             <TouchableOpacity style={styles.button} onPress={toggleSuggestionsPanel}>
                 <Text style={styles.buttonText}>Sugerencias</Text>

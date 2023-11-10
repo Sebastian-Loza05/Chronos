@@ -11,7 +11,7 @@ import { BlurView } from 'expo-blur';
 const ScreenWidth = Dimensions.get('window').width;
 const ScreenHeight = Dimensions.get('window').height;
 
-export default function Voice({setSuggestionsOpen}) {
+export default function Voice({setSuggestionsOpen, setSuggestions}) {
   const [recording, setRecording] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
 

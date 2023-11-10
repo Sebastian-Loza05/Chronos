@@ -185,10 +185,10 @@ export default function HeaderDia() {
             alert('Por favor, ingrese la hora de inicio de la tarea.');
             return;
         }
-        if (!endTime.trim()) {
-            alert('Por favor, ingrese la hora de finalización de la tarea.');
-            return;
-        }
+        // if (!endTime.trim()) {
+        //     alert('Por favor, ingrese la hora de finalización de la tarea.');
+        //     return;
+        // }
 
         const formData = {
             name: name.trim(),
@@ -280,55 +280,20 @@ export default function HeaderDia() {
                             placeholder="Date"
                             value={dia}
                             onChangeText={setDia}
-                            onFocus={showDatePicker}
-                            editable={!isDatePickerVisible}
                         />
-                        {isDatePickerVisible && (
-                            <DateTimePicker
-                                value={selectedDate}
-                                mode="date"
-                                display="default"
-                                onChange={onDateChange}
-                            />
-                        )}
                         <TextInput
                             style={styles.input}
                             placeholder="Start Time"
                             value={startTime}
                             onChangeText={setStartTime}
-                            onFocus={showTimePicker}
-                            editable={!isTimePickerVisible}
                         />
-
-                        {isTimePickerVisible && (
-                            <RNDateTimePicker
-                                value={selectedTime}
-                                mode="time"
-                                display="default"
-                                onChange={onTimeChange}
-                                onTouchCancel={() => setTimePickerVisibility(false)}
-                            />
-                        )}
 
                         <TextInput
                             style={styles.input}
                             placeholder="End Time"
-                            value={FinTime}
-                            onChangeText={setFinTime}
-                            onFocus={showEndTimePicker}
-                            editable={!isEndTimePickerVisible}
+                            value={endTime}
+                            onChangeText={setEndTime}
                         />
-
-                        {isEndTimePickerVisible && (
-                            <RNDateTimePicker
-                                value={selectedEndTime}
-                                mode="time"
-                                display="default"
-                                onChange={onEndTimeChange}
-                                onTouchCancel={() => setEndTimePickerVisibility(false)}
-                            />
-                        )}
-
 
                         <TextInput
                             style={styles.input}

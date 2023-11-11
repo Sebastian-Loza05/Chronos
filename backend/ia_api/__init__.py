@@ -55,8 +55,6 @@ def voice_recomendations():
         audio_file.save(save_file)
         ffmpeg.input(save_file).output(output_file).run()
         os.remove(save_file)
-        
-
 
         horario = [
             "03/11/2023 00:00 - 08:00: duermo",

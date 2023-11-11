@@ -3,7 +3,9 @@ import datetime
 import pyttsx3
 import speech_recognition as sr
 
-openai.api_key = "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"        
+openai.api_key = "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"
+
+
 
 # ¡Hola! Soy Chronos, tu asistente de calendario. ¿En qué puedo ayudarte hoy?
 class Chronos:
@@ -73,6 +75,34 @@ class Chronos:
         prompt = f"Horario:\n{horario}\nspeech: {speech}"
         response = self.get_completion(prompt)
         return response
+    
+
+    def parse_response(response):
+
+        lines = response.strip().split("\n")
+        key, value = map(str.strip, lines[0].split(":", 1)) 
+    
+        if not key == "Tipo" or not value in ["crear", "eliminar", "actualizar"]:
+            return None
+    
+        result = {}
+    
+        for line in lines:
+            key, value = map(str.strip, line.split(":", 1)) 
+    
+            if key == "Tipo":
+                result["request"] = value
+            elif key == "Actividad":
+                result["name"] = value
+            elif key == "Fecha":
+                result["date"] = value
+            elif key == "Hora":
+                start_time, end_time = map(str.strip, value.split("-"))
+                result["start_time"] = start_time
+                result["end_time"] = end_time
+    
+        return result
+
 
 
 # Chat gpt-3.5-turbo model as Chronos

@@ -17,8 +17,7 @@ from models import Users, setup_db, Tasks
 from datetime import timedelta
 from werkzeug.utils import secure_filename
 
-from transcribe import speech_to_text
-from chronos import User
+from chronos import Chronos, behavior
 
 SECRET_KEY = config('SECRET_KEY')
 ACCESS_EXPIRES = timedelta(hours=1)
@@ -56,9 +55,8 @@ def voice_recomendations():
         audio_file.save(save_file)
         ffmpeg.input(save_file).output(output_file).run()
         os.remove(save_file)
-        text = speech_to_text('uploads/audio.wav')
-        os.remove(output_file)
         
+
 
         horario = [
             "03/11/2023 00:00 - 08:00: duermo",
@@ -68,8 +66,10 @@ def voice_recomendations():
             "03/11/2023 16:00 - 18:00: Clases de Machine Learning"
         ]
 
-        user = User(horario)
-        response = user.make_request(text)
+        chronos = Chronos("gpt-3.5-turbo", behavior)
+        speech = chronos.listen_to("example.wav")
+        response = chronos.process_request(horario, speech)
+        print(response)
 
         return jsonify({
             'success': True,

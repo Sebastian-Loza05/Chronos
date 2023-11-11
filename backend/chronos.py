@@ -1,7 +1,8 @@
 import openai
 import datetime
+from decouple import config
 
-openai.api_key = "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"
+openai.api_key = config('OPENAI_API_KEY')
 
 # Chat gpt-3.5-turbo model as Chronos
 # Chronos debe tener acceso a ciertos datos del usuario como su horario
@@ -12,22 +13,22 @@ class Chronos:
 
     def get_completion(self, behavior, prompt):
         response = openai.ChatCompletion.create(
-          model=self.model,
-          messages=[
-            {
-              "role": "assistant",
-              "content": behavior
-            },
-            {
-              "role": "user",
-              "content": prompt,
-            }
-          ],
-          temperature=1,
-          max_tokens=256,
-          top_p=1,
-          frequency_penalty=0,
-          presence_penalty=0
+            model=self.model,
+            messages=[
+                {
+                    "role": "assistant",
+                    "content": behavior
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            temperature=1,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
         )
         return response.choices[0].message["content"]
 
@@ -63,14 +64,14 @@ class Chronos:
         print("Chronos esta pensando...")
         response = self.get_completion(behavior, prompt)
         return response
-    
+
 class User:
 
     def __init__(self, horario):
         self.fecha = datetime.date.today().strftime("%d/%m/%Y")
         self.horario = horario
         self.chronos = Chronos("gpt-3.5-turbo")
-    
+
     def make_request(self, speech):
         response = self.chronos.get_suggestion(self.fecha, self.horario, speech)
         print(f"Chronos: {response}")
@@ -79,6 +80,6 @@ class User:
         if answer == "si":
             self.horario.append(response)
         return response
-            
+
     def get_horario(self):
         return self.horario

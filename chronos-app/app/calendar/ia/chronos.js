@@ -1,16 +1,19 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {StyleSheet, Text, View, Image, TouchableOpacity} from "react-native";
 import LottieView from 'lottie-react-native';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Voice from "../../../components/audio/voice";
+import { Video, ResizeMode } from 'expo-av';
 
 
 export default function Chronos() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
-    //const Tab = createBottomTabNavigator();
+    const video = useRef(null);
+    const [status, setStatus] = useState({});
+    
     const [suggestions, setSuggestions] = useState([
         {
             title: "Hacer ejercicio",
@@ -41,13 +44,6 @@ export default function Chronos() {
             />
         );
     }
-    const onMicrophonePress = () => {
-        setIsRecording(true);
-        setSuggestionsOpen(false);
-        setTimeout(() => {
-            setIsRecording(false);
-        }, 1000);
-    };
     const toggleSuggestionsPanel = () => {
         //getNewSuggestionFromAI();
         setSuggestionsOpen(prevState => !prevState);
@@ -79,14 +75,25 @@ export default function Chronos() {
     }
     //
     function RobotAnimation() {
-        return (
-            <LottieView
-                style={styles.animationExpanded}
-                source={require('../../../assets/animations/robot.json')}
-                autoPlay
-                loop
-            />
-        );
+    // return (
+    //     <LottieView
+    //         style={styles.animationExpanded}
+    //         source={require('../../../assets/animations/robot.json')}
+    //         autoPlay
+    //         loop
+    //     />
+    // );
+      return (
+        <Video 
+          ref={video}
+          sytle={styles.animation}
+          source={require('../../../assets/animations/robot.mp4')}
+          useNativeControls
+          resizeMode={ResizeMode.CONTAIN}
+          isLooping
+          onPlaybackStatusUpdate={status => setStatus(() => status)}
+        />
+      )
     }
 
     function handleSuggestionPress(suggestion) {
@@ -99,6 +106,7 @@ export default function Chronos() {
             <Text style={styles.title}>Welcome to Chronos</Text>
 
             <View style={styles.card}>
+              <Image source={require('../../../assets/animations/robot.gif')} style={styles.animation} />
             </View>
 
             <Voice setSuggestionsOpen={setSuggestionsOpen} setSuggestions={setSuggestions}/>
@@ -189,12 +197,13 @@ const styles = StyleSheet.create({
         height: 250
     },
     animation: {
-        width: 270,
-        height: 270,
+        flex: 1,
+        width: 230,
+        height: 230,
         position: 'absolute',
         zIndex: 10,
-        top: '50%',
-        left: '50%',
+        top: '60%',
+        left: '76%',
         transform: [
             { translateX: -190 },
             { translateY: -142 },

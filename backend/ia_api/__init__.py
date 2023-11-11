@@ -58,7 +58,6 @@ def voice_recomendations():
         os.remove(save_file)
         text = speech_to_text('uploads/audio.wav')
         os.remove(output_file)
-        
 
         horario = [
             "03/11/2023 00:00 - 08:00: duermo",

@@ -111,8 +111,7 @@ export const sendAudio = async (formData) => {
       },
       body: formData
     })
-
-    return await response.json();
+    return await response.blob();
   } catch (error) {
     console.log(error);
   }

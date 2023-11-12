@@ -1,22 +1,32 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Modal, TouchableOpacity, Dimensions} from 'react-native';
+import { View, StyleSheet, Modal, TouchableOpacity, Dimensions} from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Audio } from 'expo-av';
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { sendAudio } from '../../app/api';
 import { router } from 'expo-router';
 import { BlurView } from 'expo-blur';
+import * as FileSystem from 'expo-file-system';
 
 
 const ScreenWidth = Dimensions.get('window').width;
 const ScreenHeight = Dimensions.get('window').height;
 
+
+function MicrophoneAnimation() {
+  return (
+    <LottieView
+      style={styles.animation}
+      source={require('../../assets/animations/voz.json')}
+      autoPlay
+      loop
+    />
+  );
+}
+
 export default function Voice({setSuggestionsOpen, setSuggestions}) {
   const [recording, setRecording] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-
-  const width = (ScreenWidth * 100 ) /100;
-  const height = (ScreenHeight * 30 ) /100;
 
   const startRecording = async () => {
     setSuggestionsOpen(false);
@@ -66,23 +76,26 @@ export default function Voice({setSuggestionsOpen, setSuggestions}) {
     }
     formData.append('audio', audio);
 
-    const data = await sendAudio(formData);
-    if (data?.msg){
+    const speech = await sendAudio(formData);
+    if (speech?.msg){
       router.replace("/auth/login")
     }
-    console.log(data);
+
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(speech);
+    fileReader.onload = async () => {
+      const base64data = fileReader.result;
+      const { sound, status } = await Audio.Sound.createAsync(
+        { uri: base64data },
+        { shouldPlay: true }
+      );
+      //console.log(status);
+      await sound.playAsync();
+      if (!status.isPlaying)
+        await sound.unloadAsync();
+    }
   }
 
-  function MicrophoneAnimation() {
-    return (
-      <LottieView
-        style={styles.animation}
-        source={require('../../assets/animations/voz.json')}
-        autoPlay
-        loop
-      />
-    );
-  }
 
   return (
     <View>

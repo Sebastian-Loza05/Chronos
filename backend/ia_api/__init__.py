@@ -4,7 +4,9 @@ from flask import (
     Flask,
     request,
     jsonify,
-    abort
+    abort,
+    send_file,
+    make_response
 )
 from flask_cors import CORS
 from flask_jwt_extended import (
@@ -33,6 +35,8 @@ jwt = JWTManager(app)
 setup_db(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
+# Instanciamiento de chronos
+chronos = Chronos("gpt-3.5-turbo", behavior)
 # ----------------------------------------------------------------
 @app.route("/voice/recomendations", methods=["POST"])
 @jwt_required()
@@ -41,7 +45,9 @@ def voice_recomendations():
     error_422 = False
     output_file = "uploads/audio.wav"
     try:
+        print(request.files)
         if 'audio' not in request.files:
+            print("asbfakfab")
             error_406 = True
             abort(406)
 
@@ -55,7 +61,6 @@ def voice_recomendations():
         audio_file.save(save_file)
         ffmpeg.input(save_file).output(output_file).run()
         os.remove(save_file)
-        # text = speech_to_text('uploads/audio.wav')
 
         horario = [
             "03/11/2023 00:00 - 08:00: duermo",
@@ -65,16 +70,16 @@ def voice_recomendations():
             "03/11/2023 16:00 - 18:00: Clases de Machine Learning"
         ]
 
-        chronos = Chronos("gpt-3.5-turbo", behavior)
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, speech)
+        chronos.make_response_speech1(response)
         print(response)
         os.remove(output_file)
-
-        return jsonify({
-            'success': True,
-            'response': response
-        })
+        response = send_file(
+            "../uploads/response.mp3",
+            mimetype="audio/mp3",
+            download_name="response.mp3")
+        return response
 
     except Exception as e:
         print(e)

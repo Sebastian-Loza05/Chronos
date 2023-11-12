@@ -1,25 +1,28 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
-  Text,
+  Dimensions,
   TouchableOpacity,
   Modal,
   TextInput,
+  Text,
   Platform,
+  SafeAreaView,
+  ScrollView,
 } from "react-native";
+import { Calendar } from "react-native-calendars";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import React, { useState, useEffect } from "react";
-import AppLoading from "expo-app-loading";
-import * as Font from "expo-font";
-import LottieView from "lottie-react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { getTasksDate } from "../../app/api";
-import { createTask } from "../../app/api";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { useNavigation } from '@react-navigation/native';
+import * as Font from "expo-font";
+import AppLoading from "expo-app-loading";
+import LottieView from "lottie-react-native";
+import { createTask, getTasksDate } from "../../app/api";
 
+const { width, height } = Dimensions.get("window");
 
-export default function HeaderDia() {
+export default function CalendarViewMes() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -28,9 +31,7 @@ export default function HeaderDia() {
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
   const [selectedEndTime, setSelectedEndTime] = useState(new Date());
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [date, setDate] = useState(new Date());
-  const [show, setShow] = useState(false);
   const [modalVisible, setmodalVisible] = useState(false);
   const [name, setName] = useState("");
   const [place, setPlace] = useState("");
@@ -39,18 +40,116 @@ export default function HeaderDia() {
   const [endTime, setEndTime] = useState("");
   const [dia, setDia] = useState("");
   const [State, setState] = useState("");
-  const navigation = useNavigation();
+  const [selectedDay, setSelectedDay] = useState(null);
 
-  function AppNavigator() {
+  const getTasksForDay = (date) => {
+    // Retorna las tareas para la fecha dada
+    // Aquí deberías reemplazar esto con tu lógica para obtener las tareas reales
+    return ["Tarea 1", "Tarea 2", "Tarea 3"];
+  };
+
+  const handleDayPress = (day) => {
+    setSelectedDay(day.dateString);
+    setModalVisible(true);
+  };
+
+  const renderTasksModal = () => {
+    if (!selectedDay) return null;
+
+    const tasks = getTasksForDay(selectedDay);
+
     return (
-        <Stack.Navigator>
-          <Stack.Screen name="Day" component={Dia} />
-          <Stack.Screen name="Week" component={Semana} /> // Asumiendo que tienes un componente Semana
-          <Stack.Screen name="Month" component={Mes} />
-          // ... otras rutas
-        </Stack.Navigator>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "transparent",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fcd9d9",
+              padding: 30,
+              height: "40%",
+              borderRadius: 10,
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: "Gabarito",
+                fontWeight: "bold",
+                marginBottom: 20,
+                textAlign: "center",
+                color: "#000000",
+              }}
+            >
+              Tasks for {selectedDay}
+            </Text>
+            {tasks.map((task, index) => (
+              <View
+                key={index}
+                style={{
+                  backgroundColor: "#f1426b", // Color de fondo para cada tarea
+                  padding: 10,
+                  borderRadius: 5,
+                  marginBottom: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: "white",
+                    textAlign: "center",
+                    fontFamily: "Gabarito",
+                  }}
+                >
+                  {task}
+                </Text>
+              </View>
+            ))}
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={{
+                backgroundColor: "#982C40", // Color de fondo del botón cerrar
+                padding: 8,
+                borderRadius: 5,
+                marginTop: 20,
+                width: "20%",
+                right: -60,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: "white", // Color del texto del botón cerrar
+                  textAlign: "center",
+                  fontFamily: "Gabarito",
+                }}
+              >
+                Cerrar
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     );
-  }
+  };
 
   async function loadFonts() {
     await Font.loadAsync({
@@ -81,13 +180,6 @@ export default function HeaderDia() {
     setmodalVisible(true);
   };
 
-  const onMicrophonePress = () => {
-    setIsRecording(true);
-    setTimeout(() => {
-      setIsRecording(false);
-    }, 10000);
-  };
-
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -112,26 +204,6 @@ export default function HeaderDia() {
       </View>
     </Modal>
   );
-  const currentDate = new Date();
-  const currentHour = currentDate.getHours();
-  let greeting = "Good Morning!";
-
-  if (currentHour >= 12 && currentHour < 18) {
-    greeting = "Good Afternoon!";
-  } else if (currentHour >= 18 || currentHour < 6) {
-    greeting = "Good Evening!";
-  }
-
-  function MicrophoneAnimation() {
-    return (
-      <LottieView
-        style={styles.animationExpanded}
-        source={require("../../assets/animations/voz.json")}
-        autoPlay
-        loop
-      />
-    );
-  }
   const onDateChange = (event, selectedDate) => {
     setDatePickerVisibility(Platform.OS === "ios");
     if (selectedDate) {
@@ -253,117 +325,145 @@ export default function HeaderDia() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.greetingHeader}>
-        <TouchableOpacity onPress={toggleModal} style={styles.buttonlist}>
-          <Icon name="list" size={18} color="#c96878" />
-          <Text style={styles.text}>Today</Text>
-        </TouchableOpacity>
-        <DateModal />
-        <Text style={styles.greetingTitle}>{greeting}</Text>
-        <Text style={styles.greetingSubtitle}>Chronos</Text>
-        <View style={styles.buttonsContainer}>
-          {isRecording && <MicrophoneAnimation />}
-          <TouchableOpacity style={styles.button} onPress={onMicrophonePress}>
-            <Icon name="microphone-alt" size={28} color="#982C40" />
+      <Calendar
+        style={styles.calendar}
+        onDayPress={handleDayPress}
+        // Personaliza los colores
+        theme={{
+          backgroundColor: "#FFFFFF",
+          calendarBackground: "#ffffff",
+          monthTextColor: "#982C40",
+          dayTextColor: "#000000",
+          textDisabledColor: "#969696",
+          selectedDayBackgroundColor: "#ff005e",
+          selectedDayTextColor: "#be2727",
+          arrowColor: "#982C40",
+          textDayFontFamily: "Gabarito",
+          textMonthFontFamily: "Gabarito",
+          textDayHeaderFontFamily: "Gabarito",
+          textDayFontSize: 16,
+          textMonthFontSize: 26,
+          textDayHeaderFontSize: 16,
+          todayTextColor: "#be2727",
+          todayBackgroundColor: "#ffdcdc",
+          headerStyle: {
+            backgroundColor: "#ffffff",
+          },
+          "stylesheet.day.basic": {
+            base: {
+              width: width / 6,
+              height: (height - 200) / 7,
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          },
+          "stylesheet.calendar.header": {
+            week: {
+              marginTop: 5,
+              flexDirection: "row",
+              justifyContent: "space-between",
+            },
+          },
+        }}
+      />
+      {renderTasksModal()}
+      <TouchableOpacity
+        onPress={onAddTaskPress}
+        style={styles.fab}
+        activeOpacity={0.7}
+      >
+        <Icon name="plus" size={20} color="#FFF" />
+      </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalView}>
+          <TextInput
+            style={styles.input}
+            placeholder="Task Name"
+            value={name}
+            onChangeText={setName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Date"
+            value={dia}
+            onChangeText={setDia}
+            onFocus={showDatePicker}
+            editable={!isDatePickerVisible}
+          />
+          {isDatePickerVisible && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )}
+          <TextInput
+            style={styles.input}
+            placeholder="Start Time"
+            value={startTime}
+            onChangeText={setStartTime}
+            onFocus={showTimePicker}
+            editable={!isTimePickerVisible}
+          />
+
+          {isTimePickerVisible && (
+            <RNDateTimePicker
+              value={selectedTime}
+              mode="time"
+              display="default"
+              onChange={onTimeChange}
+              onTouchCancel={() => setTimePickerVisibility(false)}
+            />
+          )}
+
+          <TextInput
+            style={styles.input}
+            placeholder="End Time"
+            value={endTime}
+            onChangeText={setEndTime}
+            onFocus={showEndTimePicker}
+            editable={!isEndTimePickerVisible}
+          />
+
+          {isEndTimePickerVisible && (
+            <RNDateTimePicker
+              value={selectedEndTime}
+              mode="time"
+              display="default"
+              onChange={onEndTimeChange}
+              onTouchCancel={() => setEndTimePickerVisibility(false)}
+            />
+          )}
+
+          <TextInput
+            style={styles.input}
+            placeholder="Place (Optional)"
+            value={place}
+            onChangeText={setPlace}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Description (Optional)"
+            value={description}
+            onChangeText={setDescription}
+          />
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
+            <Text style={styles.textbutton}>Guardar</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={onAddTaskPress}>
-            <Icon name="plus-circle" size={28} color="#982C40" />
-          </TouchableOpacity>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={handleCloseModal}
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={handleCloseModal}
           >
-            <View style={styles.modalView}>
-              <TextInput
-                style={styles.input}
-                placeholder="Task Name"
-                value={name}
-                onChangeText={setName}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Date"
-                value={dia}
-                onChangeText={setDia}
-                onFocus={showDatePicker}
-                editable={!isDatePickerVisible}
-              />
-              {isDatePickerVisible && (
-                <DateTimePicker
-                  value={selectedDate}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
-              <TextInput
-                style={styles.input}
-                placeholder="Start Time"
-                value={startTime}
-                onChangeText={setStartTime}
-                onFocus={showTimePicker}
-                editable={!isTimePickerVisible}
-              />
-
-              {isTimePickerVisible && (
-                <RNDateTimePicker
-                  value={selectedTime}
-                  mode="time"
-                  display="default"
-                  onChange={onTimeChange}
-                  onTouchCancel={() => setTimePickerVisibility(false)}
-                />
-              )}
-
-              <TextInput
-                style={styles.input}
-                placeholder="End Time"
-                value={endTime}
-                onChangeText={setEndTime}
-                onFocus={showEndTimePicker}
-                editable={!isEndTimePickerVisible}
-              />
-
-              {isEndTimePickerVisible && (
-                <RNDateTimePicker
-                  value={selectedEndTime}
-                  mode="time"
-                  display="default"
-                  onChange={onEndTimeChange}
-                  onTouchCancel={() => setEndTimePickerVisibility(false)}
-                />
-              )}
-
-              <TextInput
-                style={styles.input}
-                placeholder="Place (Optional)"
-                value={place}
-                onChangeText={setPlace}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Description (Optional)"
-                value={description}
-                onChangeText={setDescription}
-              />
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSaveTask}
-              >
-                <Text style={styles.textbutton}>Guardar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={handleCloseModal}
-              >
-                <Text style={styles.textbutton}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
+            <Text style={styles.textbutton}>Cancelar</Text>
+          </TouchableOpacity>
         </View>
-      </View>
+      </Modal>
     </View>
   );
 }
@@ -371,15 +471,29 @@ export default function HeaderDia() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: "100%",
-    paddingTop: 55,
+    backgroundColor: "#EFEFEF", // Color de fondo de la vista
   },
-  greetingHeader: {
-    padding: 15,
-    backgroundColor: "#ffffff",
+  calendar: {
+    borderWidth: 0,
+    borderColor: "transparent",
+    height: height, // Asegúrate de que el calendario use toda la altura disponible
+    paddingBottom: 10, // Puedes ajustar esto para que coincida con tu diseño
+  },
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    alignItems: "center",
     justifyContent: "center",
-    alignItems: "right",
-    height: 140,
+    right: 20,
+    bottom: 20,
+    backgroundColor: "#982C40",
+    borderRadius: 28,
+    elevation: 5, // Sombra para Android
+    shadowColor: "#000", // Sombra para iOS
+    shadowRadius: 5,
+    shadowOpacity: 0.3,
+    shadowOffset: { height: 2, width: 0 },
   },
   greetingTitle: {
     fontSize: 30,

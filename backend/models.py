@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import UniqueConstraint
 from decouple import config
 from werkzeug.security import generate_password_hash, check_password_hash
 from base64 import b64encode
-import datetime
 
 DATA_USER = config('DATA_USER')
 DATA_PASSWORD = config('DATA_PASSWORD')
@@ -35,6 +35,7 @@ class Users(db.Model):
     password = db.Column(db.String(200), nullable=False)
     profile = db.relationship('Profile', uselist=False, back_populates='user')
     tasks = db.relationship('Tasks', cascade='all,delete', backref='user')
+    categories = db.relationship('Categories', cascade='all,delete', backref='user')
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -166,6 +167,7 @@ class Tasks(db.Model):
     fecha = db.Column(db.Date, nullable=False)
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_final = db.Column(db.Time, nullable=False)
+    tasks_categories = db.relationship('Categories_Tasks', cascade='all,delete', backref='task')
 
     def __repr__(self):
         return f'Task: id = {self.id}, user_id = {self.user_id}, nombre = {self.nombre}, estado = {self.estado}, fecha = {self.fecha}, inicio = {self.hora_inicio}, fin = {self.hora_final}'
@@ -247,7 +249,123 @@ class Tasks(db.Model):
             fecha=date
         ).all()
 
-# class Categories(db.Model):
-#     __tablename__ = 'categories'
+class Categories(db.Model):
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
+    tasks_categories = db.relationship('Categories_Tasks', cascade='all,delete', backref='category')
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'nombre', name='uq_user_category_name'),
+    )
+
+    def __repr__(self):
+        return f'Categories: id = {self.id}, user_id = {self.user_id}, nombre = {self.nombre}'
+
+    def format(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.nombre,
+        }
+
+    def insert(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def update(self):
+        try:
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+    @staticmethod
+    def get_category_by_id(id):
+        return Categories.query.filter_by(
+            id=id
+        ).one_or_none()
+
+    @staticmethod
+    def get_categories_by_user(user_id):
+        return Categories.query.filter_by(
+            user_id=user_id
+        ).all()
 
 
+class Categories_Tasks(db.Model):
+    __tablename__ = 'categories_tasks'
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'), primary_key=True)
+
+    def __repr__(self):
+        return f'Categories-Tasks: category_id = {self.category_id}, task_id = {self.task_id}'
+
+    def format(self):
+        return {
+            'category_id': self.category_id,
+            'task_id': self.task_id,
+        }
+
+    def insert(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return 1
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def update(self):
+        try:
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+    @staticmethod
+    def get_category_task_by_ids(category_id, task_id):
+        return Categories_Tasks.query.filter_by(
+            category_id=category_id,
+            task_id=task_id
+        ).one_or_none()

@@ -23,16 +23,6 @@ export default function Voice({ setSuggestionsOpen }) {
 
   const width = (ScreenWidth * 100) / 100;
   const height = (ScreenHeight * 30) / 100;
-  function MicrophoneAnimation() {
-    return (
-        <LottieView
-            style={styles.animation}
-            source={require("../../assets/animations/voz.json")}
-            autoPlay
-            loop
-        />
-    );
-  }
 
   const startRecording = async () => {
     setSuggestionsOpen(false);
@@ -80,26 +70,23 @@ export default function Voice({ setSuggestionsOpen }) {
     };
     formData.append("audio", audio);
 
-    const speech = await sendAudio(formData);
-    if (speech?.msg){
-      router.replace("/auth/login")
+    const data = await sendAudio(formData);
+    if (data?.msg) {
+      router.replace("/auth/login");
     }
+    console.log(data);
+  };
 
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(speech);
-    fileReader.onload = async () => {
-      const base64data = fileReader.result;
-      const { sound, status } = await Audio.Sound.createAsync(
-        { uri: base64data },
-        { shouldPlay: true }
-      );
-      //console.log(status);
-      await sound.playAsync();
-      if (!status.isPlaying)
-        await sound.unloadAsync();
-    }
+  function MicrophoneAnimation() {
+    return (
+      <LottieView
+        style={styles.animation}
+        source={require("../../assets/animations/voice2.json")}
+        autoPlay
+        loop
+      />
+    );
   }
-
 
   return (
     <View>
@@ -131,6 +118,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     height: "100%",
+    //backgroundColor: "rgba(255,255,255,0.5)",
     backgroundColor: "transparent",
   },
 

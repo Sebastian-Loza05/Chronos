@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from decouple import config
 from werkzeug.security import generate_password_hash, check_password_hash
 from base64 import b64encode
+import datetime
 
 DATA_USER = config('DATA_USER')
 DATA_PASSWORD = config('DATA_PASSWORD')
@@ -182,6 +183,12 @@ class Tasks(db.Model):
             'end_time': self.hora_final.strftime('%H:%M:%S')
         }
 
+    def format_ia(self):
+        fecha = self.fecha.strftime('%d/%m/%Y')
+        hora = self.hora_inicio.strftime('%H:%M') + ' - ' + self.hora_final.strftime('%H:%M')
+        nombre = self.nombre
+        return fecha + ' ' + hora + ': ' + nombre
+
     def insert(self):
         try:
             db.session.add(self)
@@ -225,6 +232,13 @@ class Tasks(db.Model):
     def get_tasks_by_user(user_id):
         return Tasks.query.filter_by(
             user_id=user_id
+        ).all()
+
+    @staticmethod
+    def get_tasks_by_user_by_date(user_id, date):
+        return Tasks.query.filter_by(
+            user_id=user_id,
+            fecha=date
         ).all()
 
     @staticmethod

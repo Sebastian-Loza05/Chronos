@@ -41,113 +41,71 @@ export default function CalendarViewMes() {
   const [dia, setDia] = useState("");
   const [State, setState] = useState("");
   const [selectedDay, setSelectedDay] = useState(null);
+  const [tasks, setTasks] = useState([]);
 
-  const getTasksForDay = (date) => {
+
+  //const getTasksForDay = (date) => {
     // Retorna las tareas para la fecha dada
     // Aquí deberías reemplazar esto con tu lógica para obtener las tareas reales
-    return ["Tarea 1", "Tarea 2", "Tarea 3"];
+    //return ["Tarea 1", "Tarea 2", "Tarea 3"];
+ // };
+  const getTasksForDay = async (date) => {
+    try {
+      const data = await getTasksDate({ type_search: 1, begin_date: date });
+      if (data.success && Array.isArray(data.tasks)) {
+        return data.tasks;
+      } else {
+        console.error("No hay tareas para ese día.");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error al obtener tareas:", error);
+      return [];
+    }
   };
 
-  const handleDayPress = (day) => {
+  //const handleDayPress = (day) => {
+    //setSelectedDay(day.dateString);
+    //setModalVisible(true);
+  //};
+  const handleDayPress = async (day) => {
     setSelectedDay(day.dateString);
     setModalVisible(true);
+    const tasksForDay = await getTasksForDay(day.dateString);
+    setTasks(tasksForDay);
   };
 
   const renderTasksModal = () => {
-    if (!selectedDay) return null;
-
-    const tasks = getTasksForDay(selectedDay);
+    //if (!selectedDay) return null;
+    if (!selectedDay || !Array.isArray(tasks)) return null;
+    //const tasks = getTasksForDay(selectedDay);
 
     return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "transparent",
-          }}
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isModalVisible}
+            onRequestClose={() => setModalVisible(false)}
         >
-          <View
-            style={{
-              backgroundColor: "#fcd9d9",
-              padding: 30,
-              height: "40%",
-              borderRadius: 10,
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 22,
-                fontFamily: "Gabarito",
-                fontWeight: "bold",
-                marginBottom: 20,
-                textAlign: "center",
-                color: "#000000",
-              }}
-            >
-              Tasks for {selectedDay}
-            </Text>
-            {tasks.map((task, index) => (
-              <View
-                key={index}
-                style={{
-                  backgroundColor: "#f1426b", // Color de fondo para cada tarea
-                  padding: 10,
-                  borderRadius: 5,
-                  marginBottom: 10,
-                }}
+          <View style={styles.centeredViewTaks}>
+            <View style={styles.modalViewTaks}>
+              <Text style={styles.modalTitle}>Tasks for {selectedDay}</Text>
+              <ScrollView style={styles.scrollView}>
+                {tasks.map((task, index) => (
+                    <View key={index} style={styles.taskContainer}>
+                      <Text style={styles.taskText}>{task.name}</Text>
+                    </View>
+                ))}
+              </ScrollView>
+              <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.closeButton}
               >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    color: "white",
-                    textAlign: "center",
-                    fontFamily: "Gabarito",
-                  }}
-                >
-                  {task}
-                </Text>
-              </View>
-            ))}
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={{
-                backgroundColor: "#982C40", // Color de fondo del botón cerrar
-                padding: 8,
-                borderRadius: 5,
-                marginTop: 20,
-                width: "20%",
-                right: -60,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 15,
-                  color: "white", // Color del texto del botón cerrar
-                  textAlign: "center",
-                  fontFamily: "Gabarito",
-                }}
-              >
-                Cerrar
-              </Text>
-            </TouchableOpacity>
+                <Text style={styles.closeButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
     );
   };
 
@@ -621,5 +579,61 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Gabarito",
     color: "#982C40",
+  },
+  centeredViewTaks: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalViewTaks: {
+    margin: 20,
+    backgroundColor: "#fcd9d9",
+    borderRadius: 10,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    minHeight: 200, // Tamaño mínimo del modal
+    maxHeight: '60%', // Tamaño máximo del modal
+  },
+  modalTitle: {
+    fontSize: 25,
+    fontWeight: "bold",
+    marginBottom: 15,
+    fontFamily:'Gabarito'
+  },
+  scrollView: {
+    width: '100%',
+  },
+  taskContainer: {
+    backgroundColor: "#ff005e",
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 12,
+  },
+  taskText: {
+    fontSize: 18,
+    color: "white",
+    textAlign: "center",
+    fontFamily:'Gabarito'
+
+  },
+  closeButton: {
+    backgroundColor: "#982C40",
+    padding: 10,
+    borderRadius: 20,
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });

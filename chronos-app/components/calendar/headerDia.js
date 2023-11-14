@@ -17,6 +17,7 @@ import { getTasksDate } from "../../app/api";
 import { createTask } from "../../app/api";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from '@react-navigation/native';
+import { router } from "expo-router";
 
 
 export default function HeaderDia() {
@@ -40,17 +41,6 @@ export default function HeaderDia() {
   const [dia, setDia] = useState("");
   const [State, setState] = useState("");
   const navigation = useNavigation();
-
-  function AppNavigator() {
-    return (
-        <Stack.Navigator>
-          <Stack.Screen name="Day" component={Dia} />
-          <Stack.Screen name="Week" component={Semana} /> // Asumiendo que tienes un componente Semana
-          <Stack.Screen name="Month" component={Mes} />
-          // ... otras rutas
-        </Stack.Navigator>
-    );
-  }
 
   async function loadFonts() {
     await Font.loadAsync({
@@ -94,6 +84,9 @@ export default function HeaderDia() {
 
   const onSelectOption = (option) => {
     console.log(`${option} Selected`);
+    if (option === "Month"){
+      router.push("/calendar/mes");
+    }
     toggleModal();
   };
   const DateModal = () => (
@@ -104,7 +97,7 @@ export default function HeaderDia() {
       onRequestClose={toggleModal}
     >
       <View style={styles.modalContainer}>
-        {["Day", "Week", "Month"].map((option) => (
+        {["Day", "Month"].map((option) => (
           <TouchableOpacity key={option} onPress={() => onSelectOption(option)}>
             <Text style={styles.modalText}>{option}</Text>
           </TouchableOpacity>

@@ -11,6 +11,7 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import React, { useState, useEffect } from "react";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
+import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getTasksDate } from "../../app/api";
@@ -66,6 +67,9 @@ export default function HeaderMes() {
   };
   const onSelectOption = (option) => {
     console.log(`${option} Selected`);
+    if (option === "Day"){
+      router.push("/calendar/dia");
+    }
     toggleModal();
   };
   const handleCloseModal = () => {
@@ -80,7 +84,7 @@ export default function HeaderMes() {
       onRequestClose={toggleModal}
     >
       <View style={styles.modalContainer}>
-        {["Day", "Week", "Month"].map((option) => (
+        {["Day", "Month"].map((option) => (
           <TouchableOpacity key={option} onPress={() => onSelectOption(option)}>
             <Text style={styles.modalText}>{option}</Text>
           </TouchableOpacity>

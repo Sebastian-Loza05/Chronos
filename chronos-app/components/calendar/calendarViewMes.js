@@ -188,22 +188,6 @@ export default function CalendarViewMes() {
     console.log(`${option} Selected`);
     toggleModal();
   };
-  const DateModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isModalVisible}
-      onRequestClose={toggleModal}
-    >
-      <View style={styles.modalContainer}>
-        {["Day", "Week", "Month"].map((option) => (
-          <TouchableOpacity key={option} onPress={() => onSelectOption(option)}>
-            <Text style={styles.modalText}>{option}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </Modal>
-  );
   const onDateChange = (event, selectedDate) => {
     setDatePickerVisibility(Platform.OS === "ios");
     if (selectedDate) {

@@ -2,7 +2,7 @@
 import React from "react";
 //import { TouchableOpacity } from "react-native-gesture-handler";
 //import {router} from "expo-router";
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Button, Alert} from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Button, Alert, ActivityIndicator} from 'react-native';
 import RedesSocialesIcon from '../../../assets/redes-sociales.png';
 import localImage from '../../../assets/estrella.png';
 import { useNavigation } from '@react-navigation/native'; // Importa useNavigation
@@ -85,6 +85,8 @@ const updateUserProfile = async (photoURL) => {
 const ProfileComponent = ({ user }) => {
   // Este estado mantendrá la URL de la foto de perfil actual
   const [profilePhoto, setProfilePhoto] = useState(user.foto);
+  const [isUploading, setIsUploading] = useState(false);
+
 
   // Este manejador se activará cuando el usuario quiera cambiar su foto de perfil
 
@@ -104,37 +106,39 @@ const ProfileComponent = ({ user }) => {
       });
 
       if (!result.canceled) {
+        setIsUploading(true); // Indicador de carga
         const uri = result.assets[0].uri;
         const response = await fetch(uri);
         const blob = await response.blob();
-        
-        // Genera un nombre único para la imagen basado en el id del usuario y la fecha/hora actual
         const imageName = `profile_${user.id}_${new Date().toISOString()}.jpg`;
-  
-        // No necesitas llamar a storage como una función, ya lo has importado
         const imageRef = ref(storage, `images/${imageName}`);
-        
-        // Sube el blob a Firebase Storage
+
         await uploadBytes(imageRef, blob);
         const downloadURL = await getDownloadURL(imageRef);
   
         setProfilePhoto(downloadURL);
-        
-        // Actualizar el perfil del usuario en tu base de datos
-        updateUserProfile(downloadURL);
+        await updateUserProfile(downloadURL);
       }
     } catch (error) {
-      console.log(error);
+      console.error('Error picking image:', error);
       Alert.alert('Error', 'An error occurred while picking the image.');
+    } finally {
+      setIsUploading(false); // Finaliza el indicador de carga
     }
   };
 
   return (
     <View style={styles.profileContainer}>
-    <Image source={{ uri: profilePhoto }} style={styles.profileImage} />
-    <TouchableOpacity style={styles.editIcon} onPress={handleEditPhoto}>
-      <FontAwesome5 name="pencil-alt" size={15} color="white" style={styles.iconStyle} />
-    </TouchableOpacity>
+    {isUploading ? (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#CFD8DC" />
+      </View>
+    ) : (
+      <Image source={{ uri: profilePhoto }} style={styles.profileImage} />
+    )}
+      <TouchableOpacity style={styles.editIcon} onPress={handleEditPhoto}>
+        <FontAwesome5 name="pencil-alt" size={15} color="white" style={styles.iconStyle}/>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -336,6 +340,14 @@ export default function user() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    width: 126, // Cambia el ancho de la imagen
+    height: 126, // Cambia la altura de la imagen
+    borderRadius: 63, // Asegúrate de que el radio de borde sea la mitad del ancho/altura
+    backgroundColor: '#AB3D52', // Un color de fondo para el círculo
+    justifyContent: 'center', // Centra el indicador verticalmente
+    alignItems: 'center', // Centra el indicador horizontalmente
+  },
   AjustesContainer:{
     marginLeft: 20,
     marginRight:20,

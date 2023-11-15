@@ -109,7 +109,7 @@ export default function Login() {
   if (!fontsLoaded) {
     return null;
   }
-  
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.all}>

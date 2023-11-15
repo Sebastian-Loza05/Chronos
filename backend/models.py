@@ -96,14 +96,10 @@ class Profile(db.Model):
     pais = db.Column(db.String(50), nullable=False)
     celular = db.Column(db.Integer, unique=True, nullable=False)
     correo = db.Column(db.String(150), nullable=False)
-    foto = db.Column(db.LargeBinary, nullable=True)
+    foto = db.Column(db.Text, nullable=True)
     user = db.relationship('Users', back_populates='profile')
 
     def format(self):
-        if self.foto is None:
-            foto = "None"
-        else:
-            foto = b64encode(self.foto).decode('utf-8')
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -114,7 +110,7 @@ class Profile(db.Model):
             'pais': self.pais,
             'celular': self.celular,
             'correo': self.correo,
-            'foto': foto
+            'foto': self.foto if self.foto else "URL predeterminada o None"
         }
 
     def insert(self):

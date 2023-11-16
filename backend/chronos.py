@@ -10,8 +10,6 @@ client = OpenAI(
     api_key=config('OPENAI_API_KEY')
 )
 
-# openai.api_key = "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"
-
 # ¡Hola! Soy Chronos, tu asistente de calendario. ¿En qué puedo ayudarte hoy?
 class Chronos:
 
@@ -97,7 +95,6 @@ class Chronos:
 
 
 class User:
-
     def __init__(self, horario):
         self.fecha = datetime.date.today().strftime("%d/%m/%Y")
         self.horario = horario
@@ -138,9 +135,7 @@ class User:
                 start_time, end_time = map(str.strip, value.split("-"))
                 result["start_time"] = start_time
                 result["end_time"] = end_time
-
         return result
-
 
 # Chat gpt-3.5-turbo model as Chronos
 # Chronos debe tener acceso a ciertos datos del usuario como su horario

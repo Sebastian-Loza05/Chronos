@@ -17,20 +17,12 @@ import { BlurView } from "expo-blur";
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
 
-function MicrophoneAnimation() {
-  return (
-    <LottieView
-      style={styles.animation}
-      source={require("../../assets/animations/voz.json")}
-      autoPlay
-      loop
-    />
-  );
-}
-
 export default function Voice({ setSuggestionsOpen }) {
   const [recording, setRecording] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const width = (ScreenWidth * 100) / 100;
+  const height = (ScreenHeight * 30) / 100;
 
   const startRecording = async () => {
     setSuggestionsOpen(false);
@@ -78,46 +70,23 @@ export default function Voice({ setSuggestionsOpen }) {
     };
     formData.append("audio", audio);
 
-    const speech = await sendAudio(formData);
-    if (speech?.msg){
-      router.replace("/auth/login")
+    const data = await sendAudio(formData);
+    if (data?.msg) {
+      router.replace("/auth/login");
     }
-    if (Platform.OS === "android") {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(speech);
-      fileReader.onload = async () => {
-        const base64data = fileReader.result;
-        const { sound, status } = await Audio.Sound.createAsync(
-          { uri: base64data },
-          { shouldPlay: true }
-        );
-        await sound.playAsync();
-        if (!status.isPlaying)
-          await sound.unloadAsync();
-      }
-    }
-    else if (Platform.OS === 'ios') {
-      console.log("Para ios");
-      // const AudioUrl = URL.createObjectURL(speech)+"#.mp3";
-      const {uri} = await FileSystem.writeAsStringAsync(
-        FileSystem.cacheDirectory + "audio.mp3",
-        speech,
-        { encoding: FileSystem.EncodingType.Base64}
-      )
-      const {sound, status } = await Audio.Sound.createAsync(
-        { uri: uri },
-        { shouldPlay: true }
-      );
-      await sound.Platform.playAsync();
-      if (!status.isPlaying){
-        await sound.unloadAsync();
-        console.log("Audio is not playing");
-      }
-      else
-        console.log("Audio is playing");
-    }
-  }
+    console.log(data);
+  };
 
+  function MicrophoneAnimation() {
+    return (
+      <LottieView
+        style={styles.animation}
+        source={require("../../assets/animations/voice2.json")}
+        autoPlay
+        loop
+      />
+    );
+  }
 
   return (
     <View>
@@ -149,6 +118,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     height: "100%",
+    //backgroundColor: "rgba(255,255,255,0.5)",
     backgroundColor: "transparent",
   },
 

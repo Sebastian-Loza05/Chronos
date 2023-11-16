@@ -109,7 +109,7 @@ export default function Login() {
   if (!fontsLoaded) {
     return null;
   }
-  
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.all}>
@@ -186,7 +186,6 @@ const styles = StyleSheet.create({
     margin:0,
     padding:0,
     justifyContent:'center',
-    alignItems:'center',
   },
   //Container de arriba
   topContainer: {
@@ -206,7 +205,6 @@ const styles = StyleSheet.create({
   
   logoContainer: {
     alignItems: "center",
-    marginTop: 0,
     marginBottom: 1,
     marginTop: -60,
   },
@@ -284,7 +282,6 @@ inputWithIcon: {
     position: 'absolute',
     top:  100, // Ajusta el valor según el espacio deseado entre los íconos
     left: 35,
-    top: iconOffset,
     width: 50,
     height: 50,
     backgroundColor: 'white',

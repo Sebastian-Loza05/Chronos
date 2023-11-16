@@ -13,7 +13,7 @@ export default function Chronos() {
     const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
     const video = useRef(null);
     const [status, setStatus] = useState({});
-    
+
     const [suggestions, setSuggestions] = useState([
         {
             title: "Hacer ejercicio",
@@ -75,25 +75,24 @@ export default function Chronos() {
     }
     //
     function RobotAnimation() {
-    // return (
-    //     <LottieView
-    //         style={styles.animationExpanded}
-    //         source={require('../../../assets/animations/robot.json')}
-    //         autoPlay
-    //         loop
-    //     />
-    // );
-      return (
-        <Video 
-          ref={video}
-          sytle={styles.animation}
-          source={require('../../../assets/animations/robot.mp4')}
-          useNativeControls
-          resizeMode={ResizeMode.CONTAIN}
-          isLooping
-          onPlaybackStatusUpdate={status => setStatus(() => status)}
-        />
-      )
+        return (
+            <LottieView
+                style={styles.animationExpanded}
+               source={require('../../../assets/animations/robot3.json')}
+                autoPlay
+               loop
+             />
+       // return (
+         //   <Video
+           //     ref={video}
+             //   sytle={styles.animation}
+               // source={require('../../../assets/animations/robot.mp4')}
+                //useNativeControls
+                //resizeMode={ResizeMode.CONTAIN}
+                //isLooping
+                //onPlaybackStatusUpdate={status => setStatus(() => status)}
+            ///>
+        )
     }
 
     function handleSuggestionPress(suggestion) {
@@ -106,11 +105,11 @@ export default function Chronos() {
             <Text style={styles.title}>Welcome to Chronos</Text>
 
             <View style={styles.card}>
-              <Image source={require('../../../assets/animations/robot.gif')} style={styles.animation} />
+                <RobotAnimation/>
             </View>
 
             <Voice setSuggestionsOpen={setSuggestionsOpen} setSuggestions={setSuggestions}/>
-  
+
             <TouchableOpacity style={styles.button} onPress={toggleSuggestionsPanel}>
                 <Text style={styles.buttonText}>Sugerencias</Text>
             </TouchableOpacity>
@@ -291,4 +290,3 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
 });
-

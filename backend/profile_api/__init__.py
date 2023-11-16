@@ -78,7 +78,12 @@ def sign_in():
         pais = data.get("pais", None)
         celular = data.get("celular", None)
         correo = data.get("correo", None)
-
+        # Imágenes predeterminadas basadas en el género
+        default_profile_images = {
+            'female': 'https://media.discordapp.net/attachments/1155323431915630594/1171520201183998045/image_17.png?ex=655cfa35&is=654a8535&hm=7bd18544dbac9719106aee1b8e756209f2afa458da7ded9cae2c532d3be19089&=&width=421&height=423',
+            'male': 'https://media.discordapp.net/attachments/996002132891271188/1171557183574511756/image_24.png?ex=655d1ca7&is=654aa7a7&hm=ae91272407d0a2a4bb49614f85738d77c7d6f90943a15be2d2a910756abad4d1&=&width=425&height=423',
+        }
+        print("iMAGEN: ", default_profile_images[genero])
         # Creación de user
         if username is None or password is None:
             error_422 = True
@@ -104,7 +109,8 @@ def sign_in():
             fecha_nacimiento=fecha_nacimiento,
             pais=pais,
             celular=celular,
-            correo=correo
+            correo=correo,
+            foto=default_profile_images[genero.lower()]
         )
 
         profile_id = profile.insert()
@@ -142,13 +148,15 @@ def update_profile():
         # Obtención de la información
         current_user = get_jwt_identity()
         profile = Profile.get_by_profile_id(current_user["id"])
-        foto = request.files["foto"]
-        if not foto:
-            error_422 = True
-            abort(406)
 
-        foto = foto.read()
-        profile.foto = foto
+        # Aquí cambiamos para recibir un JSON en lugar de un archivo
+        data = request.get_json()
+        foto_url = data.get("foto")
+        if not foto_url:
+            error_422 = True
+            abort(422)
+
+        profile.foto = foto_url  # Ahora estamos asignando la URL de la imagen
 
         # Actualización del perfil
         profile_id = profile.update()
@@ -156,8 +164,6 @@ def update_profile():
         if profile_id == -1:
             error_406 = True
             abort(406)
-
-        profile = Profile.get_by_profile_id(current_user["id"])
 
         return ({
             'success': True,
@@ -174,6 +180,8 @@ def update_profile():
             abort(406)
         else:
             abort(500)
+
+
 
 @app.route("/profile", methods=["DELETE"])
 @jwt_required()

@@ -21,6 +21,8 @@ from werkzeug.utils import secure_filename
 
 from chronos import Chronos, behavior
 
+from datetime import datetime
+
 SECRET_KEY = config('SECRET_KEY')
 ACCESS_EXPIRES = timedelta(hours=1)
 JWT_SECRET_KEY = config('JWT_SECRET_KEY')
@@ -62,13 +64,14 @@ def voice_recomendations():
         ffmpeg.input(save_file).output(output_file).run()
         os.remove(save_file)
 
-        horario = [
-            "03/11/2023 00:00 - 08:00: duermo",
-            "03/11/2023 08:00 - 08:30: desayuno",
-            "03/11/2023 08:30 - 09:30 Pasear al perro",
-            "03/11/2023 09:00 - 11:00: Clases de algoritmos",
-            "03/11/2023 16:00 - 18:00: Clases de Machine Learning"
-        ]
+        # ! Actualmente jala la del dia actual, puede estar a variacion mas adelante
+        fecha = datetime.now()
+        fecha = fecha.strftime('%Y-%m-%d')
+        current_user = get_jwt_identity()
+        horario = Tasks.get_tasks_by_user_by_date(current_user["id"], fecha)
+        horario = [p.format_ia() for p in horario]
+
+        print(horario)
 
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, speech)

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Modal, TouchableOpacity, Dimensions} from 'react-native';
+import { View, StyleSheet, Modal, TouchableOpacity, Dimensions, Platform} from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Audio } from 'expo-av';
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -80,19 +80,39 @@ export default function Voice({setSuggestionsOpen, setSuggestions}) {
     if (speech?.msg){
       router.replace("/auth/login")
     }
-
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(speech);
-    fileReader.onload = async () => {
-      const base64data = fileReader.result;
-      const { sound, status } = await Audio.Sound.createAsync(
-        { uri: base64data },
+    if (Platform.OS === "android") {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(speech);
+      fileReader.onload = async () => {
+        const base64data = fileReader.result;
+        const { sound, status } = await Audio.Sound.createAsync(
+          { uri: base64data },
+          { shouldPlay: true }
+        );
+        await sound.playAsync();
+        if (!status.isPlaying)
+          await sound.unloadAsync();
+      }
+    }
+    else if (Platform.OS === 'ios') {
+      console.log("Para ios");
+      // const AudioUrl = URL.createObjectURL(speech)+"#.mp3";
+      const {uri} = await FileSystem.writeAsStringAsync(
+        FileSystem.cacheDirectory + "audio.mp3",
+        speech,
+        { encoding: FileSystem.EncodingType.Base64}
+      )
+      const {sound, status } = await Audio.Sound.createAsync(
+        { uri: uri },
         { shouldPlay: true }
       );
-      //console.log(status);
-      await sound.playAsync();
-      if (!status.isPlaying)
+      await sound.Platform.playAsync();
+      if (!status.isPlaying){
         await sound.unloadAsync();
+        console.log("Audio is not playing");
+      }
+      else
+        console.log("Audio is playing");
     }
   }
 

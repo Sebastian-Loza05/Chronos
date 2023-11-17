@@ -87,8 +87,7 @@ def voice_recomendations():
             "../uploads/response.mp3",
             mimetype="audio/mp3",
             download_name="response.mp3")
-        json_response = {"success": True}
-        return jsonify(json_response), response
+        return response
 
     except Exception as e:
         print(e)

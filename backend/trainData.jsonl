@@ -1,0 +1,36 @@
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó ir al ginmasio para el día 17/11/2023 desde las 14:00 hasta las 16:00. Disfruta tu entrenamiento."},
+  {"role": "assistant", "content": "{'tarea':'ir al ginmasio', 'hora_inicio': '14:00', 'hora_final':'16:00', 'fecha': '17/11/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó estudiar ADA para el día 16/12/2023 desde las 9:00 hasta las 12:00. Que te vaya bien estudiando."},
+  {"role": "assistant", "content": "{'tarea':'estudiar ADA', 'hora_inicio': '9:00', 'hora_final':'12:00', 'fecha': '16/12/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó jugar fútbol para el día 18/11/2023 desde las 20:00 hasta las 22:00. Que tengas un buen partido de fútbol."},
+  {"role": "assistant", "content": "{'tarea':'jugar fútbol', 'hora_inicio': '20:00', 'hora_final':'22:00', 'fecha': '18/11/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó hacer ejercicio para el día 17/11/2023 desde las 16:00 hasta las 18:00."},
+  {"role": "assistant", "content": "{'tarea':'hacer ejercicio', 'hora_inicio': '16:00', 'hora_final':'18:00', 'fecha': '17/11/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó hacer proyecto de Base de Datos para el día 18/11/2023 desde las 15:00 hasta las 19:00."},
+  {"role": "assistant", "content": "{'tarea':'hacer proyecto de Base de Datos', 'hora_inicio': '15:00', 'hora_final':'19:00', 'fecha': '18/11/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó estudiar Arqui para el día 18/11/2023 desde las 10:00 hasta las 12:00."},
+  {"role": "assistant", "content": "{'tarea':'estudiar Arqui', 'hora_inicio': '10:00', 'hora_final':'12:00', 'fecha': '18/11/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó leer Lupin para el día 18/11/2023 desde las 22:00 hasta las 23:00."},
+  {"role": "assistant", "content": "{'tarea':'leer Lupin', 'hora_inicio': '22:00', 'hora_final':'23:00', 'fecha': '18/11/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó hacer la tarea de Software para el día 19/11/2023 desde las 14:00 hasta las 18:00."},
+  {"role": "assistant", "content": "{'tarea':'hacer la tarea de Software', 'hora_inicio': '14:00', 'hora_final': '18:00', 'fecha': '19/11/2023'}"},]}
+{"messages": [
+  {"role": "system", "content": "Serás un asistente llamado Chronos que dará sugerencias de horarios y tu respuesta final debe ser un diccionario JSON con los siguientes campos: "tarea", "hora_inicio", "hora_final", and "fecha". Si no te dan la fecha usarás la fecha actual."}, 
+  {"role": "user", "content": "Se agendó hacer proyecto de Finanzas para el día 21/11/2023 desde las 17:00 hasta las 22:00."},
+  {"role": "assistant", "content": "{'tarea':'hacer proyecto de Finanzas', 'hora_inicio': '17:00', 'hora_final': '22:00', 'fecha': '21/11/2023'}"},]}

@@ -96,12 +96,12 @@ class Chronos:
     
     def parse_response(self, response):
     
-        agendar  = r"""(.*)agendó exitosamente((.|\n)*)
+        agendar  = r"""(.*)agendó exitosamente(.*)
 nombre: (.+)
 fecha: (.+)
 hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
 
-        actualizar_eliminar = r"""(.*)(actualizó|eliminó) exitosamente((.|\n)*)
+        actualizar_eliminar = r"""(.*)(actualizó|eliminó) exitosamente(.*)
 id: (\d+)
 nombre: (.+)
 fecha: (.+)

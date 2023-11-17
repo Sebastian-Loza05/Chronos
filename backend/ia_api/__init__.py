@@ -44,6 +44,12 @@ def actualizarBd(response, user_id):
     elif response["accion"] == "actualizó":
         id = response["id"]
         tarea = Tasks.get_task_by_id(id, user_id)
+        tarea.nombre = response["nombre"]
+        tarea.date = response["fecha"]
+        tarea.hora_inicio = response["hora_inicio"]
+        tarea.hora_final = response["hora_final"]
+
+        tarea.update()
     elif response["accion"] == "eliminó":
         pass
 
@@ -91,7 +97,9 @@ def voice_recomendations():
         chronos.make_response_speech1(response)
         confirmation = chronos.parse_response(response)
 
-        actualizarBd(confirmation, current_user["id"])
+        if confirmation is not None:
+            actualizarBd(confirmation, current_user["id"])
+
         print(response)
         os.remove(output_file)
         print(confirmation, current_user["id"])

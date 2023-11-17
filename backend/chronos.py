@@ -5,6 +5,7 @@ import speech_recognition as sr
 from openai import OpenAI
 from decouple import config
 from gtts import gTTS
+import re
 
 client = OpenAI(
     api_key=config('OPENAI_API_KEY')
@@ -93,6 +94,51 @@ class Chronos:
         response = self.get_completion(prompt)
         return response
 
+    def parse_response(self, response):
+
+        agendar  = r"""Se agendó exitosamente la siguiente tarea:(.*)
+nombre: (.+)
+fecha: (.+)
+hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
+
+        actualizar_eliminar = r"""Se (actualizó|eliminó) exitosamente la siguiente tarea:(.*)
+id: (\d+)
+nombre: (.+)
+fecha: (.+)
+hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
+
+        match_agendar = re.search(agendar, response)
+        match_actualizar_eliminar = re.search(actualizar_eliminar, response)
+
+        id_tarea = None
+        if match_agendar:
+            accion = "agendó"
+            nombre = match_agendar.group(2)
+            fecha = match_agendar.group(3)
+            hora_inicio = match_agendar.group(4)
+            hora_final = match_agendar.group(5)
+        elif match_actualizar_eliminar:
+            accion = match_actualizar_eliminar.group(1)
+            id_tarea = int(match_actualizar_eliminar.group(3))
+            nombre = match_actualizar_eliminar.group(4)
+            fecha = match_actualizar_eliminar.group(5)
+            hora_inicio = match_actualizar_eliminar.group(6)
+            hora_final = match_actualizar_eliminar.group(7)
+        else:
+            return None
+        tarea_dict = {
+            "accion": accion,
+            "nombre": nombre,
+            "fecha": fecha,
+            "hora_inicio": hora_inicio,
+            "hora_final": hora_final
+        }
+
+        if accion != "agendó":
+            tarea_dict["id"] = id_tarea
+
+        return tarea_dict
+
 
 class User:
     def __init__(self, horario):
@@ -141,24 +187,30 @@ class User:
 # Chronos debe tener acceso a ciertos datos del usuario como su horario
 
 behavior = """
-Desde ahora vas a actuar como un sugeridor de horarios llamado 'Chronos'. De entrada tendrás una petición y un horario. Tus respuestas deben ser mas o menos cortas y precisas. Debes poder identificar lo que está queriendo pedir el usuario, tenemos los siguientes casos:
-- Añadir o agendar una actividad o varias actividades a su calendario
-	- Actividad: nombre y hora
-	- Para cada tarea se debe especificar el rango de tiempo y el nombre de la actividad y si no es el caso preguntar por el dato faltante.
-- Eliminar una actividad o varias actividades de su calendario
-	- Verificar si la actividad existe, si no rechazar la petición con algún mensaje. 
-Actualizar una actividad o varias actividades de su calendario
-	- Verificar si la actividad o actividades existen, si no rechazar la petición con algún mensaje. 
-- Sugerencia sobre el horario de una actividad propuesta por el usuario.
-	- Debes preguntar si el usuario está de acuerdo con la sugerencia. Si lo está responder de forma afirmativa, la sugerencia de horario debe tener un rango de tiempo.
-- Si no identificamos ningún caso no aceptes la petición. 
-Una vez confirmada la accion del usuario deben responder la confirmacion con el siguiente formato ejemplo:
-
-Se agendó ir al ginmasio para el día 17/11/2023 desde las 14:00 hasta las 16:00.
-
+Desde ahora vas a actuar como un sugeridor de horarios llamado 'Chronos'.
+Yo te voy a dar una petición y un horario (lista de actividades de la forma: '<id> <fecha> <hora>: <nombre de la actividad>').
+Tus respuestas deben ser precisas.
+Debes reconocer lo que está queriendo pedir el usuarios, casos:
+- Añadir o agendar una o varias actividad
+	- Una actividad tiene nombre y rango de tiempo.
+	- Debp especificar ambos atributos sino DEBES preguntar por el dato faltante.
+- Eliminar una o varias actividades
+	- Verificar si la actividad existe sino rechazar la petición.
+- Actualizar una o varias actividades
+	- Verificar si la actividad o actividades existen sino rechazar la petición.
+    - Si no te proporciona un dato de actualización de la tarea pedir más información.
+- Sugerencia sobre el horario de una actividad propuesta por mi.
+	- Debes preguntar si yo estoy de acuerdo con la sugerencia. Si lo está responder de forma afirmativa. 
+- Si no identificas ningún caso no aceptes la petición. 
+Una vez que comfirmes mi acción DEBES responde con el siguiente formato ejemplo:
+Se agendó/eliminó/actualizó exitosamente la siguiente tarea:
+nombre: <nombre de la actividad>
+fecha: <fecha>
+hora: <hora>
+SI Y SOLO SI la acción es eliminar o actualizar muestra el id de la tarea arriba de nombre (id: <id de la actividad>).
 Chronos, ten en cuenta que hoy estamos: """
 
-# Tipo: crear
-# Actividad: jugar futbol
+# Se agendó/eliminó/actualizó exitosamente la siguiente tarea:
+# Nombre: hacer ejercicio
 # Fecha: 10/11/2023
 # Hora: 15:00 - 16:00

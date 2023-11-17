@@ -38,6 +38,15 @@ jwt = JWTManager(app)
 setup_db(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
+def actualizarBd(response, user_id):
+    if response["accion"] == "agendó":
+        pass
+    elif response["accion"] == "actualizó":
+        id = response["id"]
+        tarea = Tasks.get_task_by_id(id, user_id)
+    elif response["accion"] == "eliminó":
+        pass
+
 # Instanciamiento de chronos
 chronos = Chronos("gpt-3.5-turbo", behavior)
 # ----------------------------------------------------------------
@@ -48,7 +57,7 @@ def voice_recomendations():
     error_422 = False
     output_file = "uploads/audio.wav"
     try:
-        print(request.files)
+        current_user = get_jwt_identity()
         if 'audio' not in request.files:
             print("asbfakfab")
             error_406 = True
@@ -77,12 +86,15 @@ def voice_recomendations():
         horario = [p.format_ia() for p in horario]
 
         print(horario)
-
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, speech)
         chronos.make_response_speech1(response)
+        confirmation = chronos.parse_response(response)
+
+        actualizarBd(confirmation, current_user["id"])
         print(response)
         os.remove(output_file)
+        print(confirmation, current_user["id"])
         response = send_file(
             "../uploads/response.mp3",
             mimetype="audio/mp3",

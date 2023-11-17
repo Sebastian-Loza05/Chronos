@@ -80,15 +80,34 @@ def voice_recomendations():
 
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, speech)
+
+        confirmation = chronos.parse_response(response)
+        print(confirmation)
+
         chronos.make_response_speech1(response)
+
         print(response)
         os.remove(output_file)
         response = send_file(
             "../uploads/response.mp3",
             mimetype="audio/mp3",
             download_name="response.mp3")
-        json_response = {"success": True}
-        return jsonify(json_response), response
+
+        if confirmation is None:
+            return response
+
+        # if confirmation['accion'] == 'agendó':
+        #     new_task = Tasks(
+        #         nombre=confirmation['nombre'],
+        #         fecha=confirmation['fecha'],
+        #         hora_inicio=confirmation['hora_inicio'],
+        #         hora_final=confirmation['hora_final']
+        #     )
+        #     new_task.insert()
+        # elif confirmation['accion'] == 'eliminó':
+        #     pass
+
+        return response
 
     except Exception as e:
         print(e)

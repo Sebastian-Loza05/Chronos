@@ -85,7 +85,6 @@ export default function Voice({ setSuggestionsOpen }) {
     formData.append("json", JSON.stringify(data));
 
     const  speech = await sendAudio(formData);
-    console.log("json: ", jsonData);
     if (speech?.msg){
       router.replace("/auth/login")
     }

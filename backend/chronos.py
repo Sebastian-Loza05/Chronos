@@ -107,8 +107,8 @@ nombre: (.+)
 fecha: (.+)
 hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
 
-        match_agendar = re.search(agendar, response)
-        match_actualizar_eliminar = re.search(actualizar_eliminar, response)
+        match_agendar = re.search(agendar, response, re.DOTALL)
+        match_actualizar_eliminar = re.search(actualizar_eliminar, response, re.DOTALL)
 
         id_tarea = None
         if match_agendar:

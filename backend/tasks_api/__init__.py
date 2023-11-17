@@ -32,7 +32,7 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 def get_tasks_params(type_search, begin_date, end_date, user):
     # En caso sólo se quieran las tareas de un día
     if type_search == 1:
-        tasks = Tasks.get_task_by_date(begin_date)
+        tasks = Tasks.get_task_by_date(begin_date, user["id"])
         return tasks
     # En caso se quieran las tareas de un periodo de tiempo
     if end_date is None:

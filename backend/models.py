@@ -240,9 +240,10 @@ class Tasks(db.Model):
         ).all()
 
     @staticmethod
-    def get_task_by_date(date):
+    def get_task_by_date(date, user_id):
         return Tasks.query.filter_by(
-            fecha=date
+            fecha=date,
+            user_id=user_id
         ).all()
 
 class Categories(db.Model):

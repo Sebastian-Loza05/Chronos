@@ -185,7 +185,7 @@ class Tasks(db.Model):
         fecha = self.fecha.strftime('%d/%m/%Y')
         hora = self.hora_inicio.strftime('%H:%M') + ' - ' + self.hora_final.strftime('%H:%M')
         nombre = self.nombre
-        return fecha + ' ' + hora + ': ' + nombre
+        return str(self.id) + ' ' + fecha + ' ' + hora + ': ' + nombre
 
     def insert(self):
         try:

@@ -7,7 +7,7 @@ import RedesSocialesIcon from '../../../assets/redes-sociales.png';
 import localImage from '../../../assets/estrella.png';
 import { useNavigation } from '@react-navigation/native'; // Importa useNavigation
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext} from 'react';
 import moment from 'moment';
 import 'moment/locale/es';  // Importa el locale en español
 import { Ionicons } from '@expo/vector-icons'; 
@@ -23,6 +23,8 @@ import * as ImagePicker from 'expo-image-picker';
 // Importaciones para Firebase:
 import { storage } from '../../config/firebaseConfig'; 
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { UserProfileContext } from '../../UserProfileContext';
+import { updateUserProfile } from '../../api';
 
 
 const user1 = {
@@ -52,32 +54,6 @@ const getCountryText = (country) => {
     return 'Perú  🇵🇪';
   } else {
     return country;
-  }
-};
-
-const updateUserProfile = async (photoURL) => {
-  const token = await AsyncStorage.getItem('userToken'); // Obtén el token de autenticación del usuario
-  
-  try {
-    const response = await fetch('http://192.168.0.16:3001/profile', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        foto: photoURL, // Asegúrate de que el backend espere un campo `foto` con la URL de la imagen
-      }),
-    });
-
-    const data = await response.json();
-    if (response.ok) {
-      // Manejo exitoso, puedes hacer algo con `data` si es necesario
-    } else {
-      throw new Error(data.error || 'Error al actualizar el perfil.');
-    }
-  } catch (error) {
-    console.error('Error updating user profile:', error);
   }
 };
 
@@ -117,7 +93,13 @@ const ProfileComponent = ({ user }) => {
         const downloadURL = await getDownloadURL(imageRef);
   
         setProfilePhoto(downloadURL);
-        await updateUserProfile(downloadURL);
+        const updateResult = await updateUserProfile(downloadURL);
+        if (updateResult.success) {
+          console.log('Perfil actualizado:', updateResult.profile_updated);
+          console.log("URL de la foto actualizada:", updateResult.profile_updated.foto);
+        } else {
+          throw new Error(updateResult.error || 'Error al actualizar el perfil.');
+        }
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -157,59 +139,21 @@ export default function user() {
     }
   };
 
-  const [user, setUser] = useState(null);
+  const { userProfile } = useContext(UserProfileContext);
 
-    useEffect(() => {
-      // Función para recuperar el perfil del usuario
-      const fetchUserProfile = async () => {
-        try {
-          const token = await AsyncStorage.getItem('userToken');
-    
-          if (!token) {
-            Alert.alert('Error', 'No se encontró el token de autenticación.');
-            return;
-          }
-    
-          const response = await fetch('http://192.168.0.16:3001/profile', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          });
-    
-          const data = await response.json();
-    
-          // Imprime la respuesta en la consola
-          console.log('Perfil del usuario:', data);
-    
-          if (response.status === 200) {
-            setUser(data.profile);
-          } else {
-            Alert.alert('Error', data.error || 'Error al obtener el perfil de usuario.');
-          }
-        } catch (error) {
-          console.error('Error fetching user profile:', error);
-          Alert.alert('Error', 'Hubo un problema al conectarse con el servidor.');
-        }
-      };
-    
-      fetchUserProfile();
-    }, []);
-        
     /* Luego descomentar, ahorita solo quiero probar si funciona bien el redireccionamiento segun el rol del usuario*/
-    if (!user) {
-        return <Text></Text>;
+    if (!userProfile) {
+      return <Text></Text>;
     }
 
     // Establece el idioma de moment en español
     moment.locale('es');
 
-    const fechaNacimiento = moment.utc(user.fecha_nacimiento, 'ddd, DD MMM YYYY HH:mm:ss GMT').format('DD-MM-YYYY');
+    const fechaNacimiento = moment.utc(userProfile.fecha_nacimiento, 'ddd, DD MMM YYYY HH:mm:ss GMT').format('DD-MM-YYYY');
 
 
     // Formatea la fecha directamente desde la cadena UTC
-    let fechaNacimientoFormateada = moment.utc(user.fecha_nacimiento).format('DD [de] MMMM [del] YYYY');
+    let fechaNacimientoFormateada = moment.utc(userProfile.fecha_nacimiento).format('DD [de] MMMM [del] YYYY');
 
     // Divide la fecha formateada en partes
       let fechaParts = fechaNacimientoFormateada.split(' ');
@@ -221,13 +165,13 @@ export default function user() {
       fechaNacimientoFormateada = fechaParts.join(' ');
 
     // Mensaje predeterminado con información del usuario
-    const defaultDescription = user1.description || `¡Hola! Soy ${user.nombre} ${user.apellido} y mi cumpleaños es el ${fechaNacimientoFormateada} ✨`;
+    //const defaultDescription = user1.description || `¡Hola! Soy ${user.nombre} ${user.apellido} y mi cumpleaños es el ${fechaNacimientoFormateada} ✨`;
 
      // Icono dependiendo del género
-    const genderIconName = user.genero === 'female' ? 'female-symbol' : 'male-symbol';
+    const genderIconName = userProfile.genero === 'female' ? 'female-symbol' : 'male-symbol';
 
-    const genderIconColor = user.genero === 'female' ? '#FF69B4' : '#1874CD'; // Colores típicos para cada género, puedes ajustarlos a tus preferencias
-    const ColorWrap = user.genero === 'female' ? 'pink' : 'skyblue'; // Colores típicos para cada género, puedes ajustarlos a tus preferencias
+    const genderIconColor = userProfile.genero === 'female' ? '#FF69B4' : '#1874CD'; // Colores típicos para cada género, puedes ajustarlos a tus preferencias
+    const ColorWrap = userProfile.genero === 'female' ? 'pink' : 'skyblue'; // Colores típicos para cada género, puedes ajustarlos a tus preferencias
       const genderIconWrapper= {
         backgroundColor: ColorWrap,
         borderRadius: 50,
@@ -266,14 +210,14 @@ export default function user() {
 
       {/* Aquí renderizas el componente de perfil y le pasas el usuario como prop */}
 
-      <ProfileComponent user={user} />
+      <ProfileComponent user={userProfile} />
 
       {/* Contenedor principal de texto */}
       <View style={styles.nuevo}>
         {/* Contenedor de la sección de nombre */}
         <View style={styles.nameContainer}>
           {/* Nombre y apellido */}
-          <Text style={styles.name}>{user.nombre} {user.apellido}</Text>
+          <Text style={styles.name}>{userProfile.nombre} {userProfile.apellido}</Text>
         </View>
 
         {/* Contenedor de la fecha de cumpleaños */}
@@ -300,7 +244,7 @@ export default function user() {
           <Fontisto name="email" size={24} color="#AB3D52"/>
           {/* Texto de Email */}
           <Text style={styles.contactText}>Email: </Text>
-          <Text style={styles.contactText2}> {user.correo}</Text>
+          <Text style={styles.contactText2}> {userProfile.correo}</Text>
     </View>
 
     {/* Contenedor de la sección de Celular */}
@@ -309,7 +253,7 @@ export default function user() {
       <Feather name="phone" size={22.5} color="#AB3D52"/>
       {/* Texto de Celular */}
       <Text style={styles.contactText}>Celular: </Text>
-      <Text style={styles.contactText2}> {user.celular}</Text>
+      <Text style={styles.contactText2}> {userProfile.celular}</Text>
     </View>
      {/*Pais*/}
      <View style={styles.contactContainer2}>
@@ -317,7 +261,7 @@ export default function user() {
       <Fontisto name="map-marker-alt" size={24} color="#AB3D52" marginLeft={2}/>
       {/* Texto de Pais */}
       <Text style={styles.contactText}> Pais: </Text>
-      <Text style={styles.contactText2}>{getCountryText(user.pais)}</Text>
+      <Text style={styles.contactText2}>{getCountryText(userProfile.pais)}</Text>
     </View>
       {/* Sección de Ajustes (Settings) */}
       <View style={styles.AjustesContainer}>

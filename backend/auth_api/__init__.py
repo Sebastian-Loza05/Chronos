@@ -10,6 +10,7 @@ from flask_cors import CORS
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
+    get_jwt_identity,
     get_jwt,
     JWTManager
 )
@@ -103,6 +104,9 @@ def login_by_token():
             # print("token:", token)
 
         if token is None or token == "undefined":
+            error_401 = True
+            abort(401)
+        if Users.get_by_username(get_jwt_identity()['username']) is None:
             error_401 = True
             abort(401)
 

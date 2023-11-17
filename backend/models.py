@@ -221,9 +221,10 @@ class Tasks(db.Model):
             db.session.close()
 
     @staticmethod
-    def get_task_by_id(id):
+    def get_task_by_id(id, user_id):
         return Tasks.query.filter_by(
-            id=id
+            id=id,
+            user_id=user_id
         ).one_or_none()
 
     @staticmethod
@@ -234,9 +235,8 @@ class Tasks(db.Model):
 
     @staticmethod
     def get_tasks_by_user_by_date(user_id, date):
-        return Tasks.query.filter_by(
-            user_id=user_id,
-            fecha=date
+        return Tasks.query.filter(
+            (Tasks.user_id == user_id) & (Tasks.fecha >= date)
         ).all()
 
     @staticmethod

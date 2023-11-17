@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext} from "react";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import LottieView from "lottie-react-native";
@@ -17,6 +17,7 @@ import { getTasksDate, createTask } from "../../app/api";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from '@react-navigation/native';
 import { router } from "expo-router";
+import { TasksContext } from '../../app/TasksContext';
 
 function MicrophoneAnimation() {
   return (
@@ -50,6 +51,7 @@ export default function HeaderDia() {
   const [dia, setDia] = useState("");
   const [State, setState] = useState("");
   const navigation = useNavigation();
+  const { refreshTasks } = useContext(TasksContext);
 
   async function loadFonts() {
     await Font.loadAsync({
@@ -237,6 +239,7 @@ export default function HeaderDia() {
       setDia("");
       setStartTime("");
       setEndTime("");
+      refreshTasks(formData.date); // Usando la fecha de la tarea que se acaba de crear
     } catch (error) {
       console.error("Error:", error);
       alert("Error al guardar la tarea. Por favor, intente de nuevo.");

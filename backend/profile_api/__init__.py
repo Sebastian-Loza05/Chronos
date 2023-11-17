@@ -47,6 +47,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
 @jwt_required()
 def get_profile():
     try:
+        print("Si aparece esto esta mal")
         current_user = get_jwt_identity()
         profile = Profile.get_by_profile_id(current_user["id"])
 
@@ -75,7 +76,7 @@ def sign_in():
         apellido = data.get("apellido", None)
         genero = data.get("genero", None)
         fecha_nacimiento = data.get("fecha_nacimiento", None)
-        pais = data.get("pais", None)
+        pais = data.get("pais", "Peru")
         celular = data.get("celular", None)
         correo = data.get("correo", None)
         # Imágenes predeterminadas basadas en el género

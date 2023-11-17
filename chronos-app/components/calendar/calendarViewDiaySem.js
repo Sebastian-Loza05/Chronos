@@ -1,5 +1,4 @@
-//CalendarViewDiaySem (todo es dinamico y solo falta poner + estetico el modal cuando se presiona una tarea *nda + uwu*)
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableWithoutFeedback, Dimensions} from "react-native"
 import Modal from 'react-native-modal';
 import { horas } from "./../../app/horas"
@@ -13,6 +12,7 @@ import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {compararHoras} from "../functions/functions";
+import { TasksContext } from '../../app/TasksContext'; 
 
 const {width} = Dimensions.get('screen');
 
@@ -26,18 +26,72 @@ const getUniqueColor = (taskId) => {
     return colors[colorIndex];
   };
 
-const TasksList = ({ tasks, containerHeight }) => {
+const calculateOverlap = (tasks) => {
+    let overlaps = {};
+    
+    tasks.forEach((task) => {
+      if (!overlaps[task.start_time]) {
+        overlaps[task.start_time] = [];
+      }
+      overlaps[task.start_time].push(task.id);
+    });
+  
+    return overlaps;
+  };
+  
+
+const TasksList = React.memo(({ tasks, containerHeight }) => {
   console.log("Tasks inside TasksList:", tasks);
+  const overlaps = calculateOverlap(tasks);
   return (
     <View style={{ position: 'relative', flex: 1 }}>
       {tasks.map((task) => (
-        <TaskItem key={task.id} task={task} containerHeight={containerHeight} />
+        <TaskItem
+         key={task.id}
+         task={task}
+         containerHeight={containerHeight}
+         overlaps={overlaps[task.start_time]}
+        />
       ))}
     </View>
   );
+});
+
+const calculateTaskWidth = (numberOfOverlaps) => {
+  switch (numberOfOverlaps) {
+    case 1:
+      return 300;
+    case 2:
+      return 150; 
+    case 3:
+      return 100; 
+    case 4:
+      return 75; 
+    case 5:
+      return 62.9; 
+    default:
+      return 380; 
+  }
 };
 
-const TaskItem = ({ task, containerHeight }) => {
+const calculateTaskLeft = (numberOfOverlaps, overlapIndex) => {
+  switch (numberOfOverlaps) {
+    case 1:
+      return  (60 + overlapIndex * 92); 
+    case 2:
+      return  (60 + overlapIndex * 150); 
+    case 3:
+      return (60 + overlapIndex * 100); 
+    case 4:
+      return (60 + overlapIndex * 75); 
+    case 5:
+      return (60 + overlapIndex * 62.9); 
+    default:
+      return 380; 
+  }
+};
+
+const TaskItem = ({ task, containerHeight, overlaps}) => { 
     const taskColor = getUniqueColor(task.id);
     const startTime = moment(task.start_time, 'HH:mm');
     const endTime = moment(task.end_time, 'HH:mm');
@@ -46,13 +100,23 @@ const TaskItem = ({ task, containerHeight }) => {
   
     const topPosition = ((startTime.hours() * containerHeight) + ((startTime.minutes() / 60) * containerHeight))-1645;
     const taskHeight = (durationInMinutes / 60) * containerHeight;
-  
+
+    // Encuentra el índice de esta tarea en el arreglo de superposiciones
+    const overlapIndex = overlaps.indexOf(task.id);
+    const numberOfOverlaps = overlaps.length;
+    console.log("numberOfOverlaps: ",numberOfOverlaps)
+
+
+    console.log("taskWidth actual: ", taskWidth);
+
+    const taskWidth = calculateTaskWidth(numberOfOverlaps); 
+    const marginLeft = calculateTaskLeft(numberOfOverlaps, overlapIndex);
     const taskStyle = {
-      position: 'absolute',
-      top: topPosition,
-      height: taskHeight,
-      width: '78%',
-      marginLeft: 60,
+      position: 'absolute', 
+      top: topPosition, //posicion de la tarea
+      height: taskHeight, //alto de la tarea
+      width: taskWidth, //ancho de la tarea
+      marginLeft: marginLeft,
       borderRadius: 15,
       padding: 10,
       display: 'flex',
@@ -61,6 +125,7 @@ const TaskItem = ({ task, containerHeight }) => {
       alignItems: 'center',
       backgroundColor: taskColor, 
     };
+    console.log("taskWidth actual2: ", taskWidth);
 
     console.log("StartTime:", startTime);
     console.log("EndTime:", endTime);
@@ -248,9 +313,8 @@ const TaskItem = ({ task, containerHeight }) => {
         </Modal>
       </View>
     );
-    
-};
-
+   
+  };
   
 export default function CalendarViewDiaySem() {
     const swiper = React.useRef();
@@ -260,43 +324,12 @@ export default function CalendarViewDiaySem() {
     const [currentMinute, setCurrentMinute]= useState(new Date().getMinutes());
     const [left, setLeft] = useState(140);
     const totalInterval = 70.0/60;
-    
-    // Cambia el estado inicial de tareas a un arreglo vacío
-    const [tasks, setTasks] = useState([]);
-
-    // useEffect para cargar las tareas cuando el componente se monta o la fecha cambia
+    const { tasks, refreshTasks } = useContext(TasksContext);
 
     useEffect(() => {
-        const loadTasks = async () => {
-          try {
-            const formData = {
-                type_search: 1,
-                begin_date: moment(value).format('YYYY-MM-DD')
-            };
-            const response = await getTasksDate(formData);
-            console.log('Tasks fetched:', response); 
-            
-            if (response && response.success) { 
-                const tasksWithFormattedTime = response.tasks.map(task => ({
-                  ...task,
-                  start_time: moment(task.start_time, 'HH:mm:ss').format('HH:mm'), // Convertierto a formato 'HH:mm'
-                  end_time: moment(task.end_time, 'HH:mm:ss').format('HH:mm') // Convertierto a formato 'HH:mm'
-              }));
-              tasksWithFormattedTime.sort(compararHoras); // Ordenando las tareas
-              setTasks(tasksWithFormattedTime); // Actualizando el estado con las tareas ordenadas
-            } else {
-              throw new Error('NO HAY TAREAS ESE DIA / API call was not successful');
-            }
-          } catch (error) {
-            console.log("Error fetching tasks:", error.message);
-            setTasks([]); // Vaciando la lista de tareas en caso de error
-          }
-        };
+      refreshTasks(value); // Pasa la fecha seleccionada a refreshTasks
+    }, [value, refreshTasks]);
       
-        loadTasks();
-      }, [value]); // Dependencia de useEffect
-      
-
     const style_customized = StyleSheet.create({
         barra: {
           flex: 1,
@@ -430,7 +463,7 @@ export default function CalendarViewDiaySem() {
                         {horas_text}
                     </View>
                     <TasksList tasks={tasks} containerHeight={containerHeight} />
-                    </ScrollView>
+                </ScrollView>
             </View>
         </View>
     </SafeAreaView>
@@ -438,11 +471,13 @@ export default function CalendarViewDiaySem() {
 }
 
 const styles = StyleSheet.create({
-
     hora_view: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16, // Espacio a la izquierda de cada hora
+        //backgroundColor:'yellow',
+        //borderWidth:3,
+        //borderColor:'red',
       },
       hora_divisor: {
         flex: 1,
@@ -530,7 +565,7 @@ const styles = StyleSheet.create({
   placeholderContent: {
     borderWidth: 4,
     borderColor: '#e5e7eb',
-    borderStyle: 'solid', //antes de pushear o algo volver a cambiar a 'dashed'
+    borderStyle: 'solid', 
     borderRadius: 9,
     flex: 1,
   },

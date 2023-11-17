@@ -75,7 +75,7 @@ def sign_in():
         apellido = data.get("apellido", None)
         genero = data.get("genero", None)
         fecha_nacimiento = data.get("fecha_nacimiento", None)
-        pais = data.get("pais", None)
+        pais = data.get("pais", "Peru")
         celular = data.get("celular", None)
         correo = data.get("correo", None)
         # Imágenes predeterminadas basadas en el género

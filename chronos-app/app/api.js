@@ -1,13 +1,16 @@
 // api.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 const ip = '192.168.169.170'
 //const ip = '192.168.0.12'
+
 
 export const api_user = "http://" + ip + ":3000/"
 export const api_profile = "http://" + ip + ":3001/"
 export const api_tasks = "http://" + ip + ":3002/"
 export const api_IA = "http://" + ip + ":3003/"
+
 
 export const authenticateUser = async (username, password) => {
     try {
@@ -44,7 +47,7 @@ export const registerUser = async (formData) => {
         apellido: formData.lastname,
         genero:formData.gender,
         fecha_nacimiento : formData.birthday,
-        pais : formData.country,
+        pais : formData.pais,
         celular : formData.phone,
         correo : formData.email,
       }),
@@ -79,7 +82,7 @@ export const loginByToken = async () => {
 export const getTasksDate = async (formData) => {
   try {
     const token = await AsyncStorage.getItem('userToken');
-    console.log('Sending data to API:', JSON.stringify(formData)); // Asegúrate de que los datos son correctos
+    console.log('Sending data to API:', JSON.stringify(formData)); 
     const response = await fetch(api_tasks + 'tasks/search', {
       method: 'POST',
       headers: {
@@ -99,6 +102,67 @@ export const getTasksDate = async (formData) => {
     throw(error);
   }
 };
+
+
+export const fetchUserProfile = async () => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      return { error: 'No se encontró el token de autenticación.' };
+    }
+
+    const response = await fetch(api_profile + 'profile', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    // Imprime la respuesta en la consola
+    console.log('Perfil del usuario:', data);
+
+    if (response.status === 200) {
+      return { profile: data.profile };
+    } else {
+      return { error: data.error || 'Error al obtener el perfil de usuario.' };
+    }
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    return { error: 'Hubo un problema al conectarse con el servidor.' };
+  }
+};
+
+export const updateUserProfile = async (photoURL) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken'); // Obteniendo el token de autenticación del usuario
+    if (!token) {
+      throw new Error('Token de autenticación no encontrado');
+    }
+
+    const response = await fetch(api_profile + 'profile', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        foto: photoURL,
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Error al actualizar el perfil.');
+    }
+    return data; // Devuelve los datos actualizados
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+  }
+};
+
 
 export const sendAudio = async (formData) => {
   try {

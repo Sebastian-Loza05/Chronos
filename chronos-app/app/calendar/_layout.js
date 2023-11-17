@@ -1,10 +1,15 @@
+import React from 'react';
 import { Tabs } from "expo-router"
 import { Platform } from "react-native"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Image } from "react-native";
+import { TasksProvider } from '../TasksContext'; 
+import { UserProfileProvider } from '../UserProfileContext';
 
 export default function TabsLayout() {
   return (
+    <UserProfileProvider>
+    <TasksProvider>
     <Tabs
       initialRouteName="ia/chronos"
       screenOptions={({route}) => ({
@@ -90,6 +95,7 @@ export default function TabsLayout() {
             }}
         />
     </Tabs>
-
-  )
+    </TasksProvider>
+    </UserProfileProvider>
+  );
 }

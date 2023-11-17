@@ -93,9 +93,9 @@ class Chronos:
         prompt = f"Horario:\n{horario}\nspeech: {speech}"
         response = self.get_completion(prompt)
         return response
-    
+
     def parse_response(self, response):
-    
+
         agendar  = r"""Se agendó exitosamente la siguiente tarea:(.*)
 nombre: (.+)
 fecha: (.+)
@@ -137,7 +137,7 @@ hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
         if accion != "agendó":
             tarea_dict["id"] = id_tarea
 
-        return tarea_dict   
+        return tarea_dict
 
 
 class User:

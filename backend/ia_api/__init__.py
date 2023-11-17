@@ -40,7 +40,13 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 def actualizarBd(response, user_id):
     if response["accion"] == "agendó":
-        pass
+        new_task = Tasks(
+            nombre=response['nombre'],
+            fecha=response['fecha'],
+            hora_inicio=response['hora_inicio'],
+            hora_final=response['hora_final']
+        )
+        new_task.insert()
     elif response["accion"] == "actualizó":
         id = response["id"]
         tarea = Tasks.get_task_by_id(id, user_id)
@@ -51,7 +57,11 @@ def actualizarBd(response, user_id):
 
         tarea.update()
     elif response["accion"] == "eliminó":
-        pass
+        tarea = Tasks.get_task_by_id(
+            response["id"],
+            user_id
+        )
+        tarea.delete()
 
 # Instanciamiento de chronos
 chronos = Chronos("gpt-3.5-turbo", behavior)
@@ -94,6 +104,10 @@ def voice_recomendations():
         print(horario)
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, speech)
+
+        confirmation = chronos.parse_response(response)
+        print(confirmation)
+
         chronos.make_response_speech1(response)
         confirmation = chronos.parse_response(response)
 
@@ -101,12 +115,13 @@ def voice_recomendations():
             actualizarBd(confirmation, current_user["id"])
 
         print(response)
+        actualizarBd(confirmation, current_user["id"])
         os.remove(output_file)
-        print(confirmation, current_user["id"])
         response = send_file(
             "../uploads/response.mp3",
             mimetype="audio/mp3",
             download_name="response.mp3")
+
         return response
 
     except Exception as e:

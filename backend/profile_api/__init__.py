@@ -47,6 +47,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
 @jwt_required()
 def get_profile():
     try:
+        print("Si aparece esto esta mal")
         current_user = get_jwt_identity()
         profile = Profile.get_by_profile_id(current_user["id"])
         print(profile.format())

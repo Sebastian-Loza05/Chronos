@@ -95,13 +95,12 @@ class Chronos:
         return response
 
     def parse_response(self, response):
-
-        agendar  = r"""Se agendó exitosamente la siguiente tarea:(.*)
+        agendar  = r"""(.*)agendó exitosamente(.*)
 nombre: (.+)
 fecha: (.+)
 hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
 
-        actualizar_eliminar = r"""Se (actualizó|eliminó) exitosamente la siguiente tarea:(.*)
+        actualizar_eliminar = r"""(.*)(actualizó|eliminó) exitosamente(.*)
 id: (\d+)
 nombre: (.+)
 fecha: (.+)
@@ -113,17 +112,17 @@ hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
         id_tarea = None
         if match_agendar:
             accion = "agendó"
-            nombre = match_agendar.group(2)
-            fecha = match_agendar.group(3)
-            hora_inicio = match_agendar.group(4)
-            hora_final = match_agendar.group(5)
+            nombre = match_agendar.group(3)
+            fecha = match_agendar.group(4)
+            hora_inicio = match_agendar.group(5)
+            hora_final = match_agendar.group(6)
         elif match_actualizar_eliminar:
-            accion = match_actualizar_eliminar.group(1)
-            id_tarea = int(match_actualizar_eliminar.group(3))
-            nombre = match_actualizar_eliminar.group(4)
-            fecha = match_actualizar_eliminar.group(5)
-            hora_inicio = match_actualizar_eliminar.group(6)
-            hora_final = match_actualizar_eliminar.group(7)
+            accion = match_actualizar_eliminar.group(2)
+            id_tarea = int(match_actualizar_eliminar.group(4))
+            nombre = match_actualizar_eliminar.group(5)
+            fecha = match_actualizar_eliminar.group(6)
+            hora_inicio = match_actualizar_eliminar.group(7)
+            hora_final = match_actualizar_eliminar.group(8)
         else:
             return None
         tarea_dict = {
@@ -138,7 +137,6 @@ hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
             tarea_dict["id"] = id_tarea
 
         return tarea_dict
-
 
 class User:
     def __init__(self, horario):
@@ -189,7 +187,7 @@ class User:
 behavior = """
 Desde ahora vas a actuar como un sugeridor de horarios llamado 'Chronos'.
 Yo te voy a dar una petición y un horario (lista de actividades de la forma: '<id> <fecha> <hora>: <nombre de la actividad>').
-Tus respuestas deben ser precisas.
+Tus respuestas deben ser cortas y precisas. 
 Debes reconocer lo que está queriendo pedir el usuarios, casos:
 - Añadir o agendar una o varias actividad
 	- Una actividad tiene nombre y rango de tiempo.
@@ -202,14 +200,12 @@ Debes reconocer lo que está queriendo pedir el usuarios, casos:
 - Sugerencia sobre el horario de una actividad propuesta por mi.
 	- Debes preguntar si yo estoy de acuerdo con la sugerencia. Si lo está responder de forma afirmativa. 
 - Si no identificas ningún caso no aceptes la petición. 
-Una vez que comfirmes mi acción DEBES responde con el siguiente formato ejemplo:
-Se agendó/eliminó/actualizó exitosamente la siguiente tarea:
-nombre: <nombre de la actividad>
-fecha: <fecha>
-hora: <hora>
+Una vez que comfirmes mi acción DEBES responder con el siguiente formato ejemplo:
+Se agendó/eliminó/actualizó exitosamente la siguiente tarea:\nnombre: <nombre de la actividad>\nfecha: <fecha>\nhora: <hora>
+Utiliza siempre un solo salto de linea.
 SI Y SOLO SI la acción es eliminar o actualizar muestra el id de la tarea arriba de nombre (id: <id de la actividad>).
+Por favor sigue el formato al pie de la letra.
 Chronos, ten en cuenta que hoy estamos: """
-
 # Se agendó/eliminó/actualizó exitosamente la siguiente tarea:
 # Nombre: hacer ejercicio
 # Fecha: 10/11/2023

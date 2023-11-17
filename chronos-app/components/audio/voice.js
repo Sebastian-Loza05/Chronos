@@ -13,6 +13,7 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import { sendAudio } from "../../app/api";
 import { router } from "expo-router";
 import { BlurView } from "expo-blur";
+import * as FileSystem from "expo-file-system";
 
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
@@ -76,9 +77,15 @@ export default function Voice({ setSuggestionsOpen }) {
       type: `audio/${filetype}`,
       name: filename,
     };
-    formData.append("audio", audio);
 
-    const speech = await sendAudio(formData);
+    const data = {
+      success: "true"
+    }
+    formData.append("audio", audio);
+    formData.append("json", JSON.stringify(data));
+
+    const  speech = await sendAudio(formData);
+    console.log("json: ", jsonData);
     if (speech?.msg){
       router.replace("/auth/login")
     }
@@ -97,24 +104,17 @@ export default function Voice({ setSuggestionsOpen }) {
       }
     }
     else if (Platform.OS === 'ios') {
-      console.log("Para ios");
-      // const AudioUrl = URL.createObjectURL(speech)+"#.mp3";
-      const {uri} = await FileSystem.writeAsStringAsync(
-        FileSystem.cacheDirectory + "audio.mp3",
-        speech,
-        { encoding: FileSystem.EncodingType.Base64}
-      )
       const {sound, status } = await Audio.Sound.createAsync(
-        { uri: uri },
+        require("../../assets/audios/response.mp3"),
         { shouldPlay: true }
       );
-      await sound.Platform.playAsync();
+
+      await sound.playAsync();
       if (!status.isPlaying){
-        await sound.unloadAsync();
-        console.log("Audio is not playing");
+        console.log("Paró audio");
       }
-      else
-        console.log("Audio is playing");
+      else 
+        console.log("Reproduciendo");
     }
   }
 

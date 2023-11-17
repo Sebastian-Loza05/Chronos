@@ -1,4 +1,5 @@
 import ffmpeg
+import json
 import os
 from flask import (
     Flask,
@@ -64,6 +65,10 @@ def voice_recomendations():
         ffmpeg.input(save_file).output(output_file).run()
         os.remove(save_file)
 
+        data = request.form.get('json')
+        json_data = json.loads(data)
+        print(json_data)
+
         # ! Actualmente jala la del dia actual, puede estar a variacion mas adelante
         fecha = datetime.now()
         fecha = fecha.strftime('%Y-%m-%d')
@@ -82,7 +87,8 @@ def voice_recomendations():
             "../uploads/response.mp3",
             mimetype="audio/mp3",
             download_name="response.mp3")
-        return response
+        json_response = {"success": True}
+        return jsonify(json_response), response
 
     except Exception as e:
         print(e)

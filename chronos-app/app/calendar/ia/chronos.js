@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from "react";
-import {StyleSheet, Text, View, Image, TouchableOpacity} from "react-native";
+import {StyleSheet, Text, View, Image, TouchableOpacity, Platform} from "react-native";
 import LottieView from 'lottie-react-native';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
@@ -7,6 +7,26 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import Voice from "../../../components/audio/voice";
 import { Video, ResizeMode } from 'expo-av';
 
+function RobotAnimation() {
+    if (Platform.OS === 'ios') {
+        return (
+            <LottieView
+                style={styles.animationExpanded}
+                source={require('../../../assets/animations/robot3.json')}
+                autoPlay
+                loop
+            />
+        )
+    }
+    else {
+        return (
+            <Image
+                source={require('../../../assets/animations/robot2.gif')}
+                style={styles.animationExpanded}
+            />
+        )
+    }
+}
 
 export default function Chronos() {
     const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -74,26 +94,6 @@ export default function Chronos() {
         );
     }
     //
-    function RobotAnimation() {
-        return (
-            <LottieView
-                style={styles.animationExpanded}
-               source={require('../../../assets/animations/robot3.json')}
-                autoPlay
-               loop
-             />
-       // return (
-         //   <Video
-           //     ref={video}
-             //   sytle={styles.animation}
-               // source={require('../../../assets/animations/robot.mp4')}
-                //useNativeControls
-                //resizeMode={ResizeMode.CONTAIN}
-                //isLooping
-                //onPlaybackStatusUpdate={status => setStatus(() => status)}
-            ///>
-        )
-    }
 
     function handleSuggestionPress(suggestion) {
         //navigation.navigate('CalendarDia', { suggestion: suggestion });

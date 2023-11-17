@@ -1,7 +1,7 @@
 // api.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ip = '192.168.1.41'
+const ip = '192.168.169.170'
 // const ip = '192.168.100.15'
 
 export const api_user = "http://" + ip + ":3000/"

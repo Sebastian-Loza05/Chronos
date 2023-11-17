@@ -221,9 +221,10 @@ class Tasks(db.Model):
             db.session.close()
 
     @staticmethod
-    def get_task_by_id(id):
+    def get_task_by_id(id, user_id):
         return Tasks.query.filter_by(
-            id=id
+            id=id,
+            user_id=user_id
         ).one_or_none()
 
     @staticmethod

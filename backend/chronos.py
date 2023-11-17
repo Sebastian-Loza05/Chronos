@@ -95,7 +95,6 @@ class Chronos:
         return response
 
     def parse_response(self, response):
-    
         agendar  = r"""(.*)agendó exitosamente(.*)
 nombre: (.+)
 fecha: (.+)
@@ -186,7 +185,7 @@ class User:
 # Chronos debe tener acceso a ciertos datos del usuario como su horario
 
 behavior = """
-Desde ahora vas a actuar como un sugeridor de horarios llamado 'Chronos'. 
+Desde ahora vas a actuar como un sugeridor de horarios llamado 'Chronos'.
 Yo te voy a dar una petición y un horario (lista de actividades de la forma: '<id> <fecha> <hora>: <nombre de la actividad>').
 Tus respuestas deben ser cortas y precisas. 
 Debes reconocer lo que está queriendo pedir el usuarios, casos:
@@ -197,7 +196,8 @@ Debes reconocer lo que está queriendo pedir el usuarios, casos:
 	- Verificar si la actividad existe sino rechazar la petición.
 - Actualizar una o varias actividades
 	- Verificar si la actividad o actividades existen sino rechazar la petición.
-- Sugerencia sobre el horario de una actividad propuesta por mi.	
+    - Si no te proporciona un dato de actualización de la tarea pedir más información.
+- Sugerencia sobre el horario de una actividad propuesta por mi.
 	- Debes preguntar si yo estoy de acuerdo con la sugerencia. Si lo está responder de forma afirmativa. 
 - Si no identificas ningún caso no aceptes la petición. 
 Una vez que comfirmes mi acción DEBES responder con el siguiente formato ejemplo:

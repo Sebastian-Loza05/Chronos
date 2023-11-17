@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -14,6 +14,7 @@ import { sendAudio } from "../../app/api";
 import { router } from "expo-router";
 import { BlurView } from "expo-blur";
 import * as FileSystem from "expo-file-system";
+import * as Speech from 'expo-speech';
 
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
@@ -32,6 +33,15 @@ function MicrophoneAnimation() {
 export default function Voice({ setSuggestionsOpen }) {
   const [recording, setRecording] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    const speak = () => {
+      const thingToSay = "Hola Luis";
+      Speech.speak(thingToSay);
+    }
+
+    speak();
+  }, [])
 
   const startRecording = async () => {
     setSuggestionsOpen(false);

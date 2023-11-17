@@ -41,6 +41,7 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 def actualizarBd(response, user_id):
     if response["accion"] == "agendó":
         new_task = Tasks(
+            user_id=user_id,
             nombre=response['nombre'],
             fecha=response['fecha'],
             hora_inicio=response['hora_inicio'],
@@ -105,17 +106,14 @@ def voice_recomendations():
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, speech)
 
-        confirmation = chronos.parse_response(response)
-        print(confirmation)
-
         chronos.make_response_speech1(response)
         confirmation = chronos.parse_response(response)
+        print(confirmation)
 
         if confirmation is not None:
             actualizarBd(confirmation, current_user["id"])
 
         print(response)
-        actualizarBd(confirmation, current_user["id"])
         os.remove(output_file)
         response = send_file(
             "../uploads/response.mp3",

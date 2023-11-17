@@ -49,7 +49,7 @@ def get_profile():
     try:
         current_user = get_jwt_identity()
         profile = Profile.get_by_profile_id(current_user["id"])
-
+        print(profile.format())
         return ({
             'success': True,
             'profile': profile.format()

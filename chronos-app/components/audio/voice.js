@@ -10,7 +10,7 @@ import {
 import LottieView from "lottie-react-native";
 import { Audio } from "expo-av";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { sendAudio } from "../../app/api";
+import { sendAudio, fetchUserProfile } from "../../app/api";
 import { router } from "expo-router";
 import { BlurView } from "expo-blur";
 import * as FileSystem from "expo-file-system";
@@ -33,11 +33,14 @@ function MicrophoneAnimation() {
 export default function Voice({ setSuggestionsOpen }) {
   const [recording, setRecording] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [userName, setUsername] = useState(false);
 
   useEffect(() => {
-    const speak = () => {
-      const thingToSay = "Hola Luis";
-      Speech.speak(thingToSay);
+    const speak = async () => {
+      const user = await fetchUserProfile();
+      setUsername(user.profile.nombre);
+      const thingToSay = `Hola ${userName}`;
+      //Speech.speak(thingToSay);
     }
 
     speak();

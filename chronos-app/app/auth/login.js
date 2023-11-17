@@ -23,7 +23,7 @@ export default function Login() {
       }
     };
 
-    checkToken();
+    //checkToken();
   }, []); // El código se ejecutará una vez al cargar el componente
 
 

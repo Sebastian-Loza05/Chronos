@@ -121,9 +121,6 @@ export const fetchUserProfile = async () => {
 
     const data = await response.json();
 
-    // Imprime la respuesta en la consola
-    console.log('Perfil del usuario:', data);
-
     if (response.status === 200) {
       return { profile: data.profile };
     } else {

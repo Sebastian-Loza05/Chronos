@@ -55,7 +55,6 @@ export default function CalendarViewMes() {
       if (data.success && Array.isArray(data.tasks)) {
         return data.tasks;
       } else {
-        console.error("No hay tareas para ese día.");
         return [];
       }
     } catch (error) {
@@ -64,10 +63,6 @@ export default function CalendarViewMes() {
     }
   };
 
-  //const handleDayPress = (day) => {
-    //setSelectedDay(day.dateString);
-    //setModalVisible(true);
-  //};
   const handleDayPress = async (day) => {
     setSelectedDay(day.dateString);
     setModalVisible(true);

@@ -4,8 +4,8 @@ import pyttsx3
 import speech_recognition as sr
 from openai import OpenAI
 from decouple import config
-from gtts import gTTS
 import re
+from transcribe import text_to_speech
 
 client = OpenAI(
     api_key=config('OPENAI_API_KEY')
@@ -53,16 +53,7 @@ class Chronos:
         return reply
 
     def make_response_speech(self, response):
-        res = client.audio.speech.create(
-            model="tts-1-hd",
-            voice="alloy",
-            input=response
-        )
-        res.stream_to_file(self.speech_file)
-
-    def make_response_speech1(self, response):
-        tts = gTTS(response, lang='es-es')
-        tts.save(self.speech_file)
+        text_to_speech(response)
 
     def listen_to(self, filename):
         r = sr.Recognizer()

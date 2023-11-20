@@ -155,7 +155,6 @@ export default function Voice({ setSuggestionsOpen }) {
     const checkStatusAudio = async () => {
       if(sound) {
         const status = await sound.getStatusAsync();
-
         if (status.isPlaying){
           console.log("Is playing");
         } else {
@@ -167,7 +166,7 @@ export default function Voice({ setSuggestionsOpen }) {
 
     const interval = setInterval(() => {
       checkStatusAudio();
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(interval);
   }, [sound]);

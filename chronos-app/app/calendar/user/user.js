@@ -38,13 +38,6 @@ const user1 = {
 
 const bannerImage = 'https://media.discordapp.net/attachments/952775750728155136/1172088601689989140/wide-tropical-beach-banner-background-vector.png?ex=655f0b92&is=654c9692&hm=c8262e4fee363733eb9e9bc4eba2c3767f56c0e37c0964fe54ad8f0cf257e031&=&width=837&height=423';
 
-const medalla1 = 'https://media.discordapp.net/attachments/1155323431915630594/1160134137886289920/image.png?ex=65338e1c&is=6521191c&hm=c029ab5d594426fbda753bdaf7b8669d969f22fb03ba6e35f91c83a10e390095&=';
-const medalla2 = 'https://media.discordapp.net/attachments/1155323431915630594/1160134014980608060/image.png?ex=65338dff&is=652118ff&hm=65fbe72bd8398af6a6d3263525e22b49b7b78fb413ca51a9bd25ba17740823c3&=';
-
-// Lista de intereses
-const interes1 = 'https://media.discordapp.net/attachments/952775750728155136/1161435237075656704/montana.png?ex=653849da&is=6525d4da&hm=8780d957d9b6b2bb5289227f94a35776e573703c6c903b901510d69f6c42f7a1&=&width=423&height=423';
-const interes2 = 'https://media.discordapp.net/attachments/952775750728155136/1161435260253372507/reciclar-senal.png?ex=653849e0&is=6525d4e0&hm=59e605288ece681af3f60348e92856c8b60585612cc0bf31440de50af6ec3885&=&width=423&height=423';
-
 const getCountryText = (country) => {
   // Lista de posibles maneras de escribir "Perú"
   const peruVariants = ['Peru', 'peru', 'Perú', 'perú'];
@@ -164,9 +157,6 @@ export default function user() {
       // Une las partes nuevamente
       fechaNacimientoFormateada = fechaParts.join(' ');
 
-    // Mensaje predeterminado con información del usuario
-    //const defaultDescription = user1.description || `¡Hola! Soy ${user.nombre} ${user.apellido} y mi cumpleaños es el ${fechaNacimientoFormateada} ✨`;
-
      // Icono dependiendo del género
     const genderIconName = userProfile.genero === 'female' ? 'female-symbol' : 'male-symbol';
 
@@ -185,27 +175,12 @@ export default function user() {
         fontSize: 24,
         marginLeft: 2,
       };
-  /*
-  const navigation = useNavigation(); // Obtiene el objeto de navegación
-  const handleCreateEventClick = () => {
-    navigation.navigate('CreateEvents');
-  }
-  */
   return (
     <ScrollView style={styles.container}>
 
       {/* Banner de fondo */}
       <Image source={{ uri: bannerImage }} style={styles.bannerImage} />
 
-
- {/*
-      <TouchableOpacity
-        style={styles.createEventButton}
-        onPress={handleCreateEventClick}
-      >
-        <Text style={styles.createEventButtonText}>Create Event</Text>
-      </TouchableOpacity>
-*/}
       {/* Contenedor para la imagen de perfil */}
 
       {/* Aquí renderizas el componente de perfil y le pasas el usuario como prop */}
@@ -315,12 +290,12 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Espacio entre el ícono y el texto
     fontSize: 16, // Tamaño del texto
     color: '#AB3D52',
-    fontFamily: 'Arial',
+    fontFamily: 'Roboto',
   },
   contactText2:{
     fontSize: 16, // Tamaño del texto
     color: '#333',
-    fontFamily: 'Arial',
+    fontFamily: 'Roboto',
     fontWeight: 'bold',
   },
   nuevo:{
@@ -336,18 +311,18 @@ const styles = StyleSheet.create({
     height: 200,
 
   },
-profileContainer: {
-  position: 'absolute',
-  top: 120,
-  alignSelf: 'center',
-  justifyContent: 'center',
-  width: 130, // Cambia el ancho del contenedor
-  height: 130, // Cambia la altura del contenedor
-  borderRadius: 130, // Asegúrate de que el radio de borde sea igual al ancho/altura
-  //borderWidth: 3, // Aumenta el ancho del borde
-  //borderColor: '#AB3D52', //Color del borde
-},
-/*Cambie*/
+  profileContainer: {
+    position: 'absolute',
+    top: 120,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    width: 130, // Cambia el ancho del contenedor
+    height: 130, // Cambia la altura del contenedor
+    borderRadius: 130, // Asegúrate de que el radio de borde sea igual al ancho/altura
+    //borderWidth: 3, // Aumenta el ancho del borde
+    //borderColor: '#AB3D52', //Color del borde
+  },
+  /*Cambie*/
   editIcon: {
     // Estilos para el botón que contiene el icono
     position: 'absolute', // Puedes ajustar la posición según necesites
@@ -372,15 +347,14 @@ profileContainer: {
   iconStyle: {
     // Estilos para el icono en sí
   },
-/*Cambie*/
-profileImage: {
-  width: 126, // Cambia el ancho de la imagen
-  height: 126, // Cambia la altura de la imagen
-  borderRadius: 63, // Asegúrate de que el radio de borde sea la mitad del ancho/altura
-  alignSelf: 'center',
-  justifyContent: 'center',
-},
-
+  /*Cambie*/
+  profileImage: {
+    width: 126, // Cambia el ancho de la imagen
+    height: 126, // Cambia la altura de la imagen
+    borderRadius: 63, // Asegúrate de que el radio de borde sea la mitad del ancho/altura
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
   textContainer: {
     top: 50,
     marginLeft: 20,
@@ -408,7 +382,6 @@ profileImage: {
   genderText:{
     marginLeft: 8,
   },
-
   birthdayContainer: {
     marginTop: -15,
     marginBottom: 0,
@@ -434,11 +407,9 @@ profileImage: {
     letterSpacing: 0.5, // Espaciado de letras personalizado
     lineHeight: 24, // Altura de línea para un mejor espaciado vertical
     color: '#AB3D52', // O el color que prefieras
-    fontFamily: 'Arial',
+    fontFamily: 'Roboto',
     // otros estilos que necesites
   },
-
-
   aboutme: {
     fontSize: 17,
     color: 'black',
@@ -467,81 +438,6 @@ profileImage: {
     flexDirection: 'row', //Coloca los elementos en la misma línea
     alignItems: 'center', //Alinea verticalmente los elementos al centro
   },
-  interesesContainer: {
-    marginTop: 60,
-  },
-  interesesTitle: {
-    fontSize: 19,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    marginLeft: 20,
-  },
-  interesesContent: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginRight:20,
-    marginLeft:20,
-
-  },
-  //este es el que contiene tanto al Icono y el Titulo del Interes
-interes: {
-  alignItems: 'center',
-  width: '30%',
-  marginBottom: 10,
-  borderRadius: 10,
-  backgroundColor: '#7FCCEB',
-},
-
-  //este es del Icono nomas
-  interesIconContainer: {
-    width: 80, // Ancho del contenedor del ícono
-    height: 80, // Alto del contenedor del ícono
-    borderRadius: 10, // Borde de estilo squircle para el contenedor del ícono
-    //borderWidth: 2, // Ancho del borde del contenedor del ícono
-    //borderColor: 'gold', // Color del borde del contenedor del ícono
-    justifyContent: 'center', // Centra verticalmente el ícono
-    alignItems: 'center', // Centra horizontalmente el ícono
-  },
-  //este espeficamente de la imagen del icono
-  interesIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  interesTitle: {
-    marginTop: 5,
-    fontWeight: 'bold',
-  },
-
-estrellasContainer: {
-  position: 'absolute',
-  top: 10, // Ajusta la posición superior para superponer en la parte superior
-  right: 5, // Ajusta la posición derecha para superponer en el lado derecho
-  flexDirection: 'row', // Alinear las estrellas en una fila
-},
-
-  estrella: {
-    width: 25, // Ajusta el tamaño de las estrellas según tus preferencias
-    height: 25,
-    marginRight: 5, // Espacio entre las estrellas
-  },
-    // Estilos para el botón flotante "Create Event"
-  createEventButton: {
-    position: 'absolute',
-    bottom: 65, // Ajusta la posición inferior según tu preferencia
-    backgroundColor: 'green', // Cambia el color del botón según tu paleta de colores
-    borderRadius: 30, // Asegúrate de que el botón sea redondo
-    paddingHorizontal: 20, // Agrega relleno horizontal para el botón
-    paddingVertical: 10, // Agrega relleno vertical para el botón
-    justifyContent: 'center', // Centra verticalmente el ícono
-    alignItems: 'center', // Centra horizontalmente el ícono
-  },
-  createEventButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white', // Cambia el color del texto del botón según tu diseño
-  },
   cerrar_sesion_1:{
     backgroundColor: "#f8c1c1",
     marginTop:200,
@@ -551,14 +447,42 @@ estrellasContainer: {
     justifyContent: 'center', // Centra verticalmente el ícono
     borderRadius: 130,
   },
+  /*
   logoutContainer: {
     alignItems:'flex-end',
     justifyContent: 'flex-end',
     flexDirection: "column",
     alignItems: 'center',
     height: '13%',
+    borderWidth:3,
+    borderColor:'blue',
 
   },
+  */
+  logoutContainer: {
+    width: '100%', // Ocupa todo el ancho disponible
+    alignItems: 'center', // Alinea los elementos internos al centro horizontalmente
+    justifyContent: 'flex-end', // Alinea el botón de logout al final del contenedor verticalmente
+    padding: 10, // Espacio alrededor del botón para evitar que se pegue a los bordes
+    paddingVertical:30,
+    //borderWidth:3,
+  },
+  /*
+  logoutButton: {
+    flexDirection: 'row', // Icono y texto en fila
+    alignItems: 'center', // Alineación vertical
+    backgroundColor: "#f8c1c1",
+    padding: 10,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },*/
   logoutButton: {
     flexDirection: 'row', // Icono y texto en fila
     alignItems: 'center', // Alineación vertical

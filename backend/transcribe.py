@@ -1,28 +1,29 @@
-import pyttsx3
-import speech_recognition as sr
+import azure.cognitiveservices.speech as speechsdk
+from decouple import config
 
-# pip install pyttsx3
-# pip install SpeechRecognition
-# .wav files only (filename)
+SPEECH_KEY = config('SPEECH_KEY')
+SPEECH_REGION = config('SPEECH_REGION')
 
-def speech_to_text(filename):
-    r = sr.Recognizer()
+speech_config = speechsdk.SpeechConfig(subscription=SPEECH_KEY, region=SPEECH_REGION)
+audio_config = speechsdk.audio.AudioOutputConfig(filename="uploads/response.mp3")
 
-    with sr.AudioFile(filename) as source:
-        print("Chronos: te escucho...")
+# Language of the speaker
+speech_config.speech_synthesis_voice_name = "es-PE-AlexNeural"
+speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
-        audio = r.listen(source)
+def text_to_speech(text):
+    result = speech_synthesizer.speak_text_async(text).get()
+    # Checks result.
+    if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+        print("Speech synthesized to speaker for text [{}]".format(text))
+        with open("uploads/response.mp3", "wb") as file:
+            file.write(result.audio_data)
+    elif result.reason == speechsdk.ResultReason.Canceled:
+        cancellation_details = result.cancellation_details
+        print("Speech synthesis canceled: {}".format(cancellation_details.reason))
+        if cancellation_details.reason == speechsdk.CancellationReason.Error:
+            if cancellation_details.error_details:
+                print("Error details: {}".format(cancellation_details.error_details))
+        print("Did you update the subscription info?")
 
-        try:
-            text = r.recognize_google(audio, language="es-PE")
-
-            print(f"Chronos: tu consulta... {text}")
-
-            engine = pyttsx3.init()
-            engine.runAndWait()
-        except sr.UnknownValueError:
-            print("Chronos: Lo siento, no pude entender lo que dijiste.")
-        except sr.RequestError as e:
-            print(f"Chronos: No se pudieron solicitar resultados del servicio de reconocimiento de voz de Google: {e}")
-        return text
 

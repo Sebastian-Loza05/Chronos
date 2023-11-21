@@ -39,6 +39,8 @@ chronos-app/*.tsbuildinfo
 # backend
 backend/env
 backend/uploads/*.wav
+backend/uploads/*.m4a
+backend/uploads/*.mp3
 
 # .env
 backend/.env

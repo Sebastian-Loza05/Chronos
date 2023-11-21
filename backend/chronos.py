@@ -4,8 +4,8 @@ import pyttsx3
 import speech_recognition as sr
 from openai import OpenAI
 from decouple import config
-from gtts import gTTS
 import re
+from transcribe import text_to_speech
 
 client = OpenAI(
     api_key=config('OPENAI_API_KEY')
@@ -53,16 +53,7 @@ class Chronos:
         return reply
 
     def make_response_speech(self, response):
-        res = client.audio.speech.create(
-            model="tts-1-hd",
-            voice="alloy",
-            input=response
-        )
-        res.stream_to_file(self.speech_file)
-
-    def make_response_speech1(self, response):
-        tts = gTTS(response, lang='es-es')
-        tts.save(self.speech_file)
+        text_to_speech(response)
 
     def listen_to(self, filename):
         r = sr.Recognizer()
@@ -106,8 +97,8 @@ nombre: (.+)
 fecha: (.+)
 hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
 
-        match_agendar = re.search(agendar, response)
-        match_actualizar_eliminar = re.search(actualizar_eliminar, response)
+        match_agendar = re.search(agendar, response, re.DOTALL)
+        match_actualizar_eliminar = re.search(actualizar_eliminar, response, re.DOTALL)
 
         id_tarea = None
         if match_agendar:
@@ -198,10 +189,13 @@ Debes reconocer lo que está queriendo pedir el usuarios, casos:
 	- Verificar si la actividad o actividades existen sino rechazar la petición.
     - Si no te proporciona un dato de actualización de la tarea pedir más información.
 - Sugerencia sobre el horario de una actividad propuesta por mi.
-	- Debes preguntar si yo estoy de acuerdo con la sugerencia. Si lo está responder de forma afirmativa. 
+	- Debes preguntar si yo estoy de acuerdo con la sugerencia. Si lo está, agrega la tarea. 
 - Si no identificas ningún caso no aceptes la petición. 
-Una vez que comfirmes mi acción DEBES responder con el siguiente formato ejemplo:
-Se agendó/eliminó/actualizó exitosamente la siguiente tarea:\nnombre: <nombre de la actividad>\nfecha: <fecha>\nhora: <hora>
+Una vez que comfirmes mi acción DEBES responder con el siguiente formato ejemplo, todo en minúscula:
+Se agendó/eliminó/actualizó exitosamente la siguiente tarea: 
+nombre: <nombre de la actividad>
+fecha: <fecha>
+hora: <hora>
 Utiliza siempre un solo salto de linea.
 SI Y SOLO SI la acción es eliminar o actualizar muestra el id de la tarea arriba de nombre (id: <id de la actividad>).
 Por favor sigue el formato al pie de la letra.

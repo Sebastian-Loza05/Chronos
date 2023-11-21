@@ -10,7 +10,7 @@ import {
 import LottieView from "lottie-react-native";
 import { Audio } from "expo-av";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { sendAudio } from "../../app/api";
+import { sendAudio, fetchUserProfile } from "../../app/api";
 import { router } from "expo-router";
 import { BlurView } from "expo-blur";
 import * as FileSystem from "expo-file-system";
@@ -33,11 +33,13 @@ function MicrophoneAnimation() {
 export default function Voice({ setSuggestionsOpen }) {
   const [recording, setRecording] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [sound, setSound] = useState(null);
 
   useEffect(() => {
-    const speak = () => {
-      const thingToSay = "Hola Luis";
-      Speech.speak(thingToSay);
+    const speak = async () => {
+      const user = await fetchUserProfile();
+      const thingToSay = `Hola ${user.profile.nombre}`;
+      //Speech.speak(thingToSay);
     }
 
     speak();
@@ -45,23 +47,30 @@ export default function Voice({ setSuggestionsOpen }) {
 
   const startRecording = async () => {
     setSuggestionsOpen(false);
-    setModalVisible(true);
     try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
+      if (sound === null) {
+        console.log(sound);
+        setModalVisible(true);
+        await Audio.requestPermissionsAsync();
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
 
-      console.log("Starting recording..");
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
-      setRecording(recording);
-      console.log("Recording started");
+        console.log("Starting recording..");
+        const { recording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY,
+        );
+        setRecording(recording);
+        console.log("Recording started");
+      }
     } catch (err) {
       console.error("Failed to start recording ", err);
     }
+  };
+
+  const pauseAudio = async () => {
+    await sound.unloadAsync();
   };
 
   const stopRecording = async () => {
@@ -108,25 +117,59 @@ export default function Voice({ setSuggestionsOpen }) {
           { shouldPlay: true }
         );
         await sound.playAsync();
+        setSound(sound);
+        if (!status.isPlaying){
+          console.log("Is not playing");
+          await sound.unloadAsync();
+        }
+      }
+    }
+    else if (Platform.OS === 'ios') {
+// Configura el modo de audio para usar el altavoz principal
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        allowsRecordingIOS: false,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+        interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+        playThroughEarpieceAndroid: false,
+      });
+
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(speech);
+      fileReader.onload = async () => {
+        const base64data = fileReader.result;
+        const { sound, status } = await Audio.Sound.createAsync(
+          { uri: base64data },
+          { shouldPlay: true }
+        );
+        await sound.playAsync();
         if (!status.isPlaying)
           await sound.unloadAsync();
       }
     }
-    else if (Platform.OS === 'ios') {
-      const {sound, status } = await Audio.Sound.createAsync(
-        require("../../assets/audios/response.mp3"),
-        { shouldPlay: true }
-      );
-
-      await sound.playAsync();
-      if (!status.isPlaying){
-        console.log("Paró audio");
-      }
-      else 
-        console.log("Reproduciendo");
-    }
   }
 
+  useEffect(() => {
+    const checkStatusAudio = async () => {
+      if(sound) {
+        const status = await sound.getStatusAsync();
+        if (status.isPlaying){
+          console.log("Is playing");
+        } else {
+          console.log("Is not playing");
+          setSound(null);
+        }
+      }
+    };
+
+    const interval = setInterval(() => {
+      checkStatusAudio();
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [sound]);
 
   return (
     <View>
@@ -143,9 +186,16 @@ export default function Voice({ setSuggestionsOpen }) {
           </TouchableOpacity>
         </BlurView>
       </Modal>
-      <TouchableOpacity style={styles.button} onPress={startRecording}>
-        <Icon name="microphone-alt" size={28} color="#982C40" />
-      </TouchableOpacity>
+      <View style={styles.buttons}>
+        <TouchableOpacity style={styles.button} onPress={startRecording}>
+          <Icon name="microphone-alt" size={28} color="#982C40" />
+        </TouchableOpacity>
+        { sound && (
+          <TouchableOpacity style={styles.button1} onPress={pauseAudio}>
+            <Icon name="pause" size={21} color="#982C40" />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
@@ -161,6 +211,11 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
 
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: "space-evenly",
+  },
+
   button: {
     backgroundColor: "#f8c1c1",
     paddingVertical: 10,
@@ -169,6 +224,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
     top: -40,
     alignSelf: "center",
+    marginRight: "2%"
+  },
+
+  button1: {
+    backgroundColor: "#f8c1c1",
+    paddingHorizontal: 20,
+    paddingTop: "11%",
+    borderRadius: 40,
+    marginTop: 20,
+    height: '68%',
+    maxHeight: "68%",
+    top: -40,
+    alignSelf: "center",
+    marginLeft: "2%"
   },
 
   button_stop: {

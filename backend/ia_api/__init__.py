@@ -106,7 +106,10 @@ def voice_recomendations():
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, speech)
 
-        chronos.make_response_speech1(response)
+        if os.path.exists("../uploads/response.mp3"):
+            os.remove("../uploads/response.mp3")
+
+        chronos.make_response_speech(response)
         confirmation = chronos.parse_response(response)
         print(confirmation)
 

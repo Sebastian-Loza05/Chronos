@@ -11,7 +11,6 @@ export const UserProfileProvider = ({ children }) => {
       const result = await fetchUserProfile();
       if (result.profile) {
         setUserProfile(result.profile);
-        console.log("Usuario info: ", result.profile);
       } else if (result.error) {
         console.error('Error fetching user profile:', result.error);
       }

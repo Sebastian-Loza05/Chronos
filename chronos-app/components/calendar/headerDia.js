@@ -6,6 +6,7 @@ import {
   Modal,
   TextInput,
   Platform,
+  ScrollView
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import React, { useState, useEffect, useContext} from "react";
@@ -270,7 +271,7 @@ export default function HeaderDia() {
             visible={modalVisible}
             onRequestClose={handleCloseModal}
           >
-            <View style={styles.modalView}>
+            <ScrollView contentContainerStyle={styles.modalView}>
               <TextInput
                 style={styles.input}
                 placeholder="Task Name"
@@ -355,7 +356,7 @@ export default function HeaderDia() {
               >
                 <Text style={styles.textbutton}>Cancelar</Text>
               </TouchableOpacity>
-            </View>
+            </ScrollView>
           </Modal>
         </View>
       </View>
@@ -389,8 +390,8 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
     padding: 2,
     marginTop: -26,
   },
@@ -404,11 +405,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 50,
     padding: 9,
-    marginLeft: 15,
+    marginHorizontal: '1%',
     borderColor: "#982C40",
     borderWidth: 3,
+    alignSelf: "flex-end",
     top: -40,
-    left: 220,
   },
   title: {
     fontSize: 25,
@@ -479,7 +480,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     width: "88%",
-    height: "53%",
+    height: "68%",
+    overflow: "scroll",
   },
   input: {
     width: "75%",

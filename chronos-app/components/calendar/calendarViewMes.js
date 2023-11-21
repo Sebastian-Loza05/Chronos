@@ -19,6 +19,7 @@ import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 import LottieView from "lottie-react-native";
 import { createTask, getTasksDate } from "../../app/api";
+import * as SplashScreen from 'expo-splash-screen';
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,20 +43,18 @@ export default function CalendarViewMes() {
   const [State, setState] = useState("");
   const [selectedDay, setSelectedDay] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [expandedTaskId, setExpandedTaskId] = useState(null);
 
 
-  //const getTasksForDay = (date) => {
-    // Retorna las tareas para la fecha dada
-    // Aquí deberías reemplazar esto con tu lógica para obtener las tareas reales
-    //return ["Tarea 1", "Tarea 2", "Tarea 3"];
- // };
+
+
   const getTasksForDay = async (date) => {
     try {
       const data = await getTasksDate({ type_search: 1, begin_date: date });
       if (data.success && Array.isArray(data.tasks)) {
         return data.tasks;
       } else {
-        console.error("No hay tareas para ese día.");
         return [];
       }
     } catch (error) {
@@ -64,21 +63,20 @@ export default function CalendarViewMes() {
     }
   };
 
-  //const handleDayPress = (day) => {
-    //setSelectedDay(day.dateString);
-    //setModalVisible(true);
-  //};
   const handleDayPress = async (day) => {
     setSelectedDay(day.dateString);
     setModalVisible(true);
     const tasksForDay = await getTasksForDay(day.dateString);
     setTasks(tasksForDay);
   };
+  const handlePressTaskName = (taskId) => {
+    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
+  };
+
+
 
   const renderTasksModal = () => {
-    //if (!selectedDay) return null;
     if (!selectedDay || !Array.isArray(tasks)) return null;
-    //const tasks = getTasksForDay(selectedDay);
 
     return (
         <Modal
@@ -92,9 +90,24 @@ export default function CalendarViewMes() {
               <Text style={styles.modalTitle}>Tasks for {selectedDay}</Text>
               <ScrollView style={styles.scrollView}>
                 {tasks.map((task, index) => (
-                    <View key={index} style={styles.taskContainer}>
+                    <TouchableOpacity
+                        key={task.id}
+                        onPress={() => handlePressTaskName(task.id)}
+                        style={[
+                          styles.taskContainer,
+                          expandedTaskId === task.id && styles.expandedTaskContainer
+                        ]}
+                    >
                       <Text style={styles.taskText}>{task.name}</Text>
-                    </View>
+                      {expandedTaskId === task.id && (
+                          <View style={styles.taskDetails}>
+                            <Text style={styles.taskTextDetail}>Start Time: {task.start_time}</Text>
+                            <Text style={styles.taskTextDetail}>End Time: {task.end_time}</Text>
+                            <Text style={styles.taskTextDetail}>Place: {task.place}</Text>
+                            <Text style={styles.taskTextDetail}>Description: {task.description}</Text>
+                          </View>
+                      )}
+                    </TouchableOpacity>
                 ))}
               </ScrollView>
               <TouchableOpacity
@@ -127,11 +140,11 @@ export default function CalendarViewMes() {
 
   if (!fontsLoaded) {
     return (
-      <AppLoading
-        startAsync={loadFonts}
-        onFinish={() => setFontsLoaded(true)}
-        onError={console.warn}
-      />
+        <AppLoading
+            startAsync={loadFonts}
+            onFinish={() => setFontsLoaded(true)}
+            onError={console.warn}
+        />
     );
   }
   const onAddTaskPress = () => {
@@ -266,147 +279,147 @@ export default function CalendarViewMes() {
   };
 
   return (
-    <View style={styles.container}>
-      <Calendar
-        style={styles.calendar}
-        onDayPress={handleDayPress}
-        // Personaliza los colores
-        theme={{
-          backgroundColor: "#FFFFFF",
-          calendarBackground: "#ffffff",
-          monthTextColor: "#982C40",
-          dayTextColor: "#000000",
-          textDisabledColor: "#969696",
-          selectedDayBackgroundColor: "#ff005e",
-          selectedDayTextColor: "#be2727",
-          arrowColor: "#982C40",
-          textDayFontFamily: "Gabarito",
-          textMonthFontFamily: "Gabarito",
-          textDayHeaderFontFamily: "Gabarito",
-          textDayFontSize: 16,
-          textMonthFontSize: 26,
-          textDayHeaderFontSize: 16,
-          todayTextColor: "#be2727",
-          todayBackgroundColor: "#ffdcdc",
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          "stylesheet.day.basic": {
-            base: {
-              width: width / 6,
-              height: (height - 200) / 7,
-              alignItems: "center",
-              justifyContent: "center",
-            },
-          },
-          "stylesheet.calendar.header": {
-            week: {
-              marginTop: 5,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            },
-          },
-        }}
-      />
-      {renderTasksModal()}
-      <TouchableOpacity
-        onPress={onAddTaskPress}
-        style={styles.fab}
-        activeOpacity={0.7}
-      >
-        <Icon name="plus" size={20} color="#FFF" />
-      </TouchableOpacity>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={handleCloseModal}
-      >
-        <View style={styles.modalView}>
-          <TextInput
-            style={styles.input}
-            placeholder="Task Name"
-            value={name}
-            onChangeText={setName}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Date"
-            value={dia}
-            onChangeText={setDia}
-            onFocus={showDatePicker}
-            editable={!isDatePickerVisible}
-          />
-          {isDatePickerVisible && (
-            <DateTimePicker
-              value={selectedDate}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
+      <View style={styles.container}>
+        <Calendar
+            style={styles.calendar}
+            onDayPress={handleDayPress}
+            // Personaliza los colores
+            theme={{
+              backgroundColor: "#FFFFFF",
+              calendarBackground: "#ffffff",
+              monthTextColor: "#982C40",
+              dayTextColor: "#000000",
+              textDisabledColor: "#969696",
+              selectedDayBackgroundColor: "#ff005e",
+              selectedDayTextColor: "#be2727",
+              arrowColor: "#982C40",
+              textDayFontFamily: "Gabarito",
+              textMonthFontFamily: "Gabarito",
+              textDayHeaderFontFamily: "Gabarito",
+              textDayFontSize: 16,
+              textMonthFontSize: 26,
+              textDayHeaderFontSize: 16,
+              todayTextColor: "#be2727",
+              todayBackgroundColor: "#ffdcdc",
+              headerStyle: {
+                backgroundColor: "#ffffff",
+              },
+              "stylesheet.day.basic": {
+                base: {
+                  width: width / 6,
+                  height: (height - 200) / 7,
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              },
+              "stylesheet.calendar.header": {
+                week: {
+                  marginTop: 5,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                },
+              },
+            }}
+        />
+        {renderTasksModal()}
+        <TouchableOpacity
+            onPress={onAddTaskPress}
+            style={styles.fab}
+            activeOpacity={0.7}
+        >
+          <Icon name="plus" size={20} color="#FFF" />
+        </TouchableOpacity>
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={handleCloseModal}
+        >
+          <View style={styles.modalView}>
+            <TextInput
+                style={styles.input}
+                placeholder="Task Name"
+                value={name}
+                onChangeText={setName}
             />
-          )}
-          <TextInput
-            style={styles.input}
-            placeholder="Start Time"
-            value={startTime}
-            onChangeText={setStartTime}
-            onFocus={showTimePicker}
-            editable={!isTimePickerVisible}
-          />
-
-          {isTimePickerVisible && (
-            <RNDateTimePicker
-              value={selectedTime}
-              mode="time"
-              display="default"
-              onChange={onTimeChange}
-              onTouchCancel={() => setTimePickerVisibility(false)}
+            <TextInput
+                style={styles.input}
+                placeholder="Date"
+                value={dia}
+                onChangeText={setDia}
+                onFocus={showDatePicker}
+                editable={!isDatePickerVisible}
             />
-          )}
-
-          <TextInput
-            style={styles.input}
-            placeholder="End Time"
-            value={endTime}
-            onChangeText={setEndTime}
-            onFocus={showEndTimePicker}
-            editable={!isEndTimePickerVisible}
-          />
-
-          {isEndTimePickerVisible && (
-            <RNDateTimePicker
-              value={selectedEndTime}
-              mode="time"
-              display="default"
-              onChange={onEndTimeChange}
-              onTouchCancel={() => setEndTimePickerVisibility(false)}
+            {isDatePickerVisible && (
+                <DateTimePicker
+                    value={selectedDate}
+                    mode="date"
+                    display="default"
+                    onChange={onDateChange}
+                />
+            )}
+            <TextInput
+                style={styles.input}
+                placeholder="Start Time"
+                value={startTime}
+                onChangeText={setStartTime}
+                onFocus={showTimePicker}
+                editable={!isTimePickerVisible}
             />
-          )}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Place (Optional)"
-            value={place}
-            onChangeText={setPlace}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Description (Optional)"
-            value={description}
-            onChangeText={setDescription}
-          />
-          <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
-            <Text style={styles.textbutton}>Guardar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={handleCloseModal}
-          >
-            <Text style={styles.textbutton}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </View>
+            {isTimePickerVisible && (
+                <RNDateTimePicker
+                    value={selectedTime}
+                    mode="time"
+                    display="default"
+                    onChange={onTimeChange}
+                    onTouchCancel={() => setTimePickerVisibility(false)}
+                />
+            )}
+
+            <TextInput
+                style={styles.input}
+                placeholder="End Time"
+                value={endTime}
+                onChangeText={setEndTime}
+                onFocus={showEndTimePicker}
+                editable={!isEndTimePickerVisible}
+            />
+
+            {isEndTimePickerVisible && (
+                <RNDateTimePicker
+                    value={selectedEndTime}
+                    mode="time"
+                    display="default"
+                    onChange={onEndTimeChange}
+                    onTouchCancel={() => setEndTimePickerVisibility(false)}
+                />
+            )}
+
+            <TextInput
+                style={styles.input}
+                placeholder="Place (Optional)"
+                value={place}
+                onChangeText={setPlace}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Description (Optional)"
+                value={description}
+                onChangeText={setDescription}
+            />
+            <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
+              <Text style={styles.textbutton}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCloseModal}
+            >
+              <Text style={styles.textbutton}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
   );
 }
 
@@ -603,6 +616,7 @@ const styles = StyleSheet.create({
     minHeight: 200, // Tamaño mínimo del modal
     maxHeight: '60%', // Tamaño máximo del modal
   },
+
   modalTitle: {
     fontSize: 25,
     fontWeight: "bold",
@@ -613,10 +627,19 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   taskContainer: {
-    backgroundColor: "#ff005e",
-    padding: 12,
+    backgroundColor: "#ee3e3e",
+    padding: 15,
     borderRadius: 5,
     marginBottom: 12,
+  },
+  taskDetails:{
+    backgroundColor: "#ee3e3e",
+    padding: 10,
+    borderRadius: 5,
+    height:'auto',
+    paddingEnd:20,
+    paddingHorizontal:20
+
   },
   taskText: {
     fontSize: 18,
@@ -624,6 +647,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily:'Gabarito'
 
+  },
+  taskTextDetail:{
+    fontSize: 12,
+    color: "white",
+    textAlign: "center",
+    fontFamily:'Gabarito'
   },
   closeButton: {
     backgroundColor: "#982C40",
@@ -635,5 +664,9 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  expandedTaskContainer: {
+    height: 'auto', // o un valor específico mayor que el original
+    backgroundColor: '#ee3e3e'
   },
 });

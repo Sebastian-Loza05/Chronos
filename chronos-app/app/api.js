@@ -2,7 +2,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const ip = '192.168.169.170'
+const ip = '192.168.96.253'
 //const ip = '192.168.0.12'
 
 

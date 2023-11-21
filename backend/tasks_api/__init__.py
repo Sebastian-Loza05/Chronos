@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     JWTManager
 )
 from decouple import config
-from models import Users, Tasks, Categories, Categories_Tasks, setup_db
+from models import Users, Tasks, setup_db
 from datetime import timedelta
 
 SECRET_KEY = config('SECRET_KEY')
@@ -32,7 +32,7 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 def get_tasks_params(type_search, begin_date, end_date, user):
     # En caso sólo se quieran las tareas de un día
     if type_search == 1:
-        tasks = Tasks.get_task_by_date(begin_date)
+        tasks = Tasks.get_task_by_date(begin_date, user["id"])
         return tasks
     # En caso se quieran las tareas de un periodo de tiempo
     if end_date is None:
@@ -223,109 +223,6 @@ def update_task(task_id):
             abort(404)
         else:
             abort(500)
-
-@app.route("/category", methods=['POST'])
-@jwt_required()
-def create_category():
-    error_406 = False
-    error_422 = False
-    try:
-        data = request.get_json()
-        name = data.get('name', None)
-
-        if name is None:
-            error_422 = True
-            abort(422)
-
-        current_user = get_jwt_identity()
-
-        category = Categories(
-            user_id=current_user['id'],
-            nombre=name
-        )
-        result = category.insert()
-        if result == -1:
-            error_406 = True
-            abs(406)
-
-        category = Categories.get_category_by_id(result)
-
-        return jsonify({
-            'success': True,
-            'created': category.format()
-        })
-    except Exception as e:
-        print(e)
-        if error_406:
-            abort(406)
-        elif error_422:
-            abort(422)
-        else:
-            abort(500)
-
-# Unitario por ahora pero creo q seria mejor en conjunto
-@app.route("/task/<task_id>/category", methods=['POST'])
-@jwt_required()
-def asignar_categoria(task_id):
-    error_404 = False
-    error_406 = False
-    error_422 = False
-    try:
-        task = Tasks.get_task_by_id(task_id)
-        if task is None:
-            error_404 = True
-            abort(404)
-
-        data = request.get_json()
-
-        category_id = data.get("category_id", None)
-        if category_id is None:
-            error_422 = True
-            abort(422)
-
-        category_task = Categories_Tasks(
-            category_id=category_id,
-            task_id=task_id
-        )
-
-        result = category_task.insert()
-        if result == -1:
-            error_406 = True
-            abort(406)
-
-        category_task = Categories_Tasks.get_category_task_by_ids(category_id, task_id)
-
-        return jsonify({
-            'success': True,
-            'created': category_task.format()
-        })
-    except Exception as e:
-        print(e)
-        if error_404:
-            abort(404)
-        elif error_406:
-            abort(406)
-        elif error_422:
-            abort(422)
-        else:
-            abort(500)
-
-@app.route("/categories", methods=['GET'])
-@jwt_required()
-def get_categories():
-    try:
-        current_user = get_jwt_identity()
-
-        categories = Categories.get_categories_by_user(current_user["id"])
-        categories = [p.format() for p in categories]
-
-        return jsonify({
-            'success': True,
-            'categories': categories
-        })
-    except Exception as e:
-        print(e)
-        abort(500)
 
 @app.errorhandler(401)
 def unauthorized(error):

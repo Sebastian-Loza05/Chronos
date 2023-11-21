@@ -91,9 +91,9 @@ def voice_recomendations():
         ffmpeg.input(save_file).output(output_file).run()
         os.remove(save_file)
 
-        data = request.form.get('json')
-        json_data = json.loads(data)
-        print(json_data)
+        # data = request.form.get('json')
+        # json_data = json.loads(data)
+        # print(json_data)
 
         # ! Actualmente jala la del dia actual, puede estar a variacion mas adelante
         fecha = datetime.now()

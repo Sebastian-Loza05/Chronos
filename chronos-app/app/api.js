@@ -220,5 +220,22 @@ export const updateTask = async (taskId, formData) => {
   }
 };
 
+export const changeVoice = async (formData) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    const response = await fetch(api_IA + 'voice/change', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData)
+    })
+    return await response.json();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
   

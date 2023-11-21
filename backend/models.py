@@ -35,6 +35,7 @@ class Users(db.Model):
     password = db.Column(db.String(200), nullable=False)
     profile = db.relationship('Profile', uselist=False, back_populates='user')
     tasks = db.relationship('Tasks', cascade='all,delete', backref='user')
+    settings = db.relationship('Settings', cascade='all,delete', back_populates='user')
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -243,4 +244,57 @@ class Tasks(db.Model):
             fecha=date,
             user_id=user_id
         ).all()
+
+class Settings(db.Model):
+    __tablename__ = 'settings'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    voice = db.Column(db.String(100), nullable=False)
+    user = db.relationship('Users', back_populates='settings')
+
+    def format(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'voice': self.voice
+        }
+
+    def insert(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def update(self):
+        try:
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+    @staticmethod
+    def get_by_user_id(user_id):
+        return Settings.query.filter_by(
+            user_id=user_id
+        ).one_or_none()
 

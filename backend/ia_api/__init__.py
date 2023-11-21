@@ -16,7 +16,7 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 from decouple import config
-from models import Users, setup_db, Tasks
+from models import Users, setup_db, Tasks, Settings
 from datetime import timedelta
 from werkzeug.utils import secure_filename
 
@@ -64,6 +64,7 @@ def actualizarBd(response, user_id):
         )
         tarea.delete()
 
+
 # Instanciamiento de chronos
 chronos = Chronos("gpt-3.5-turbo", behavior)
 # ----------------------------------------------------------------
@@ -91,10 +92,6 @@ def voice_recomendations():
         ffmpeg.input(save_file).output(output_file).run()
         os.remove(save_file)
 
-        # data = request.form.get('json')
-        # json_data = json.loads(data)
-        # print(json_data)
-
         # ! Actualmente jala la del dia actual, puede estar a variacion mas adelante
         fecha = datetime.now()
         fecha = fecha.strftime('%Y-%m-%d')
@@ -108,6 +105,13 @@ def voice_recomendations():
 
         if os.path.exists("../uploads/response.mp3"):
             os.remove("../uploads/response.mp3")
+
+        # ! Cambiar por la voz de chronos
+        settings = Settings.get_by_user_id(current_user["id"])
+        chronos.change_voice(settings.voice)
+
+        # ! Si quieren probar sin azure tts
+        # chronos.make_response_speech_without_azure(response)
 
         chronos.make_response_speech(response)
         confirmation = chronos.parse_response(response)
@@ -125,6 +129,38 @@ def voice_recomendations():
 
         return response
 
+    except Exception as e:
+        print(e)
+        if error_406:
+            abort(406)
+        elif error_422:
+            abort(422)
+        else:
+            abort(500)
+
+@app.route("/voice/change", methods=["PATCH"])
+@jwt_required()
+def change_voice():
+    error_406 = False
+    error_422 = False
+    try:
+        current_user = get_jwt_identity()
+        data = request.get_json()
+        codigo = data["codigo"]
+        if codigo is None:
+            error_422 = True
+            abort(422)
+
+        configuration = Settings.get_by_user_id(current_user["id"])
+        configuration.voice = codigo
+        configuration_id = configuration.update()
+        if configuration_id == -1:
+            error_406 = True
+            abort(406)
+        return jsonify({
+            'success': True,
+            'voz': configuration.format()
+        })
     except Exception as e:
         print(e)
         if error_406:

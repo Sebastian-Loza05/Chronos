@@ -13,7 +13,7 @@ from flask_jwt_extended import (
     JWTManager
 )
 from decouple import config
-from models import Users, setup_db, Profile
+from models import Users, setup_db, Profile, Settings
 from datetime import timedelta
 
 SECRET_KEY = config('SECRET_KEY')
@@ -119,6 +119,16 @@ def sign_in():
             error_406 = True
             abort(406)
 
+        configuration = Settings(
+            user_id=user_id,
+            voice="es-PE-AlexNeural"
+        )
+
+        configuration_id = configuration.insert()
+        if configuration_id == -1:
+            error_406 = True
+            abort(406)
+
         # Auto login
         user = Users.get_by_id(user_id)
         # user = profile.user
@@ -131,7 +141,7 @@ def sign_in():
         })
 
     except Exception as e:
-        print(e)
+        print("Error: ", e)
         if error_406:
             abort(406)
         elif error_422:

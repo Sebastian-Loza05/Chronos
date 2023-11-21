@@ -6,6 +6,7 @@ from openai import OpenAI
 from decouple import config
 import re
 from transcribe import text_to_speech
+from gtts import gTTS
 
 client = OpenAI(
     api_key=config('OPENAI_API_KEY')
@@ -19,6 +20,7 @@ class Chronos:
         self.behavior = behavior
         self.today = datetime.date.today().strftime("%d/%m/%Y")
         self.speech_file = "uploads/response.mp3"
+        self.voice = "es-PE-AlexNeural"
 
         self.engine = pyttsx3.init()
         voices = self.engine.getProperty('voices')
@@ -53,7 +55,14 @@ class Chronos:
         return reply
 
     def make_response_speech(self, response):
-        text_to_speech(response)
+        text_to_speech(response, self.voice)
+
+    def make_response_speech_without_azure(self, response):
+        tts = gTTS(response, lang='es-es')
+        tts.save(self.speech_file)
+
+    def change_voice(self, voice):
+        self.voice = voice
 
     def listen_to(self, filename):
         r = sr.Recognizer()

@@ -11,7 +11,9 @@ audio_config = speechsdk.audio.AudioOutputConfig(filename="uploads/response.mp3"
 speech_config.speech_synthesis_voice_name = "es-PE-AlexNeural"
 speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
-def text_to_speech(text):
+def text_to_speech(text, voice):
+    speech_config.speech_synthesis_voice_name = voice
+    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
     result = speech_synthesizer.speak_text_async(text).get()
     # Checks result.
     if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:

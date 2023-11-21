@@ -30,7 +30,7 @@
     "expo-linking": "~5.0.2",
     "expo-permissions": "~14.2.1",
     "expo-router": "^2.0.0",
-    "expo-splash-screen": "^0.22.0",
+    "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "firebase": "^10.6.0",
     "lottie-react-native": "5.1.6",

@@ -13,6 +13,7 @@ import ComunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {compararHoras} from "../functions/functions";
 import { TasksContext } from '../../app/TasksContext'; 
+import { useFocusEffect } from '@react-navigation/native';
 
 const {width} = Dimensions.get('screen');
 
@@ -163,6 +164,7 @@ const TaskItem = ({ task, containerHeight, overlaps}) => {
         padding: 20,
         borderRadius: 10,
         justifyContent: 'center',
+        alignSelf: 'center',
         height: 513,
         width: 340,
      };
@@ -258,7 +260,7 @@ const TaskItem = ({ task, containerHeight, overlaps}) => {
      
      return (
       <View>
-        <TouchableOpacity onPress={toggleModal}>
+      <TouchableOpacity onPressIn={toggleModal}>
           <View style={taskStyle}>
             <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{task.name}</Text>
             <View style={timeStyle}>
@@ -325,6 +327,13 @@ export default function CalendarViewDiaySem() {
     const [left, setLeft] = useState(140);
     const totalInterval = 70.0/60;
     const { tasks, refreshTasks } = useContext(TasksContext);
+
+    // Actualiza las tareas cuando la pestaña gana foco
+    useFocusEffect(
+      React.useCallback(() => {
+        refreshTasks(value);
+      }, [value, refreshTasks])
+    );
 
     useEffect(() => {
       refreshTasks(value); // Pasa la fecha seleccionada a refreshTasks
@@ -531,12 +540,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginHorizontal: -4,
   },
   item:{
     flex: 1,
     height: 50,
-    marginHorizontal: 4,
+    marginHorizontal: 3,
     paddingVertical: 6,
     paddingHorizontal: 4,
     borderWidth: 1,

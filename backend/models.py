@@ -36,6 +36,7 @@ class Users(db.Model):
     profile = db.relationship('Profile', uselist=False, back_populates='user')
     tasks = db.relationship('Tasks', cascade='all,delete', backref='user')
     settings = db.relationship('Settings', cascade='all,delete', back_populates='user')
+    blocked_days = db.relationship('BlockedDays', cascade="all,delete", backref='user')
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -298,3 +299,55 @@ class Settings(db.Model):
             user_id=user_id
         ).one_or_none()
 
+class BlockedDays(db.Model):
+    __tablename__ = 'blocked_days'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    fecha = db.Column(db.Date, nullable=False)
+
+    def format(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'fecha': self.fecha
+        }
+
+    def insert(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def update(self):
+        try:
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return -1
+        finally:
+            db.session.close()
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+    @staticmethod
+    def get_day_by_user(user_id, date):
+        return BlockedDays.query.filter_by(
+            user_id=user_id,
+            fecha=date
+        ).one_or_none()

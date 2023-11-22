@@ -92,9 +92,7 @@ export const getTasksDate = async (formData) => {
       body: JSON.stringify(formData)
     });
 
-    console.log('Response status:', response.status);
     const responseJson = await response.json();
-    console.log('Response from API:', responseJson);
 
     return responseJson;
   } catch (error) {

@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     JWTManager
 )
 from decouple import config
-from models import Users, Tasks, setup_db, BlockedDays
+from models import Tasks, setup_db, BlockedDays
 from datetime import timedelta
 
 SECRET_KEY = config('SECRET_KEY')
@@ -229,6 +229,47 @@ def update_task(task_id):
             abort(406)
         elif error_404:
             abort(404)
+        else:
+            abort(500)
+
+@app.route("/task/blocked", methods=['POST'])
+@jwt_required()
+def create_blocked_day():
+    error_406 = False
+    error_422 = False
+    try:
+        data = request.get_json()
+        date = data.get("date", None)
+        current_user = get_jwt_identity()
+
+        if date is None:
+            error_422 = True
+            abort(422)
+
+        blocked_day = BlockedDays(
+            user_id=current_user["id"],
+            fecha=date
+        )
+
+        result = blocked_day.insert()
+
+        if result == -1:
+            error_406 = True
+            abort(406)
+
+        blocked_day = BlockedDays.get_day_by_user(current_user["id"], date)
+
+        return jsonify({
+            'success': True,
+            'blocked_day': blocked_day.format()
+        })
+
+    except Exception as e:
+        print(e)
+        if error_422:
+            abort(422)
+        elif error_406:
+            abort(406)
         else:
             abort(500)
 

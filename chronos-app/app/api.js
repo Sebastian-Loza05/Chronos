@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const ip = '192.168.169.170'
 // const ip = '192.168.0.12'
 
-
 export const api_user = "http://" + ip + ":3000/"
 export const api_profile = "http://" + ip + ":3001/"
 export const api_tasks = "http://" + ip + ":3002/"
@@ -170,6 +169,9 @@ export const sendAudio = async (formData) => {
       },
       body: formData
     })
+    if (response.status === 401) {
+      return { msg: 'Token inválido' };
+    }
     return await response.blob();
   } catch (error) {
     console.log(error);

@@ -96,7 +96,7 @@ class Chronos:
         return chronos_response
 
     def parse_response(self, response):
-    
+
         confirmation = r"""(.*)(agendó|actualizó|eliminó)((.*)id: (\d+))?(.*)nombre: (.+)\nfecha: (.+)\nhora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
         block = r"""(.*) (des)?bloqueó(.*)día(.*)(\d{2}/\d{2}/\d{4})(.*)"""
 
@@ -118,7 +118,7 @@ class Chronos:
                 "nombre": nombre,
                 "fecha": fecha,
                 "hora_inicio": hora_inicio,
-                "hora_final": hora_final                 
+                "hora_final": hora_final
             }
 
         if match_block:
@@ -129,7 +129,7 @@ class Chronos:
                 "accion": prex + "bloqueó",
                 "dia": dia
             }
-        
+
         return None
 
 class User:

@@ -18,7 +18,7 @@ from flask_jwt_extended import (
 from decouple import config
 from models import Users, setup_db, Tasks, Settings
 from datetime import timedelta
-from werkzeug.utils import secure_filename
+# from werkzeug.utils import secure_filename
 
 from chronos import Chronos, behavior
 
@@ -107,13 +107,13 @@ def voice_recomendations():
             os.remove("../uploads/response.mp3")
 
         # ! Cambiar por la voz de chronos
-        settings = Settings.get_by_user_id(current_user["id"])
-        chronos.change_voice(settings.voice)
+        # settings = Settings.get_by_user_id(current_user["id"])
+        # chronos.change_voice(settings.voice)
 
         # ! Si quieren probar sin azure tts
-        # chronos.make_response_speech_without_azure(response)
+        chronos.make_response_speech_without_azure(response)
 
-        chronos.make_response_speech(response)
+        # chronos.make_response_speech(response)
         confirmation = chronos.parse_response(response)
         print(confirmation)
 

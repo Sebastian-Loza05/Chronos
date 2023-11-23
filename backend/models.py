@@ -305,6 +305,7 @@ class BlockedDays(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     fecha = db.Column(db.Date, nullable=False)
+    __table_args__ = (UniqueConstraint('user_id', 'fecha', name='_user_date_uc'),)
 
     def format(self):
         return {

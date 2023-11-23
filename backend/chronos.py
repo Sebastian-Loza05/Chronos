@@ -98,7 +98,7 @@ class Chronos:
     def parse_response(self, response):
 
         confirmation = r"""(.*)(agendó|actualizó|eliminó)((.*)id: (\d+))?(.*)nombre: (.+)\nfecha: (.+)\nhora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
-        block = r"""(.*) (des)?bloqueó(.*)día(.*)(\d{2}/\d{2}/\d{2})(.*)"""
+        block = r"""(.*) (des)?bloqueó(.*)día(.*)(\d{2}/\d{2}/\d{4})(.*)"""
 
         match_confirmation = re.search(confirmation, response, re.DOTALL)
         match_block = re.search(block, response, re.DOTALL)

@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, LogBox} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router } from "expo-router";
-import { authenticateUser, loginByToken } from '../api'; // Importa la función desde el archivo api.js
+import { authenticateUser, loginByToken } from '../api';
 import { Alert, iconOffset } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LinearGradient} from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useFonts} from 'expo-font';
+
+LogBox.ignoreAllLogs();
 
 export default function Login() {
 
@@ -26,18 +28,28 @@ export default function Login() {
     checkToken();
   }, []); // El código se ejecutará una vez al cargar el componente
 
+  useEffect(() => {
+    // Esta función se ejecutará cuando el teclado se muestre
+    const handleKeyboardDidShow = (event) => {
+      const keyboardHeight = event.endCoordinates.height;
+      setKeyboardOffset(keyboardHeight - 100);
+    };
 
-  const handleKeyboardDidShow = (event) => {
-    const keyboardHeight = event.endCoordinates.height;
-    setKeyboardOffset(keyboardHeight - 100);
-  };
+    const handleKeyboardDidHide = () => {
+      setKeyboardOffset(0);
+    };
 
-  const handleKeyboardDidHide = () => {
-    setKeyboardOffset(0);
-  };
+    // Suscribirse a los eventos del teclado
+    const showSubscription = Keyboard.addListener("keyboardDidShow", handleKeyboardDidShow);
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", handleKeyboardDidHide);
 
-  Keyboard.addListener("keyboardDidShow", handleKeyboardDidShow);
-  Keyboard.addListener("keyboardDidHide", handleKeyboardDidHide);
+    // Función de limpieza que se ejecutará cuando el componente se desmonte
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []); // El arreglo vacío significa que esto se ejecutará sólo una vez al montar el componente
+
 
   const [username, setUsername] = useState(''); // Estado para el nombre de usuario
   const [password, setPassword] = useState(''); // Estado para la contraseña

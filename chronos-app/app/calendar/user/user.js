@@ -236,7 +236,7 @@ export default function user() {
       <Fontisto name="map-marker-alt" size={24} color="#AB3D52" marginLeft={2}/>
       {/* Texto de Pais */}
       <Text style={styles.contactText}> Pais: </Text>
-      <Text style={styles.contactText2}>{getCountryText(userProfile.pais)}</Text>
+      <Text style={styles.contactText2}>{getCountryText('Perú')}</Text>
     </View>
       {/* Sección de Ajustes (Settings) */}
       <View style={styles.AjustesContainer}>

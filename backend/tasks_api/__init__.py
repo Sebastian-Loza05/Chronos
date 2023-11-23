@@ -80,7 +80,7 @@ def create_task():
             error_406 = True
             abort(406)
 
-        task = Tasks.get_task_by_id(result)
+        task = Tasks.get_task_by_id(result, current_user["id"])
 
         return jsonify({
             'success': True,

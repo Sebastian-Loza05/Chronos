@@ -2,16 +2,16 @@ import unittest
 from profile_api import app as app1
 from auth_api import app as app2
 from tasks_api import app as app3
+from ia_api import app as app4
 
 from models import Users
-
-from io import BytesIO
 
 class TestChronos(unittest.TestCase):
 
     API_URL_AUTH = 'http://127.0.0.1:3000/'
     API_URL_PROFILE = 'http://127.0.0.1:3001/'
     API_URL_TASK = 'http://127.0.0.1:3002/'
+    API_URL_IA = 'http://127.0.0.1:3003/'
 
     NEW_USER = {
         "username": "dittochap",
@@ -37,6 +37,10 @@ class TestChronos(unittest.TestCase):
         "end_time": "19:00:00"
     }
 
+    NEW_TASK_BLOCKED = {
+        "date": "2023-10-20"
+    }
+
     SEARCH_TASK = {
         "type_search": 2,
         "begin_date": "2023-10-20",
@@ -45,6 +49,10 @@ class TestChronos(unittest.TestCase):
 
     UPDATE_TASK = {
         "name": "Retirarme de ADA"
+    }
+
+    NEW_CODE = {
+        "codigo": "es-AR-TomasNeutral"
     }
 
     HEADERS = {}
@@ -65,6 +73,11 @@ class TestChronos(unittest.TestCase):
         self.app3_context = app3.app_context()
         self.app3.testing = True
         self.app3_context.push()
+
+        self.app4 = app4.test_client()
+        self.app4_context = app4.app_context()
+        self.app4.testing = True
+        self.app4_context.push()
 
     # Limpieando data
     @classmethod
@@ -152,38 +165,77 @@ class TestChronos(unittest.TestCase):
         self.assertTrue(data['success'])
         self.assertTrue(data['created'])
 
-    # def test_09_get_task(self):
-    #     r = self.app1.post('/sign_in', json=self.NEW_USER)
-    #     data = r.get_json()
-    #     self.HEADERS['Authorization'] = 'Bearer ' + data['token']
-    #
-    #     r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
-    #     data = r.get_json()
-    #
-    #     self.SEARCH_TASK['type_search'] = data['created']['id']
-    #
-    #     r = self.app3.post('/tasks/search', json=self.SEARCH_TASK, headers=self.HEADERS)
-    #     data = r.get_json()
-    #
-    #     self.assertEqual(r.status_code, 200)
-    #     self.assertTrue(data['success'])
-    #     self.assertTrue(data['tasks'])
+    def test_09_get_task(self):
+        r = self.app1.post('/sign_in', json=self.NEW_USER)
+        data = r.get_json()
+        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
 
-    # def test_10_patch_task(self):
+        r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.SEARCH_TASK['type_search'] = data['created']['id']
+
+        r = self.app3.post('/tasks/search', json=self.SEARCH_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['tasks'])
+
+    def test_10_patch_task(self):
+        r = self.app1.post('/sign_in', json=self.NEW_USER)
+        data = r.get_json()
+        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+
+        r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        task_id = data['created']['id']
+
+        r = self.app3.patch('/task/' + str(task_id), json=self.UPDATE_TASK, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['task_updated'])
+
+    def test_11_post_task_blocked(self):
+        r = self.app1.post('/sign_in', json=self.NEW_USER)
+        data = r.get_json()
+        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+
+        r = self.app3.post('/task/blocked', json=self.NEW_TASK_BLOCKED, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['blocked_day'])
+
+    def test_12_patch_voice(self):
+        r = self.app1.post('/sign_in', json=self.NEW_USER)
+        data = r.get_json()
+        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+
+        r = self.app4.patch('/voice/change', json=self.NEW_CODE, headers=self.HEADERS)
+        data = r.get_json()
+
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['voz'])
+
+    # def test_12_post_recommendation(self):
     #     r = self.app1.post('/sign_in', json=self.NEW_USER)
     #     data = r.get_json()
     #     self.HEADERS['Authorization'] = 'Bearer ' + data['token']
     #
-    #     r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
+    #     audio_path = 'Prueba.m4a'
+    #     content_type = 'multipart/form-data'
+    #     data = {'audio': open(audio_path, 'rb')}
+    #
+    #     r = self.app4.post('/voice/recomendations', headers=self.HEADERS, content_type=content_type, data=data)
+    #
     #     data = r.get_json()
-    #
-    #     task_id = data['created']['id']
-    #
-    #     r = self.app3.patch('/task/' + str(task_id), json=self.UPDATE_TASK, headers=self.HEADERS)
-    #     data = r.get_json()
-    #
-    #     self.assertEqual(r.status_code, 200)
-    #     self.assertTrue(data['success'])
-    #     self.assertTrue(data['task_updated'])
+    #     self.assertTrue(data.headers['Content-Type'])
+
 if __name__ == "__main__":
     unittest.main()

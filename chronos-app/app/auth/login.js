@@ -2,14 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Keyboard, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, LogBox} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router } from "expo-router";
-import { authenticateUser, loginByToken } from '../api'; // Importa la función desde el archivo api.js
+import { authenticateUser, loginByToken } from '../api';
 import { Alert, iconOffset } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LinearGradient} from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useFonts} from 'expo-font';
 
-LogBox.ignoreAllLogs(); // Ignora todos los mensajes de advertencia
+LogBox.ignoreAllLogs();
 
 export default function Login() {
 

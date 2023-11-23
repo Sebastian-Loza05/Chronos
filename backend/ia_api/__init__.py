@@ -67,6 +67,8 @@ def actualizarBd(response, user_id):
 
 # Instanciamiento de chronos
 chronos = Chronos("gpt-3.5-turbo", behavior)
+# chronos = Chronos("gpt-4-1106-preview", behavior)
+
 # ----------------------------------------------------------------
 @app.route("/voice/recomendations", methods=["POST"])
 @jwt_required()

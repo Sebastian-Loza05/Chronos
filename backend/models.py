@@ -293,6 +293,7 @@ class Settings(db.Model):
         finally:
             db.session.close()
 
+
     @staticmethod
     def get_by_user_id(user_id):
         return Settings.query.filter_by(
@@ -311,6 +312,10 @@ class BlockedDays(db.Model):
             'user_id': self.user_id,
             'fecha': self.fecha
         }
+
+    def format_ia(self):
+        fecha = self.fecha.strftime('%d/%m/%Y')
+        return fecha
 
     def insert(self):
         try:
@@ -351,3 +356,9 @@ class BlockedDays(db.Model):
             user_id=user_id,
             fecha=date
         ).one_or_none()
+
+    @staticmethod
+    def get_blocks_by_user(user_id):
+        return BlockedDays.query.filter_by(
+            user_id=user_id
+        ).all()

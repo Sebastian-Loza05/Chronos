@@ -123,13 +123,8 @@ export default function Register() {
                 throw new Error(data.message || 'Algo salió mal al registrarse.');
             }
 
-            const token = data.token;
-            if (token) {
-                await AsyncStorage.setItem('userToken', token);
-            }
-
             setMessage('Registro exitoso!');
-            router.replace("/calendar");
+            router.replace("/auth/login");
 
         } catch (error) {
             setMessage(error.message);

@@ -195,7 +195,6 @@ Debes reconocer lo que estoy pidiendo, casos:
 - Bloquear o desbloquear un día
     - Confirmar esta acción respondiendo: Se bloqueó/desbloqueó exitosamente el día <fecha>
 - Si no identificas ningún caso no aceptes la petición. 
-- Antes de agendar o actualizar una actividad, verifica si hay conflictos de horario con la lista de actividades de mi horario que te pasé. Si hay conflictos, informa y no agendes la tarea.
 Una vez que comfirmes mi acción, siempre empiece con 'Se agendó/eliminó/actualizó...' dependiendo el caso y siempre en la siguiente línea responde siguiendo este formato:
 Se agendó/eliminó/actualizó exitosamente la siguiente tarea: 
 nombre: <nombre de la actividad>

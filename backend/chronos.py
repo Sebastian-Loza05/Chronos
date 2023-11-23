@@ -5,7 +5,7 @@ import speech_recognition as sr
 from openai import OpenAI
 from decouple import config
 import re
-# from transcribe import text_to_speech
+from transcribe import text_to_speech
 from gtts import gTTS
 
 client = OpenAI(
@@ -54,8 +54,8 @@ class Chronos:
         self.messages.append({"role": "assistant", "content": reply})
         return reply
 
-    # def make_response_speech(self, response):
-    #     text_to_speech(response, self.voice)
+    def make_response_speech(self, response):
+        text_to_speech(response, self.voice)
 
     def make_response_speech_without_azure(self, response):
         tts = gTTS(response, lang='es-es')

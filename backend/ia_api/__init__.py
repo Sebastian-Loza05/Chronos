@@ -73,8 +73,13 @@ def actualizarBd(response, user_id):
         block = BlockedDays.get_day_by_user(user_id, response["dia"])
         block.delete()
 
+def verificar_conflicto(horario, tarea):
+    pass
+
 # Instanciamiento de chronos
 chronos = Chronos("gpt-3.5-turbo", behavior)
+# chronos = Chronos("gpt-4-1106-preview", behavior)
+
 # ----------------------------------------------------------------
 @app.route("/voice/recomendations", methods=["POST"])
 @jwt_required()
@@ -104,8 +109,8 @@ def voice_recomendations():
         fecha = datetime.now()
         fecha = fecha.strftime('%Y-%m-%d')
         current_user = get_jwt_identity()
-        horario = Tasks.get_tasks_by_user_by_date(current_user["id"], fecha)
-        horario = [p.format_ia() for p in horario]
+        horario_objects = Tasks.get_tasks_by_user_by_date(current_user["id"], fecha)
+        horario = [p.format_ia() for p in horario_objects]
         bloqueados = BlockedDays.get_blocks_by_user(current_user["id"])
         bloqueados = [p.format_ia() for p in bloqueados]
         print(bloqueados)
@@ -117,13 +122,13 @@ def voice_recomendations():
             os.remove("../uploads/response.mp3")
 
         # ! Cambiar por la voz de chronos
-        # settings = Settings.get_by_user_id(current_user["id"])
-        # chronos.change_voice(settings.voice)
+        settings = Settings.get_by_user_id(current_user["id"])
+        chronos.change_voice(settings.voice)
 
         # ! Si quieren probar sin azure tts
-        chronos.make_response_speech_without_azure(response)
+        # chronos.make_response_speech_without_azure(response)
 
-        # chronos.make_response_speech(response)
+        chronos.make_response_speech(response)
         confirmation = chronos.parse_response(response)
         print(confirmation)
 

@@ -127,7 +127,7 @@ class Chronos:
             dia = match_block.group(5)
             return {
                 "accion": prex + "bloqueó",
-                "dia": dia
+                "fecha": dia
             }
 
         return None
@@ -200,6 +200,7 @@ Se agendó/eliminó/actualizó exitosamente la siguiente tarea:
 nombre: <nombre de la actividad>
 fecha: <fecha>
 hora: <hora_inicio> - <hora_final>
+Si la hora_inicio o la hora final es de este estilo 8:00 escríbela siempre con un 0 adelante, es decir 08:00.
 Si la acción es eliminar o actualizar muestra el id de la tarea arriba de nombre (id: <id de la actividad>).
 Tus respuestas deben ser cortas y precisas.
 Chronos, ten en cuenta que hoy estamos: """

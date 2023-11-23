@@ -1,14 +1,12 @@
 import React, {useState, useEffect, useRef} from "react";
-import {StyleSheet, Text, View, Image, TouchableOpacity, Platform} from "react-native";
+import {StyleSheet, Text, View, Image, TouchableOpacity, Platform, FlatList} from "react-native";
 import LottieView from 'lottie-react-native';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Voice from "../../../components/audio/voice";
-import { Video, ResizeMode } from 'expo-av';
 import voicesData from '../../../assets/audios/voces.json';
 import {changeVoice} from '../../api';
-import { FlatList } from 'react-native';
 import {access} from "@babel/core/lib/config/validation/option-assertions";
 
 
@@ -127,6 +125,8 @@ export default function Chronos() {
             <View style={styles.card}>
                 <RobotAnimation/>
             </View>
+            
+            <Voice />
 
             <TouchableOpacity style={styles.button} onPress={toggleVoicePanel}>
                 <Text style={styles.buttonText}> Personalizame!</Text>

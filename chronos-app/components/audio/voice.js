@@ -30,7 +30,7 @@ function MicrophoneAnimation() {
   );
 }
 
-export default function Voice({ setSuggestionsOpen }) {
+export default function Voice() {
   const [recording, setRecording] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [sound, setSound] = useState(null);
@@ -46,7 +46,6 @@ export default function Voice({ setSuggestionsOpen }) {
   }, [])
 
   const startRecording = async () => {
-    setSuggestionsOpen(false);
     try {
       if (sound === null) {
         console.log(sound);

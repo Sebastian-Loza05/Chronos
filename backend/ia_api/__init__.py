@@ -53,7 +53,7 @@ def verificar_conflicto(horario, bloqueados, tarea):
         inicio_tarea = h.hora_inicio.strftime('%H:%M:%S')
         final_tarea = h.hora_final.strftime('%H:%M:%S')
         if fecha_tarea == tarea["fecha"]:
-            if inicio_tarea <= inicio_formateado and final_tarea >= inicio_formateado:
+            if inicio_tarea <= inicio_formateado and final_tarea > inicio_formateado:
                 print(h)
                 return True
             elif inicio_tarea <= final_formateado and final_tarea >= final_formateado:
@@ -61,6 +61,7 @@ def verificar_conflicto(horario, bloqueados, tarea):
                 return True
             elif inicio_tarea >= inicio_formateado and final_tarea <= final_formateado:
                 print(h)
+                return True
     return False
 
 def actualizarBd(response, user_id, horario, bloqueados):
@@ -110,7 +111,7 @@ def actualizarBd(response, user_id, horario, bloqueados):
         block.insert()
         return True
     elif response["accion"] == "desbloqueó":
-        block = BlockedDays.get_day_by_user(user_id, response["dia"])
+        block = BlockedDays.get_day_by_user(user_id, response["fecha"])
         block.delete()
         return True
 

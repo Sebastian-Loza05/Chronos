@@ -1,0 +1,206 @@
+[
+  {
+    "Nombre": "Elena",
+    "Sexo": "Femenino",
+    "Acento": "Argentino",
+    "codigo": "es-AR-ElenaNeural"
+  },
+  {
+    "Nombre": "Tomas",
+    "Sexo": "Masculino",
+    "Acento": "Argentino",
+    "codigo": "es-AR-TomasNeural"
+  },
+  {
+    "Nombre": "Sofia",
+    "Sexo": "Femenino",
+    "Acento": "Boliviano",
+    "codigo": "es-BO-SofiaNeural"
+  },
+  {
+    "Nombre": "Marcelo",
+    "Sexo": "Masculino",
+    "Acento": "Boliviano",
+    "codigo": "es-AR-MarceloNeural"
+  },
+  {
+    "Nombre": "Catalina",
+    "Sexo": "Femenino",
+    "Acento": "Chileno",
+    "codigo": "es-CL-CatalinaNeural"
+  },
+  {
+    "Nombre": "Lorenzo",
+    "Sexo": "Masculino",
+    "Acento": "Chileno",
+    "codigo": "es-CL-LorenzoNeural"
+  },
+  {
+    "Nombre": "Salome",
+    "Sexo": "Femenino",
+    "Acento": "Colombiano",
+    "codigo": "es-CO-SalomeNeural"
+  },
+  {
+    "Nombre": "Gonzalo",
+    "Sexo": "Masculino",
+    "Acento": "Colombiano",
+    "codigo": "es-CO-GonzaloNeural"
+  },
+  {
+    "Nombre": "Maria",
+    "Sexo": "Femenino",
+    "Acento": "Costarricense",
+    "codigo": "es-CR-MariaNeural"
+  },
+  {
+    "Nombre": "Juan",
+    "Sexo": "Masculino",
+    "Acento": "Costarricense",
+    "codigo": "es-CR-JuanNeural"
+  },
+  {
+    "Nombre": "Belkys",
+    "Sexo": "Femenino",
+    "Acento": "Cubano",
+    "codigo": "es-CU-BelkysNeural"
+  },
+  {
+    "Nombre": "Manuel",
+    "Sexo": "Masculino",
+    "Acento": "Cubano",
+    "codigo": "es-CU-ManuelNeural"
+  },
+  {
+    "Nombre": "Andrea",
+    "Sexo": "Femenino",
+    "Acento": "Ecuatoriano",
+    "codigo": "es-EC-AndreaNeural"
+  },
+  {
+    "Nombre": "Luis",
+    "Sexo": "Masculino",
+    "Acento": "Ecuatoriano",
+    "codigo": "es-EC-LuisNeural"
+  },
+  {
+    "Nombre": "Elvira",
+    "Sexo": "Femenino",
+    "Acento": "Español-España",
+    "codigo": "es-ES-ElviraNeural"
+  },
+  {
+    "Nombre": "Abril",
+    "Sexo": "Femenino",
+    "Acento": "Español-España",
+    "codigo": "es-ES-AbrilNeural"
+  },
+  {
+    "Nombre": "Estrella",
+    "Sexo": "Femenino",
+    "Acento": "Español-España",
+    "codigo": "es-ES-EstrellaNeural"
+  },
+  {
+    "Nombre": "Alvaro",
+    "Sexo": "Masculino",
+    "Acento": "Español-España",
+    "codigo": "es-ES-AlvaroNeural"
+  },
+  {
+    "Nombre": "Arnau",
+    "Sexo": "Masculino",
+    "Acento": "Español-España",
+    "codigo": "es-ES-ArnauNeural"
+  },
+  {
+    "Nombre": "Dario",
+    "Sexo": "Masculino",
+    "Acento": "Español-España",
+    "codigo": "es-ES-DarioNeural"
+  },
+  {
+    "Nombre": "Dalia",
+    "Sexo": "Femenino",
+    "Acento": "Mexicano",
+    "codigo": "es-MX-DaliaNeural"
+  },
+  {
+    "Nombre": "Beatriz",
+    "Sexo": "Femenino",
+    "Acento": "Mexicano",
+    "codigo": "es-MX-BeatrizNeural"
+  },
+  {
+    "Nombre": "Jorge",
+    "Sexo": "Masculino",
+    "Acento": "Mexicano",
+    "codigo": "es-MX-JorgeNeural"
+  },
+  {
+    "Nombre": "Gerardo",
+    "Sexo": "Masculino",
+    "Acento": "Mexicano",
+    "codigo": "es-MX-GerardoNeural"
+  },
+  {
+    "Nombre": "Margarita",
+    "Sexo": "Femenino",
+    "Acento": "Panameño",
+    "codigo": "es-PA-MargaritaNeural"
+  },
+  {
+    "Nombre": "Roberto",
+    "Sexo": "Masculino",
+    "Acento": "Panameño",
+    "codigo": "es-PA-RobertoNeural"
+  },
+  {
+    "Nombre": "Camila",
+    "Sexo": "Femenino",
+    "Acento": "Peruano",
+    "codigo": "es-PE-CamilaNeural"
+  },
+  {
+    "Nombre": "Alex",
+    "Sexo": "Masculino",
+    "Acento": "Peruano",
+    "codigo": "es-PE-AlexNeural"
+  },
+  {
+    "Nombre": "Tania",
+    "Sexo": "Femenino",
+    "Acento": "Paraguayo",
+    "codigo": "es-PY-TaniaNeural"
+  },
+  {
+    "Nombre": "Mario",
+    "Sexo": "Masculino",
+    "Acento": "Paraguayo",
+    "codigo": "es-PY-MarioNeural"
+  },
+  {
+    "Nombre": "Valentina",
+    "Sexo": "Femenino",
+    "Acento": "Uruguayo",
+    "codigo": "es-UY-ValentinaNeural"
+  },
+  {
+    "Nombre": "Mateo",
+    "Sexo": "Masculino",
+    "Acento": "Uruguayo",
+    "codigo": "es-UY-MateoNeural"
+  },
+  {
+    "Nombre": "Paola",
+    "Sexo": "Femenino",
+    "Acento": "Venezolano",
+    "codigo": "es-VE-PaolaNeural"
+  },
+  {
+    "Nombre": "Sebastian",
+    "Sexo": "Masculino",
+    "Acento": "Venezolano",
+    "codigo": "es-VE-SebastianNeural"
+  }
+]

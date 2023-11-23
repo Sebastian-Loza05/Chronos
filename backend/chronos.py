@@ -88,55 +88,48 @@ class Chronos:
 
         return speech
 
-    def process_request(self, horario, speech):
+    def process_request(self, horario, bloqueados, speech):
         horario = '\n'.join(horario)
-        prompt = f"Horario:\n{horario}\nspeech: {speech}"
-        response = self.get_completion(prompt)
-        return response
+        bloqueados = '\n'.join(bloqueados)
+        prompt = f"Horario:\n{horario}Bloqueados:\n{bloqueados}\nPetición: {speech}"
+        chronos_response = self.get_completion(prompt)
+        return chronos_response
 
     def parse_response(self, response):
-        agendar  = r"""(.*)agendó exitosamente(.*)
-nombre: (.+)
-fecha: (.+)
-hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
+    
+        confirmation = r"""(.*)(agendó|actualizó|eliminó)((.*)id: (\d+))?(.*)nombre: (.+)\nfecha: (.+)\nhora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
+        block = r"""(.*)(bloqueó|desbloqueó)(.*)día(.*)(\d{2}/\d{2}/\d{2})(.*)"""
 
-        actualizar_eliminar = r"""(.*)(actualizó|eliminó) exitosamente(.*)
-id: (\d+)
-nombre: (.+)
-fecha: (.+)
-hora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
+        match_confirmation = re.search(confirmation, response, re.DOTALL)
+        match_block = re.search(block, response, re.DOTALL)
 
-        match_agendar = re.search(agendar, response, re.DOTALL)
-        match_actualizar_eliminar = re.search(actualizar_eliminar, response, re.DOTALL)
+        if match_confirmation:
+            accion = match_confirmation.group(2)
+            id = match_confirmation.group(5)
+            id_tarea = int(id) if id else None
+            nombre = match_confirmation.group(7)
+            fecha = match_confirmation.group(8)
+            hora_inicio = match_confirmation.group(9)
+            hora_final = match_confirmation.group(10)
 
-        id_tarea = None
-        if match_agendar:
-            accion = "agendó"
-            nombre = match_agendar.group(3)
-            fecha = match_agendar.group(4)
-            hora_inicio = match_agendar.group(5)
-            hora_final = match_agendar.group(6)
-        elif match_actualizar_eliminar:
-            accion = match_actualizar_eliminar.group(2)
-            id_tarea = int(match_actualizar_eliminar.group(4))
-            nombre = match_actualizar_eliminar.group(5)
-            fecha = match_actualizar_eliminar.group(6)
-            hora_inicio = match_actualizar_eliminar.group(7)
-            hora_final = match_actualizar_eliminar.group(8)
-        else:
-            return None
-        tarea_dict = {
-            "accion": accion,
-            "nombre": nombre,
-            "fecha": fecha,
-            "hora_inicio": hora_inicio,
-            "hora_final": hora_final
-        }
+            return {
+                "accion": accion,
+                "id": id_tarea,
+                "nombre": nombre,
+                "fecha": fecha,
+                "hora_inicio": hora_inicio,
+                "hora_final": hora_final                 
+            }
 
-        if accion != "agendó":
-            tarea_dict["id"] = id_tarea
-
-        return tarea_dict
+        if match_block:
+            accion = match_block.group(2)
+            dia = match_block.group(5)
+            return {
+                "accion": "bloqueó",
+                "dia": dia
+            }
+        
+        return None
 
 class User:
     def __init__(self, horario):
@@ -185,31 +178,28 @@ class User:
 # Chronos debe tener acceso a ciertos datos del usuario como su horario
 
 behavior = """
-Desde ahora vas a actuar como un sugeridor de horarios llamado 'Chronos'.
-Yo te voy a dar una petición y un horario (lista de actividades de la forma: '<id> <fecha> <hora>: <nombre de la actividad>').
-Tus respuestas deben ser cortas y precisas. 
-Debes reconocer lo que está queriendo pedir el usuarios, casos:
-- Añadir o agendar una o varias actividad
-	- Una actividad tiene nombre y rango de tiempo.
-	- Debp especificar ambos atributos sino DEBES preguntar por el dato faltante.
-- Eliminar una o varias actividades
+Desde ahora vas a actuar como un manipulador de horarios llamado 'Chronos'.
+En base a mi horario (lista de actividades: '<id> <fecha> <hora_inicio> - <hora_final>: <nombre de la actividad>') y dias bloqueados tengo una petición.
+Debes reconocer lo que estoy pidiendo, casos:
+- Añadir o agendar una actividad
+	- Debo especificar al menos un nombre y un rango de tiempo. Si no es asi preguntar por el dato faltante.
+- Eliminar una actividad
 	- Verificar si la actividad existe sino rechazar la petición.
-- Actualizar una o varias actividades
-	- Verificar si la actividad o actividades existen sino rechazar la petición.
-    - Si no te proporciona un dato de actualización de la tarea pedir más información.
+    - Si existe más de una actividad con el mismo nombre en ese día, elimina la que tenga id menor.
+- Actualizar una actividad
+	- Verificar si existe, sino rechazar la petición.
+    - Si doy un dato de actualización de tarea pedir más información.
 - Sugerencia sobre el horario de una actividad propuesta por mi.
-	- Debes preguntar si yo estoy de acuerdo con la sugerencia. Si lo está, agrega la tarea. 
+	- Debes preguntar si estoy de acuerdo con la sugerencia. Agrega la tarea si es asi. 
+- Bloquear o desbloquear un día
+    - Confirmar esta acción respondiendo: Se bloqueó/desbloqueó exitosamente el día <fecha>
+    - No puedo agendar/eliminar/actualizar actividades en los dias bloqueados. Estos deben desbloquarse antes.
 - Si no identificas ningún caso no aceptes la petición. 
-Una vez que comfirmes mi acción DEBES responder con el siguiente formato ejemplo, todo en minúscula:
+Una vez que comfirmes mi acción responde con el siguiente formato ejemplo (todo en minúscula):
 Se agendó/eliminó/actualizó exitosamente la siguiente tarea: 
 nombre: <nombre de la actividad>
 fecha: <fecha>
-hora: <hora>
-Utiliza siempre un solo salto de linea.
-SI Y SOLO SI la acción es eliminar o actualizar muestra el id de la tarea arriba de nombre (id: <id de la actividad>).
-Por favor sigue el formato al pie de la letra.
+hora: <hora_inicio> - <hora_final>
+Si la acción es eliminar o actualizar muestra el id de la tarea arriba de nombre (id: <id de la actividad>).
+Tus respuestas deben ser cortas y precisas. 
 Chronos, ten en cuenta que hoy estamos: """
-# Se agendó/eliminó/actualizó exitosamente la siguiente tarea:
-# Nombre: hacer ejercicio
-# Fecha: 10/11/2023
-# Hora: 15:00 - 16:00

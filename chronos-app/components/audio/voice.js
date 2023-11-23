@@ -103,10 +103,11 @@ export default function Voice({ setSuggestionsOpen }) {
     formData.append("audio", audio);
     formData.append("json", JSON.stringify(data));
 
-    const  speech = await sendAudio(formData);
-    if (speech?.msg){
-      router.replace("/auth/login")
+    const speech = await sendAudio(formData);
+    if (!speech instanceof Blob) {
+      console.log("Json");
     }
+
     if (Platform.OS === "android") {
       const fileReader = new FileReader();
       fileReader.readAsDataURL(speech);
@@ -155,12 +156,8 @@ export default function Voice({ setSuggestionsOpen }) {
     const checkStatusAudio = async () => {
       if(sound) {
         const status = await sound.getStatusAsync();
-        if (status.isPlaying){
-          console.log("Is playing");
-        } else {
-          console.log("Is not playing");
+        if (!status.isPlaying)
           setSound(null);
-        }
       }
     };
 

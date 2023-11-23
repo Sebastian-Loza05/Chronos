@@ -6,6 +6,11 @@ import * as Font from 'expo-font';
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Voice from "../../../components/audio/voice";
 import { Video, ResizeMode } from 'expo-av';
+import voicesData from '../../../assets/audios/voces.json';
+import {changeVoice} from '../../api';
+import { FlatList } from 'react-native';
+import {access} from "@babel/core/lib/config/validation/option-assertions";
+
 
 function RobotAnimation() {
     if (Platform.OS === 'ios') {
@@ -33,14 +38,13 @@ export default function Chronos() {
     const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
     const video = useRef(null);
     const [status, setStatus] = useState({});
+    const [voices, setVoices] = useState([]);
+    const [isVoicePanelOpen, setVoicePanelOpen] = useState(false);
 
-    const [suggestions, setSuggestions] = useState([
-        {
-            title: "Hacer ejercicio",
-            time: "10:00 AM - 11:00 AM",
-            date: "5 Nov 2023"
-        }
-    ]);
+    useEffect(() => {
+        // Aquí asumimos que voicesData es un array de voces
+        setVoices(voicesData);
+    }, []);
     async function loadFonts() {
         await Font.loadAsync({
             'Gabarito': require('../../../assets/fonts/Gabarito-VariableFont_wght.ttf'),
@@ -68,18 +72,6 @@ export default function Chronos() {
         //getNewSuggestionFromAI();
         setSuggestionsOpen(prevState => !prevState);
     };
-
-    // Aquí se puede obtener las sugerencias de la IA
-    function getNewSuggestionFromAI() {
-        const newSuggestion = {
-            title: "Leer un libro",
-            time: "8:00 PM - 9:00 PM",
-            date: "6 Nov 2023"
-        };
-
-        setSuggestions(prevSuggestions => [...prevSuggestions, newSuggestion]);
-    }
-
     function Suggestion({ suggestion, index, onPress }) {
         return (
             <TouchableOpacity style={styles.suggestionContainer} onPress={onPress}>
@@ -93,12 +85,40 @@ export default function Chronos() {
             </TouchableOpacity>
         );
     }
-    //
-
-    function handleSuggestionPress(suggestion) {
-        //navigation.navigate('CalendarDia', { suggestion: suggestion });
-        console.log('Suggestion pressed:', suggestion);
+    //voces
+    function VoiceOption({ voice, onPress }) {
+        return (
+            <TouchableOpacity
+                style={styles.voiceOption}
+                onPress={() => onPress(voice)}
+            >
+                <Text style={styles.voiceText}>{voice.Nombre} - {voice.Sexo} - {voice.Acento}</Text>
+            </TouchableOpacity>
+        );
     }
+    function handleVoiceSelection(voice) {
+        const formData = { codigo: voice.codigo };
+
+        changeVoice(formData)
+            .then(response => {
+                if (response.success) {
+                    console.log('Voz cambiada:', response.voz);
+                    toggleVoicePanel();
+                } else {
+                    alert('Error al cambiar la voz');
+                    toggleVoicePanel();
+                }
+            })
+            .catch(error => {
+                console.error('Error al cambiar la voz:', error);
+                alert('Error al cambiar la voz: ' + error.message);
+                toggleVoicePanel();
+            });
+    }
+    const toggleVoicePanel = () => {
+        setVoicePanelOpen(prevState => !prevState);
+    };
+
 
     return (
         <View style={styles.container}>
@@ -108,27 +128,27 @@ export default function Chronos() {
                 <RobotAnimation/>
             </View>
 
-            <Voice setSuggestionsOpen={setSuggestionsOpen} setSuggestions={setSuggestions}/>
-
-            <TouchableOpacity style={styles.button} onPress={toggleSuggestionsPanel}>
-                <Text style={styles.buttonText}>Sugerencias</Text>
+            <TouchableOpacity style={styles.button} onPress={toggleVoicePanel}>
+                <Text style={styles.buttonText}> Personalizame!</Text>
             </TouchableOpacity>
 
-            {isSuggestionsOpen && (
+            {isVoicePanelOpen && (
                 <TouchableOpacity
                     style={styles.fullScreenTouchable}
-                    onPress={toggleSuggestionsPanel}
+                    onPress={toggleVoicePanel}
                     activeOpacity={1}
                 >
-                    <View style={styles.suggestionsContainer}>
-                        {suggestions.map((suggestion, index) => (
-                            <Suggestion
-                                key={index}
-                                index={index}
-                                suggestion={suggestion}
-                                onPress={() => handleSuggestionPress(suggestion)}
-                            />
-                        ))}
+                    <View style={styles.voicesContainer}>
+                        <FlatList
+                            data={voices}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item, index }) => (
+                                <VoiceOption
+                                    voice={item}
+                                    onPress={handleVoiceSelection}
+                                />
+                            )}
+                        />
                     </View>
                 </TouchableOpacity>
             )}
@@ -229,7 +249,7 @@ const styles = StyleSheet.create({
         color: "#982C40",
         fontFamily:'Gabarito'
     },
-    suggestionContainer: {
+    voicesContainer: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#e0e0e0',
@@ -271,12 +291,13 @@ const styles = StyleSheet.create({
     },
     fullScreenTouchable: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        justifyContent: 'flex-end',
-        alignItems:'center'
+        top: '65%',
+        left: '11%',
+        width: '90%',
+        height: '40%',
+        alignItems:'center',
+        backgroundColor: '#f8c1c1',
+        borderRadius:20
 
     },
     suggestionsContainer: {
@@ -289,4 +310,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
+    voiceOption: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#982C40'
+    },
+    voiceText: {
+        fontSize: 16,
+        color: '#000000',
+        fontFamily:'Gabarito'
+    },
+
 });

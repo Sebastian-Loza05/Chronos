@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     JWTManager
 )
 from decouple import config
-from models import Users, Tasks, setup_db
+from models import Tasks, setup_db, BlockedDays
 from datetime import timedelta
 
 SECRET_KEY = config('SECRET_KEY')
@@ -32,8 +32,11 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 def get_tasks_params(type_search, begin_date, end_date, user):
     # En caso sólo se quieran las tareas de un día
     if type_search == 1:
-        tasks = Tasks.get_task_by_date(begin_date, user["id"])
-        return tasks
+        blocked_day = BlockedDays.get_day_by_user(user["id"], begin_date)
+        if blocked_day is None:
+            tasks = Tasks.get_task_by_date(begin_date, user["id"])
+            return tasks
+        return ["Blocked"]
     # En caso se quieran las tareas de un periodo de tiempo
     if end_date is None:
         return [-1]
@@ -114,7 +117,6 @@ def search():
 
         # llamamos a la función para obtener tasks
         tasks = get_tasks_params(type_search, begin_date, end_date, current_user)
-        # print("Tasks: ", tasks)
 
         if len(tasks) == 0:
             error_404 = True
@@ -123,11 +125,17 @@ def search():
         if tasks[0] == -1:
             error_422 = True
             abort(422)
+        elif tasks[0] == "Blocked":
+            return jsonify({
+                'success': True,
+                'blocked': True
+            })
 
         tasks = [task.format() for task in tasks]
 
         return jsonify({
             'success': True,
+            "blocked": False,
             'tasks': tasks
         })
 
@@ -221,6 +229,47 @@ def update_task(task_id):
             abort(406)
         elif error_404:
             abort(404)
+        else:
+            abort(500)
+
+@app.route("/task/blocked", methods=['POST'])
+@jwt_required()
+def create_blocked_day():
+    error_406 = False
+    error_422 = False
+    try:
+        data = request.get_json()
+        date = data.get("date", None)
+        current_user = get_jwt_identity()
+
+        if date is None:
+            error_422 = True
+            abort(422)
+
+        blocked_day = BlockedDays(
+            user_id=current_user["id"],
+            fecha=date
+        )
+
+        result = blocked_day.insert()
+
+        if result == -1:
+            error_406 = True
+            abort(406)
+
+        blocked_day = BlockedDays.get_day_by_user(current_user["id"], date)
+
+        return jsonify({
+            'success': True,
+            'blocked_day': blocked_day.format()
+        })
+
+    except Exception as e:
+        print(e)
+        if error_422:
+            abort(422)
+        elif error_406:
+            abort(406)
         else:
             abort(500)
 

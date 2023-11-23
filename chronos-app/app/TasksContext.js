@@ -6,6 +6,7 @@ export const TasksContext = createContext(null);
 
 export const TasksProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
+  const [blocked, setBlocked] = useState(false); 
 
   // Define la función de carga de tareas
   const loadTasks = useCallback(async (date) => {
@@ -17,6 +18,7 @@ export const TasksProvider = ({ children }) => {
       const response = await getTasksDate(formData);
       
       if (response && response.success) {
+        setBlocked(response.blocked);
         const tasksWithFormattedTime = response.tasks.map((task) => ({
           ...task,
           start_time: moment(task.start_time, 'HH:mm:ss').format('HH:mm'),
@@ -26,6 +28,7 @@ export const TasksProvider = ({ children }) => {
         tasksWithFormattedTime.sort((a, b) => moment(a.start_time, 'HH:mm').diff(moment(b.start_time, 'HH:mm')));
         setTasks(tasksWithFormattedTime);
       } else {
+        setBlocked(false);
         throw new Error('NO HAY TAREAS ESE DIA/Failed to load tasks');
       }
     } catch (error) {
@@ -40,7 +43,7 @@ export const TasksProvider = ({ children }) => {
   }, [loadTasks]);
 
   return (
-    <TasksContext.Provider value={{ tasks, setTasks, refreshTasks }}>
+    <TasksContext.Provider value={{ tasks, setTasks, refreshTasks, blocked, setBlocked }}>
       {children}
     </TasksContext.Provider>
   );

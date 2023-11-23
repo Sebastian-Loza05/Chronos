@@ -17,7 +17,6 @@ def text_to_speech(text, voice):
     result = speech_synthesizer.speak_text_async(text).get()
     # Checks result.
     if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-        print("Speech synthesized to speaker for text [{}]".format(text))
         with open("uploads/response.mp3", "wb") as file:
             file.write(result.audio_data)
     elif result.reason == speechsdk.ResultReason.Canceled:

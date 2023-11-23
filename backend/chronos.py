@@ -98,11 +98,10 @@ class Chronos:
     def parse_response(self, response):
 
         confirmation = r"""(.*)(agendó|actualizó|eliminó)((.*)id: (\d+))?(.*)nombre: (.+)\nfecha: (.+)\nhora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
-        block = r"""(.*)(bloqueó|desbloqueó)(.*)día(.*)(\d{2}/\d{2}/\d{2})(.*)"""
+        block = r"""(.*)(bloqueó|desbloqueó)(.*)día(.*)(\d{2}/\d{2}/\d{4})(.*)"""
 
         match_confirmation = re.search(confirmation, response, re.DOTALL)
         match_block = re.search(block, response, re.DOTALL)
-
         if match_confirmation:
             accion = match_confirmation.group(2)
             id = match_confirmation.group(5)
@@ -197,7 +196,8 @@ Debes reconocer lo que estoy pidiendo, casos:
     - No puedo agendar/eliminar/actualizar actividades en los dias bloqueados. Estos deben desbloquarse antes.
 - Si no identificas ningún caso no aceptes la petición. 
 - Antes de agendar o actualizar una actividad, verifica si hay conflictos de horario con la lista de actividades de mi horario que te pasé. Si hay conflictos, informa y no agendes la tarea.
-Una vez que comfirmes mi acción responde con el siguiente formato ejemplo (todo en minúscula) y no pongas algo extra o diferente a como muestra el formato y que siempre empiece 'Se agendó/eliminó/actualizó...' en una línea distinta a todo lo anterior:
+- Si el usuario quiere agendar una tarea en un dia bloqueado, indica al usuario que no se puede agendar por ese motivo, ten en cuenta que solo puede actualizar si es para cambiar el dia y si puede eliminar cualquier tarea de un dia bloqueado.
+Una vez que comfirmes mi acción, siempre empiece con 'Se agendó/eliminó/actualizó...' dependiendo el caso y siempre en la siguiente siguiendo este formato:
 Se agendó/eliminó/actualizó exitosamente la siguiente tarea: 
 nombre: <nombre de la actividad>
 fecha: <fecha>

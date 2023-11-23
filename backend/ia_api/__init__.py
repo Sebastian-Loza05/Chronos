@@ -16,7 +16,7 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 from decouple import config
-from models import Users, setup_db, Tasks, Settings
+from models import Users, setup_db, Tasks, Settings, BlockedDays
 from datetime import timedelta
 # from werkzeug.utils import secure_filename
 
@@ -63,6 +63,12 @@ def actualizarBd(response, user_id):
             user_id
         )
         tarea.delete()
+    elif response["accion"] == "bloqueó":
+        block = BlockedDays(
+            user_id=user_id,
+            fecha=response["dia"]
+        )
+        block.insert()
 
 
 # Instanciamiento de chronos
@@ -98,8 +104,9 @@ def voice_recomendations():
         current_user = get_jwt_identity()
         horario = Tasks.get_tasks_by_user_by_date(current_user["id"], fecha)
         horario = [p.format_ia() for p in horario]
-        bloqueados = []
-
+        bloqueados = BlockedDays.get_blocks_by_user(current_user["id"])
+        bloqueados = [p.format_ia() for p in bloqueados]
+        print(bloqueados)
         print(horario)
         speech = chronos.listen_to(output_file)
         response = chronos.process_request(horario, bloqueados, speech)
@@ -131,6 +138,10 @@ def voice_recomendations():
         return response
 
     except Exception as e:
+        if os.path.exists("../uploads/response.mp3"):
+            os.remove("../uploads/response.mp3")
+        if os.path.exists("../uploads/audio.wav"):
+            os.remove("../uploads/audio.wav")
         print(e)
         if error_406:
             abort(406)

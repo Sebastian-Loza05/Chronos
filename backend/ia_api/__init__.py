@@ -40,12 +40,8 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 
 def verificar_conflicto(horario, tarea):
-    print("response: ", tarea)
-    print("horarios: ")
-    fecha_obj = datetime.strptime(tarea["fecha"], '%d/%m/%Y')
     inicio_obj = datetime.strptime(tarea["hora_inicio"], '%H:%M')
     final_obj = datetime.strptime(tarea["hora_final"], '%H:%M')
-    fecha_formateada = fecha_obj.strftime('%Y-%m-%d')
     inicio_formateado = inicio_obj.strftime('%H:%M:%S')
     final_formateado = final_obj.strftime('%H:%M:%S')
     for h in horario:
@@ -53,7 +49,7 @@ def verificar_conflicto(horario, tarea):
         fecha_tarea = h.fecha.strftime('%Y-%m-%d')
         inicio_tarea = h.hora_inicio.strftime('%H:%M:%S')
         final_tarea = h.hora_final.strftime('%H:%M:%S')
-        if fecha_tarea == fecha_formateada:
+        if fecha_tarea == tarea["fecha"]:
             if inicio_tarea <= inicio_formateado and final_tarea >= inicio_formateado:
                 print(h)
                 return True
@@ -65,6 +61,9 @@ def verificar_conflicto(horario, tarea):
     return False
 
 def actualizarBd(response, user_id, horario):
+    print("response: ", response)
+    fecha_obj = datetime.strptime(response["fecha"], '%d/%m/%Y')
+    response["fecha"] = fecha_obj.strftime('%Y-%m-%d')
     if response["accion"] == "agendó":
         conflicto = verificar_conflicto(horario, response)
         if conflicto:

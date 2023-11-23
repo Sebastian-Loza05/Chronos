@@ -32,7 +32,7 @@ class Chronos:
         chat = client.chat.completions.create(
             model=self.model,
             messages=self.messages,
-            temperature=1,
+            temperature=0.5,
             max_tokens=256,
         )
 
@@ -96,7 +96,7 @@ class Chronos:
         return chronos_response
 
     def parse_response(self, response):
-    
+
         confirmation = r"""(.*)(agendó|actualizó|eliminó)((.*)id: (\d+))?(.*)nombre: (.+)\nfecha: (.+)\nhora: (\d{2}:\d{2}) - (\d{2}:\d{2})(.*)"""
         block = r"""(.*)(bloqueó|desbloqueó)(.*)día(.*)(\d{2}/\d{2}/\d{2})(.*)"""
 
@@ -118,7 +118,7 @@ class Chronos:
                 "nombre": nombre,
                 "fecha": fecha,
                 "hora_inicio": hora_inicio,
-                "hora_final": hora_final                 
+                "hora_final": hora_final
             }
 
         if match_block:
@@ -128,7 +128,7 @@ class Chronos:
                 "accion": "bloqueó",
                 "dia": dia
             }
-        
+
         return None
 
 class User:
@@ -189,17 +189,19 @@ Debes reconocer lo que estoy pidiendo, casos:
 - Actualizar una actividad
 	- Verificar si existe, sino rechazar la petición.
     - Si doy un dato de actualización de tarea pedir más información.
+    - Antes de actualizar la actividad, verifica si hay conflictos de horario con las tareas existentes. Si hay conflictos, informa y no actualices la tarea.
 - Sugerencia sobre el horario de una actividad propuesta por mi.
 	- Debes preguntar si estoy de acuerdo con la sugerencia. Agrega la tarea si es asi. 
 - Bloquear o desbloquear un día
     - Confirmar esta acción respondiendo: Se bloqueó/desbloqueó exitosamente el día <fecha>
     - No puedo agendar/eliminar/actualizar actividades en los dias bloqueados. Estos deben desbloquarse antes.
 - Si no identificas ningún caso no aceptes la petición. 
-Una vez que comfirmes mi acción responde con el siguiente formato ejemplo (todo en minúscula):
+- Antes de agendar o actualizar una actividad, verifica si hay conflictos de horario con la lista de actividades de mi horario que te pasé. Si hay conflictos, informa y no agendes la tarea.
+Una vez que comfirmes mi acción responde con el siguiente formato ejemplo (todo en minúscula) y no pongas algo extra o diferente a como muestra el formato y que siempre empiece 'Se agendó/eliminó/actualizó...' en una línea distinta a todo lo anterior:
 Se agendó/eliminó/actualizó exitosamente la siguiente tarea: 
 nombre: <nombre de la actividad>
 fecha: <fecha>
 hora: <hora_inicio> - <hora_final>
 Si la acción es eliminar o actualizar muestra el id de la tarea arriba de nombre (id: <id de la actividad>).
-Tus respuestas deben ser cortas y precisas. 
+Tus respuestas deben ser cortas y precisas.
 Chronos, ten en cuenta que hoy estamos: """

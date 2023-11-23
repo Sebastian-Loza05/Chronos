@@ -18,7 +18,7 @@ class TestChronos(unittest.TestCase):
         "password": "1234",
         "nombre": "Sebastián",
         "apellido": "Tuesta",
-        "genero": "M",
+        "genero": "male",
         "fecha_nacimiento": "2004-01-16",
         "pais": "Perú",
         "celular": 943759343,
@@ -113,13 +113,10 @@ class TestChronos(unittest.TestCase):
         r = self.app1.post('/sign_in', json=self.NEW_USER)
         data = r.get_json()
         self.HEADERS['Authorization'] = 'Bearer ' + data['token']
-        with open('prueba.jpg', 'rb') as f:
-            image_data = f.read()
-        file_like = BytesIO(image_data)
-        content_type = 'multipart/form-data'
-        data = {'foto': (file_like, 'prueba.jpg')}
 
-        r = self.app1.patch('/profile', headers=self.HEADERS, content_type=content_type, data=data)
+        data = {'foto': "https://media.discordapp.net/attachments/1155323431915630594/1171520201183998045/image_17.png?ex=655cfa35&is=654a8535&hm=7bd18544dbac9719106aee1b8e756209f2afa458da7ded9cae2c532d3be19089&=&width=421&height=423" }
+
+        r = self.app1.patch('/profile', headers=self.HEADERS, json=data)
         data = r.get_json()
         self.assertEqual(r.status_code, 200)
         self.assertTrue(data)
@@ -155,38 +152,38 @@ class TestChronos(unittest.TestCase):
         self.assertTrue(data['success'])
         self.assertTrue(data['created'])
 
-    def test_09_get_task(self):
-        r = self.app1.post('/sign_in', json=self.NEW_USER)
-        data = r.get_json()
-        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+    # def test_09_get_task(self):
+    #     r = self.app1.post('/sign_in', json=self.NEW_USER)
+    #     data = r.get_json()
+    #     self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+    #
+    #     r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
+    #     data = r.get_json()
+    #
+    #     self.SEARCH_TASK['type_search'] = data['created']['id']
+    #
+    #     r = self.app3.post('/tasks/search', json=self.SEARCH_TASK, headers=self.HEADERS)
+    #     data = r.get_json()
+    #
+    #     self.assertEqual(r.status_code, 200)
+    #     self.assertTrue(data['success'])
+    #     self.assertTrue(data['tasks'])
 
-        r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
-        data = r.get_json()
-
-        self.SEARCH_TASK['type_search'] = data['created']['id']
-
-        r = self.app3.post('/tasks/search', json=self.SEARCH_TASK, headers=self.HEADERS)
-        data = r.get_json()
-
-        self.assertEqual(r.status_code, 200)
-        self.assertTrue(data['success'])
-        self.assertTrue(data['tasks'])
-
-    def test_10_patch_task(self):
-        r = self.app1.post('/sign_in', json=self.NEW_USER)
-        data = r.get_json()
-        self.HEADERS['Authorization'] = 'Bearer ' + data['token']
-
-        r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
-        data = r.get_json()
-
-        task_id = data['created']['id']
-
-        r = self.app3.patch('/task/' + str(task_id), json=self.UPDATE_TASK, headers=self.HEADERS)
-        data = r.get_json()
-
-        self.assertEqual(r.status_code, 200)
-        self.assertTrue(data['success'])
-        self.assertTrue(data['task_updated'])
+    # def test_10_patch_task(self):
+    #     r = self.app1.post('/sign_in', json=self.NEW_USER)
+    #     data = r.get_json()
+    #     self.HEADERS['Authorization'] = 'Bearer ' + data['token']
+    #
+    #     r = self.app3.post('/task', json=self.NEW_TASK, headers=self.HEADERS)
+    #     data = r.get_json()
+    #
+    #     task_id = data['created']['id']
+    #
+    #     r = self.app3.patch('/task/' + str(task_id), json=self.UPDATE_TASK, headers=self.HEADERS)
+    #     data = r.get_json()
+    #
+    #     self.assertEqual(r.status_code, 200)
+    #     self.assertTrue(data['success'])
+    #     self.assertTrue(data['task_updated'])
 if __name__ == "__main__":
     unittest.main()

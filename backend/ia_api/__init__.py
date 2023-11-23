@@ -69,7 +69,9 @@ def actualizarBd(response, user_id):
             fecha=response["dia"]
         )
         block.insert()
-
+    elif response["accion"] == "desbloqueó":
+        block = BlockedDays.get_day_by_user(user_id, response["dia"])
+        block.delete()
 
 # Instanciamiento de chronos
 chronos = Chronos("gpt-3.5-turbo", behavior)

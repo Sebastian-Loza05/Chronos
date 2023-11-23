@@ -98,10 +98,11 @@ def voice_recomendations():
         current_user = get_jwt_identity()
         horario = Tasks.get_tasks_by_user_by_date(current_user["id"], fecha)
         horario = [p.format_ia() for p in horario]
+        bloqueados = []
 
         print(horario)
         speech = chronos.listen_to(output_file)
-        response = chronos.process_request(horario, speech)
+        response = chronos.process_request(horario, bloqueados, speech)
 
         if os.path.exists("../uploads/response.mp3"):
             os.remove("../uploads/response.mp3")

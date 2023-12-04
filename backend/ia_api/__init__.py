@@ -39,13 +39,16 @@ setup_db(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 
-def verificar_conflicto(horario, tarea):
+def verificar_conflicto(horario, bloqueados, tarea):
     inicio_obj = datetime.strptime(tarea["hora_inicio"], '%H:%M')
     final_obj = datetime.strptime(tarea["hora_final"], '%H:%M')
     inicio_formateado = inicio_obj.strftime('%H:%M:%S')
     final_formateado = final_obj.strftime('%H:%M:%S')
+    for h in bloqueados:
+        fecha_block = h.fecha.strftime('%Y-%m-%d')
+        if tarea["fecha"] == fecha_block:
+            return True
     for h in horario:
-        print(h.fecha)
         fecha_tarea = h.fecha.strftime('%Y-%m-%d')
         inicio_tarea = h.hora_inicio.strftime('%H:%M:%S')
         final_tarea = h.hora_final.strftime('%H:%M:%S')
@@ -53,7 +56,7 @@ def verificar_conflicto(horario, tarea):
             if inicio_tarea <= inicio_formateado and final_tarea > inicio_formateado:
                 print(h)
                 return True
-            elif inicio_tarea <= final_formateado and final_tarea >= final_formateado:
+            elif inicio_tarea < final_formateado and final_tarea >= final_formateado:
                 print(h)
                 return True
             elif inicio_tarea >= inicio_formateado and final_tarea <= final_formateado:
@@ -61,12 +64,12 @@ def verificar_conflicto(horario, tarea):
                 return True
     return False
 
-def actualizarBd(response, user_id, horario):
-    print("response:", response)
+def actualizarBd(response, user_id, horario, bloqueados):
+    print("response: ", response)
     fecha_obj = datetime.strptime(response["fecha"], '%d/%m/%Y')
     response["fecha"] = fecha_obj.strftime('%Y-%m-%d')
     if response["accion"] == "agendó":
-        conflicto = verificar_conflicto(horario, response)
+        conflicto = verificar_conflicto(horario, bloqueados, response)
         if conflicto:
             return False
         new_task = Tasks(
@@ -79,7 +82,7 @@ def actualizarBd(response, user_id, horario):
         new_task.insert()
         return True
     elif response["accion"] == "actualizó":
-        conflicto = verificar_conflicto(horario, response)
+        conflicto = verificar_conflicto(horario, bloqueados, response)
         if conflicto:
             return False
         id = response["id"]
@@ -146,8 +149,8 @@ def voice_recomendations():
         current_user = get_jwt_identity()
         horario_objects = Tasks.get_tasks_by_user_by_date(current_user["id"], fecha)
         horario = [p.format_ia() for p in horario_objects]
-        bloqueados = BlockedDays.get_blocks_by_user(current_user["id"])
-        bloqueados = [p.format_ia() for p in bloqueados]
+        bloqueados_object = BlockedDays.get_blocks_by_user(current_user["id"])
+        bloqueados = [p.format_ia() for p in bloqueados_object]
         print(bloqueados)
         print(horario)
         speech = chronos.listen_to(output_file)
@@ -164,15 +167,22 @@ def voice_recomendations():
         # chronos.make_response_speech_without_azure(response)
 
         chronos.make_response_speech(response)
+
         confirmation = chronos.parse_response(response)
-        print(confirmation)
+        # print(confirmation)
 
         if confirmation is not None:
-            success = actualizarBd(confirmation, current_user["id"], horario_objects)
+            success = actualizarBd(
+                confirmation,
+                current_user["id"],
+                horario_objects,
+                bloqueados_object
+            )
             if not success:
                 response = "No se pudo realizar la acción, hay un conflicto con el horario"
 
         chronos.make_response_speech(response)
+        # chronos.make_response_speech_without_azure(response)
         print(response)
         os.remove(output_file)
         response = send_file(
